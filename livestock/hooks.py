@@ -126,7 +126,45 @@ app_license = "MIT"
 
 # Testing
 # -------
+fixtures = [
+    
+    'Project Type',
+	'strain',
+	{
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "name",
+                "in",
+                (
+                    "Project-column_break_25",                    
+                    "Project-hatchery_details",
+                    "Project-strain",
+                    "Project-supplier",
+                    "Project-receiving_date",
+                    "Project-setting_date",
+                    "Project-setter_no",
+					"Project-number_received",
+					"Project-number_set",
+					"Project-cull_eggs",
+					"Project-eggs_wt_gm",
+					"Project-date_of_hatching",
+					"Project-fertile_eggs",
+					"Project-infertile_eggs",
+					"Project-chicks_transfer_date",
+					"Project-number_hatched",
+					"Project-chicks_transferred",
+					"Project-culls_no",
+					"Project-shed_no",
+					"Project-spoiled_fertility",
+					"Project-av_chicks_wt",
+                    
+                ),
+            ]
+        ],
+    },
 
+]
 # before_tests = "livestock.install.before_tests"
 
 # Overriding Methods

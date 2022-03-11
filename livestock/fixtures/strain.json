@@ -1,0 +1,22 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "strain",
+  "modified": "2022-03-11 13:27:29.608801",
+  "name": "cobb",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "strain": "cobb"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "strain",
+  "modified": "2022-03-11 13:28:55.637290",
+  "name": "ross",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "strain": "ross"
+ }
+]

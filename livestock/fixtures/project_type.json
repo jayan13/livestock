@@ -1,0 +1,46 @@
+[
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2021-11-14 10:34:06.033681",
+  "name": "Internal",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "Internal"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2021-11-14 10:34:06.045990",
+  "name": "External",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "External"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2021-11-14 10:34:06.053420",
+  "name": "Other",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "Other"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2022-03-10 13:30:13.867328",
+  "name": "Hatchery",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": " Hatchery"
+ }
+]
