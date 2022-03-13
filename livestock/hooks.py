@@ -158,11 +158,14 @@ fixtures = [
 					"Project-shed_no",
 					"Project-spoiled_fertility",
 					"Project-av_chicks_wt",
+					"Project-items",
+					"Project-section_break_35",
                     
                 ),
             ]
         ],
     },
+	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form", )] ] },
 
 ]
 # before_tests = "livestock.install.before_tests"

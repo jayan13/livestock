@@ -1,0 +1,15 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Project",
+  "enabled": 1,
+  "modified": "2022-03-13 13:53:08.674850",
+  "name": "Project-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on(\"Poultry Items\", \n    { \n        item_code: function(frm, cdt, cdn) \n            { \n\t\tvar d = locals[cdt][cdn];\n                \n                frappe.call(\n                    { \n                        method: \"frappe.client.get_value\",\n                        args: { \n                            doctype: \"Item Price\", \n                            filters: {\n                                item_code: d.item_code\n                            },\n                            fieldname:[\"price_list_rate\",\"uom\"]\n                        },\n                        callback: function(r) \n                            { \n                                if(r.message) \n                                    { \n                                        var item_price = r.message; \n\t\t\t\t\t                    if(item_price.price_list_rate){\n\t\t\t\t                    \td.rate=item_price.price_list_rate;\n\t\t\t\t                    \td.uom=item_price.uom;\n\t\t\t\t                    \td.qty=1;\n                                        frm.refresh_fields()\n\t\t\t\t\t                    }\n                                    } \n                            }\n                    });   \n            } \n    }\n);",
+  "view": "Form"
+ }
+]
