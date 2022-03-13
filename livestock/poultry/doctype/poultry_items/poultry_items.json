@@ -50,16 +50,15 @@
   },
   {
    "fieldname": "project",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Project",
-   "options": "Project",
-   "search_index": 1
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-13 11:29:25.575123",
+ "modified": "2022-03-13 14:51:04.385614",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Poultry Items",
