@@ -161,6 +161,7 @@ fixtures = [
 					"Project-items",
 					"Project-section_break_35",
 					"Project-create_stock_entry",
+					"Stock Entry-manufacturing_type",
                     
                 ),
             ]
