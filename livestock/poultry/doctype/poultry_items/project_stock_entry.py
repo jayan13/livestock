@@ -87,3 +87,11 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
 
 def add_stock_entry(item,project):
     frappe.msgprint(""" Item code  {0} """.format(item.item_code))
+
+@frappe.whitelist()
+def update_project_item_stat(doc,event):
+    if doc.project:
+        udoc = frappe.get_doc('Project', doc.project)
+        if doc.manufacturing_type == "Day Old Chicken":
+            udoc.item_processed = 1
+            udoc.save()

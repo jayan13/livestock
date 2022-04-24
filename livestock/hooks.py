@@ -102,7 +102,11 @@ app_license = "MIT"
 # 		"on_trash": "method"
 #	}
 # }
-
+doc_events = {
+    "Stock Entry": {
+        "on_submit": "livestock.poultry.doctype.poultry_items.project_stock_entry.update_project_item_stat",
+    }
+}
 # Scheduled Tasks
 # ---------------
 
@@ -161,6 +165,7 @@ fixtures = [
 					"Project-items",
 					"Project-section_break_35",
 					"Project-create_stock_entry",
+					"Project-item_processed",
 					"Stock Entry-manufacturing_type",
                     
                 ),
