@@ -17,6 +17,9 @@ def stock_entry(project):
     udoc = frappe.get_doc('Project', project)
     #items=[]
     #frappe.msgprint(""" projects  {0} """.format(udoc.project_name))
+    if sett.scrap_item=="" or sett.product =="" or sett.base_row_material=="":
+        frappe.throw(_("Please update hatchery settings Base Row Material, Product, Scrap "))
+
     stock_entry = frappe.new_doc("Stock Entry")    
     stock_entry.company = udoc.company
     stock_entry.purpose = "Manufacture"
