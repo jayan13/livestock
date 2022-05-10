@@ -12,13 +12,13 @@ from erpnext.stock.get_item_details import (
 @frappe.whitelist()
 def stock_entry(project):
 
-    from erpnext.stock.doctype.item.item import get_item_defaults
-    sett = frappe.get_doc('Hatchery Settings')
+    from erpnext.stock.doctype.item.item import get_item_defaults    
     udoc = frappe.get_doc('Project', project)
+    sett = frappe.get_doc('Hatchery Settings',udoc.company)
     #items=[]
     #frappe.msgprint(""" projects  {0} """.format(udoc.project_name))
-    if sett.scrap_item=="" or sett.product =="" or sett.base_row_material=="":
-        frappe.throw(_("Please update hatchery settings Base Row Material, Product, Scrap "))
+    if not sett:
+        frappe.throw(_("Please add hatchery settings for {0} ").format(udoc.company))
 
     stock_entry = frappe.new_doc("Stock Entry")    
     stock_entry.company = udoc.company
@@ -30,6 +30,41 @@ def stock_entry(project):
     base_row_rate=0
     total_add_cost=0
 
+    if sett.base_row_material:
+        base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')        
+        item_account_details = get_item_defaults(sett.base_row_material, udoc.company)
+        stock_uom = item_account_details.stock_uom
+        conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
+        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+        expense_account=item_account_details.get("expense_account")
+        
+        if sett.row_material_target_warehouse:
+            validate_stock_qty(sett.base_row_material,udoc.number_received,sett.row_material_target_warehouse,stock_uom,stock_uom)
+
+        precision = cint(frappe.db.get_default("float_precision")) or 3    
+        amount=flt(flt(udoc.number_received) * flt(base_row_rate), precision)
+        stock_entry.append('items', {
+                        's_warehouse': sett.row_material_target_warehouse,
+                        'item_code': sett.base_row_material,
+                        'qty': udoc.number_received,
+                        'actual_qty':udoc.number_received,
+                        'uom': stock_uom,
+                        'cost_center':cost_center,					
+                        'ste_detail': item_account_details.name,
+                        'stock_uom': stock_uom,
+                        'expense_account':expense_account,
+                        'valuation_rate': base_row_rate,
+                        "basic_rate":base_row_rate, 	
+                        "basic_amount":amount,  
+                        "amount":amount,  
+                        "transfer_qty":udoc.number_received,
+                        'conversion_factor': flt(conversion_factor),
+                                  
+        })
+    else:
+        frappe.throw(_("Please set base Rowmaterial in hatchery settings for {0} ").format(udoc.company))
+    
+
     if udoc.items:
         for item in udoc.items:
             if item.s_warehouse or item.t_warehouse:
@@ -37,13 +72,11 @@ def stock_entry(project):
                 #stock_uom = frappe.db.get_value("Item", item.item_code, "stock_uom")
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
-                cost_center=udoc.cost_center or item_account_details.get("buying_cost_center")
+                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
                 expense_account=item_account_details.get("expense_account")                
                 
                 if item.s_warehouse:
-                    validate_stock_qty(item.item_code,item.qty,item.s_warehouse,item.uom,stock_uom)
-                if sett.base_row_material == item.item_code:
-                    base_row_rate=item.rate
+                    validate_stock_qty(item.item_code,item.qty,item.s_warehouse,item.uom,stock_uom)                
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(flt(item.qty) * flt(item.rate), precision)
@@ -74,15 +107,16 @@ def stock_entry(project):
     tot_scrap= udoc.number_received - udoc.chicks_transferred
     
     if tot_scrap:
-        item_account_details = get_item_defaults(sett.scrap_item, udoc.company)
+        item_account_details = get_item_defaults(sett.scrap, udoc.company)
         stock_uom = item_account_details.stock_uom
-        conversion_factor = get_conversion_factor(sett.scrap_item, stock_uom).get("conversion_factor")
-        cost_center=udoc.cost_center or item_account_details.get("buying_cost_center")
+        conversion_factor = get_conversion_factor(sett.scrap, stock_uom).get("conversion_factor")
+        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3    
         amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
         stock_entry.append('items', {
-                        'item_code': sett.scrap_item,
+                        't_warehouse': sett.scrap_target_warehouse,
+                        'item_code': sett.scrap,
                         'qty': tot_scrap,
                         'actual_qty':tot_scrap,
                         'uom': stock_uom,
@@ -96,7 +130,7 @@ def stock_entry(project):
                         "amount":amount,  
                         "transfer_qty":tot_scrap,
                         'conversion_factor': flt(conversion_factor),
-                        'is_process_loss':1,                    
+                        'is_scrap_item':1,                    
         })
         
     if udoc.chicks_transferred:
@@ -104,12 +138,13 @@ def stock_entry(project):
         item_account_details = get_item_defaults(sett.product, udoc.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.product, stock_uom).get("conversion_factor")
-        cost_center=udoc.cost_center or item_account_details.get("buying_cost_center")
+        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3
         cost=((udoc.chicks_transferred*base_row_rate) + total_add_cost) / udoc.chicks_transferred
         amount=flt(flt(udoc.chicks_transferred) * flt(cost), precision)
         stock_entry.append('items', {
+                        't_warehouse': sett.product_target_warehouse,
                         'item_code': sett.product,
                         'qty': udoc.chicks_transferred,
                         'actual_qty':udoc.chicks_transferred,
@@ -124,7 +159,7 @@ def stock_entry(project):
                         "amount":amount,  
                         "transfer_qty":udoc.chicks_transferred,
                         'conversion_factor': flt(conversion_factor),
-                        'is_finished_item':1,                  
+                        'is_finished_item':1,               
         })
     
     return stock_entry.as_dict()

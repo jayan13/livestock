@@ -1,21 +1,34 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-05-06 13:07:29.974519",
+ "autoname": "field:company",
+ "creation": "2022-05-10 19:10:32.976406",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
+  "cost_center",
   "base_row_material",
+  "row_material_target_warehouse",
   "product",
-  "scrap_item"
+  "product_target_warehouse",
+  "scrap",
+  "scrap_target_warehouse"
  ],
  "fields": [
   {
-   "fieldname": "product",
+   "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Product",
-   "options": "Item"
+   "label": "Company",
+   "options": "Company",
+   "unique": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
   },
   {
    "fieldname": "base_row_material",
@@ -24,16 +37,39 @@
    "options": "Item"
   },
   {
-   "fieldname": "scrap_item",
+   "fieldname": "row_material_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Row Material Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Item"
+  },
+  {
+   "fieldname": "product_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Product Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "scrap",
    "fieldtype": "Link",
    "label": "Scrap",
    "options": "Item"
+  },
+  {
+   "fieldname": "scrap_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Target Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
- "issingle": 1,
  "links": [],
- "modified": "2022-05-06 17:33:26.287703",
+ "modified": "2022-05-10 19:15:30.508322",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "Hatchery Settings",
@@ -43,8 +79,10 @@
    "create": 1,
    "delete": 1,
    "email": 1,
+   "export": 1,
    "print": 1,
    "read": 1,
+   "report": 1,
    "role": "System Manager",
    "share": 1,
    "write": 1
