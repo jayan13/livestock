@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "OWN.####",
+ "creation": "2022-05-18 11:50:39.638919",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "company",
+  "brand",
+  "warehouse",
+  "item",
+  "number_of_chicken",
+  "column_break_6",
+  "mortality_in_numbers",
+  "chicken_net_of_mortality",
+  "total_live_weight_in_kg",
+  "avg_live_weight_per_cheicken",
+  "project",
+  "section_break_11",
+  "create_stock_entry",
+  "finished_items",
+  "item_processed"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "number_of_chicken",
+   "fieldtype": "Data",
+   "label": "Number Of Chicken"
+  },
+  {
+   "fieldname": "mortality_in_numbers",
+   "fieldtype": "Data",
+   "label": "Mortality in Numbers"
+  },
+  {
+   "fieldname": "chicken_net_of_mortality",
+   "fieldtype": "Data",
+   "label": "Chicken net of mortality"
+  },
+  {
+   "fieldname": "total_live_weight_in_kg",
+   "fieldtype": "Data",
+   "label": "Total Live Weight in KG"
+  },
+  {
+   "fieldname": "avg_live_weight_per_cheicken",
+   "fieldtype": "Data",
+   "label": "Avg live weight per cheicken",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finished_items",
+   "fieldtype": "Table",
+   "label": "Finished Items",
+   "options": "Own Packing List"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.item_processed!=1",
+   "fieldname": "create_stock_entry",
+   "fieldtype": "Button",
+   "label": "Create Stock Entry"
+  },
+  {
+   "fieldname": "brand",
+   "fieldtype": "Link",
+   "label": "Brand Name",
+   "options": "Chicken Brand"
+  },
+  {
+   "fieldname": "item_processed",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Item Processed"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-21 14:31:08.722911",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Chicken Own Packing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

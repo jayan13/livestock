@@ -14,7 +14,7 @@ def stock_entry(project):
 
     from erpnext.stock.doctype.item.item import get_item_defaults    
     udoc = frappe.get_doc('Project', project)
-    sett = frappe.get_doc('Hatchery Settings',udoc.company)
+    sett = frappe.get_doc('Hatchery',udoc.hatchery)
     #items=[]
     #frappe.msgprint(""" projects  {0} """.format(udoc.project_name))
     if not sett:
@@ -186,3 +186,28 @@ def update_project_item_stat(doc,event):
         if doc.manufacturing_type == "Day Old Chicken":
             udoc.item_processed = 1
             udoc.save()
+
+@frappe.whitelist()
+def project_item_tranfer_margin(project):
+    amount=0    
+    pjt=frappe.get_doc('Project',project) 
+    account = frappe.db.get_value('Hatchery', pjt.hatchery, 'account')
+    accu=frappe.db.get_list("Stock Entry",filters={'Project': project,'stock_entry_type':"Material Transfer","docstatus":'1'},fields=['name'])
+    
+    for ac in accu:
+        
+        acc=frappe.get_doc('Stock Entry',ac.name)        
+        exp_amt=0
+        base_amount=0
+        is_add_cost=0        
+        for cost in acc.additional_costs:
+            if cost.expense_account==account:
+                exp_amt+=cost.amount
+                is_add_cost=1
+        if is_add_cost==1:
+            for item in acc.items:
+                base_amount+=item.basic_amount
+
+        amount+=exp_amt+base_amount
+        
+    return amount

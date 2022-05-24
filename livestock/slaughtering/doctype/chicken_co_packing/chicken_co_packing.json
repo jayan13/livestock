@@ -1,0 +1,130 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CO.####",
+ "creation": "2022-05-18 12:19:19.652215",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "customer",
+  "pos_profile",
+  "no_of_chicken_taken_in",
+  "mortality_in_numbers",
+  "column_break_6",
+  "chicken_net_of_mortality",
+  "no_of_chicken_taken_out",
+  "stored_in_freezer",
+  "total_live_weight_in_kg",
+  "avg_live_weight_per_cheicken",
+  "section_break_13",
+  "create_sales_invoice",
+  "finished_items",
+  "item_processed"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer Name",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "no_of_chicken_taken_in",
+   "fieldtype": "Data",
+   "label": "No of chicken taken in"
+  },
+  {
+   "fieldname": "mortality_in_numbers",
+   "fieldtype": "Data",
+   "label": "Mortality in Numbers"
+  },
+  {
+   "fieldname": "chicken_net_of_mortality",
+   "fieldtype": "Data",
+   "label": "Chicken net of mortality"
+  },
+  {
+   "fieldname": "no_of_chicken_taken_out",
+   "fieldtype": "Data",
+   "label": "No of chicken taken out"
+  },
+  {
+   "fieldname": "stored_in_freezer",
+   "fieldtype": "Data",
+   "label": "Stored in Freezer"
+  },
+  {
+   "fieldname": "total_live_weight_in_kg",
+   "fieldtype": "Data",
+   "label": "Total Live Weight in KG"
+  },
+  {
+   "fieldname": "avg_live_weight_per_cheicken",
+   "fieldtype": "Data",
+   "label": "Avg live weight per cheicken",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finished_items",
+   "fieldtype": "Table",
+   "label": "Finished Items",
+   "options": "Co Packing List"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: doc.item_processed!=1",
+   "fieldname": "create_sales_invoice",
+   "fieldtype": "Button",
+   "label": "Create Sales Invoice"
+  },
+  {
+   "fieldname": "pos_profile",
+   "fieldtype": "Link",
+   "label": "POS Profile",
+   "options": "POS Profile"
+  },
+  {
+   "fieldname": "item_processed",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Item Processed"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-21 12:34:40.844010",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Chicken Co Packing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -1,12 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:company",
- "creation": "2022-05-10 19:10:32.976406",
+ "autoname": "field:hatchery",
+ "creation": "2022-05-23 12:59:56.509709",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "hatchery",
   "company",
   "cost_center",
   "base_row_material",
@@ -14,9 +15,16 @@
   "product",
   "product_target_warehouse",
   "scrap",
-  "scrap_target_warehouse"
+  "scrap_target_warehouse",
+  "account"
  ],
  "fields": [
+  {
+   "fieldname": "hatchery",
+   "fieldtype": "Data",
+   "label": "Hatchery",
+   "unique": 1
+  },
   {
    "fieldname": "company",
    "fieldtype": "Link",
@@ -65,14 +73,20 @@
    "fieldtype": "Link",
    "label": "Scrap Target Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "label": "DOC Transfer Expense Account",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-10 19:15:30.508322",
+ "modified": "2022-05-23 14:39:42.210006",
  "modified_by": "Administrator",
  "module": "Livestock Management",
- "name": "Hatchery Settings",
+ "name": "Hatchery",
  "owner": "Administrator",
  "permissions": [
   {

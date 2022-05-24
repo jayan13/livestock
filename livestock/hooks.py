@@ -87,9 +87,9 @@ app_license = "MIT"
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	'Project':'livestock.override.HatcheryProject'
+ }
 
 # Document Events
 # ---------------
@@ -104,8 +104,14 @@ app_license = "MIT"
 # }
 doc_events = {
     "Stock Entry": {
-        "on_submit": "livestock.poultry.doctype.poultry_items.project_stock_entry.update_project_item_stat",
-    }
+        "on_submit": [
+			"livestock.poultry.doctype.poultry_items.project_stock_entry.update_project_item_stat",
+			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
+		]
+    },
+	"Sales Invoice":{
+		"on_submit":"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat"
+	}
 }
 # Scheduled Tasks
 # ---------------
@@ -166,13 +172,17 @@ fixtures = [
 					"Project-section_break_35",
 					"Project-create_stock_entry",
 					"Project-item_processed",
+					"Project-hatchery",
+					"Project-total_transfer_amount",
 					"Stock Entry-manufacturing_type",
+					"Stock Entry-own_packing",
+					"Sales Invoice-co_packing"
                     
                 ),
             ]
         ],
     },
-	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form", )] ] },
+	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form","Chicken Own Packing-Form","Chicken Co Packing-Form" )] ] },
 
 ]
 # before_tests = "livestock.install.before_tests"

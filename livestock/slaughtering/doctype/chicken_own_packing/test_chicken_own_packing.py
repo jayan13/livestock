@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestHatcherySettings(unittest.TestCase):
+class TestChickenOwnPacking(unittest.TestCase):
 	pass

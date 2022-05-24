@@ -1,4 +1,5 @@
 {
+ "cards_label": "",
  "category": "Modules",
  "charts": [],
  "creation": "2022-05-06 13:10:28.157959",
@@ -12,20 +13,84 @@
  "is_default": 0,
  "is_standard": 1,
  "label": "livestock",
- "links": [],
- "modified": "2022-05-06 13:10:28.157959",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Hatchery",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Hatchery Details",
+   "link_to": "Hatchery",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Slaughtering",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Chicken Grade",
+   "link_to": "Chicken Grade",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Brand",
+   "link_to": "Chicken Brand",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Own Packing Setting",
+   "link_to": "Own Packing Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Chicken Co Packing",
+   "link_to": "Chicken Co Packing",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Chicken Own Packing",
+   "link_to": "Chicken Own Packing",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-05-23 14:38:27.333372",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",
  "owner": "Administrator",
  "pin_to_bottom": 0,
  "pin_to_top": 0,
- "shortcuts": [
-  {
-   "doc_view": "",
-   "label": "Hatchery Settings",
-   "link_to": "Hatchery Settings",
-   "type": "DocType"
-  }
- ]
+ "shortcuts": []
 }
