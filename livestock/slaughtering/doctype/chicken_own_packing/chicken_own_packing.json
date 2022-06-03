@@ -20,6 +20,7 @@
   "avg_live_weight_per_cheicken",
   "project",
   "section_break_11",
+  "vehicle",
   "create_stock_entry",
   "finished_items",
   "item_processed"
@@ -45,7 +46,7 @@
   {
    "fieldname": "item",
    "fieldtype": "Link",
-   "label": "Item",
+   "label": "Boiler Item",
    "options": "Item"
   },
   {
@@ -111,11 +112,17 @@
    "fieldtype": "Link",
    "label": "Project",
    "options": "Project"
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Table",
+   "label": "Item Received Vehicle",
+   "options": "Own Vehicle"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-21 14:31:08.722911",
+ "modified": "2022-05-30 09:35:45.078666",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",

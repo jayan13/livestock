@@ -1,0 +1,210 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:hatchery_batch_name",
+ "creation": "2022-06-01 16:42:26.464155",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "hatchery_batch_name",
+  "hatchery",
+  "strain",
+  "supplier",
+  "receiving_date",
+  "setting_date",
+  "setter_no",
+  "number_received",
+  "number_set",
+  "cull_eggs",
+  "eggs_wt_gm",
+  "project",
+  "column_break_12",
+  "date_of_hatching",
+  "fertile_eggs",
+  "infertile_eggs",
+  "chicks_transfer_date",
+  "number_hatched",
+  "chicks_transferred",
+  "culls_no",
+  "shed_no",
+  "spoiled_fertility",
+  "av_chicks_wt",
+  "section_break_23",
+  "create_stock_entry",
+  "used_items",
+  "item_processed"
+ ],
+ "fields": [
+  {
+   "fieldname": "hatchery_batch_name",
+   "fieldtype": "Data",
+   "label": "Hatchery Batch Name ",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "hatchery",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Hatchery",
+   "options": "Hatchery Shed",
+   "reqd": 1
+  },
+  {
+   "fieldname": "strain",
+   "fieldtype": "Link",
+   "label": "Strain",
+   "options": "strain"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Source",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "receiving_date",
+   "fieldtype": "Date",
+   "label": "Receiving Date"
+  },
+  {
+   "fieldname": "setting_date",
+   "fieldtype": "Date",
+   "label": "Setting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "setter_no",
+   "fieldtype": "Data",
+   "label": "Setter No"
+  },
+  {
+   "fieldname": "number_received",
+   "fieldtype": "Int",
+   "label": "Number Received"
+  },
+  {
+   "fieldname": "number_set",
+   "fieldtype": "Int",
+   "label": "Number Set"
+  },
+  {
+   "fieldname": "cull_eggs",
+   "fieldtype": "Int",
+   "label": "Cull Eggs"
+  },
+  {
+   "fieldname": "eggs_wt_gm",
+   "fieldtype": "Data",
+   "label": "Eggs wt. gm."
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date_of_hatching",
+   "fieldtype": "Date",
+   "label": "Date Of Hatching",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fertile_eggs",
+   "fieldtype": "Int",
+   "label": "Fertile Eggs"
+  },
+  {
+   "fieldname": "infertile_eggs",
+   "fieldtype": "Int",
+   "label": "Infertile Eggs"
+  },
+  {
+   "fieldname": "chicks_transfer_date",
+   "fieldtype": "Date",
+   "label": "Chicks Transfer Date"
+  },
+  {
+   "fieldname": "number_hatched",
+   "fieldtype": "Int",
+   "label": "Number Hatched"
+  },
+  {
+   "fieldname": "chicks_transferred",
+   "fieldtype": "Int",
+   "label": "Chicks Transferred"
+  },
+  {
+   "fieldname": "culls_no",
+   "fieldtype": "Int",
+   "label": "Culls No"
+  },
+  {
+   "fieldname": "shed_no",
+   "fieldtype": "Data",
+   "label": "Shed No"
+  },
+  {
+   "fieldname": "spoiled_fertility",
+   "fieldtype": "Int",
+   "label": "Spoiled Fertility"
+  },
+  {
+   "fieldname": "av_chicks_wt",
+   "fieldtype": "Data",
+   "label": "Av. Chicks wt."
+  },
+  {
+   "fieldname": "section_break_23",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "used_items",
+   "fieldtype": "Table",
+   "label": "Used items",
+   "options": "Hatchery Items"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "item_processed",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Item Processed"
+  },
+  {
+   "depends_on": "eval:doc.item_processed!=1",
+   "fieldname": "create_stock_entry",
+   "fieldtype": "Button",
+   "label": "Create DOC"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-02 15:22:45.464138",
+ "modified_by": "Administrator",
+ "module": "Hatchery",
+ "name": "Hatchery Batch",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

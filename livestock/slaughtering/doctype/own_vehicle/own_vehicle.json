@@ -1,0 +1,58 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-24 11:47:14.544286",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vehicle_no",
+  "driver",
+  "item_quantity",
+  "spoiled_qty",
+  "date"
+ ],
+ "fields": [
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle No"
+  },
+  {
+   "fieldname": "driver",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Driver"
+  },
+  {
+   "fieldname": "item_quantity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Quantity"
+  },
+  {
+   "fieldname": "spoiled_qty",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Spoiled Qty"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-05-24 11:47:14.544286",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Own Vehicle",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

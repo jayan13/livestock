@@ -107,6 +107,8 @@ doc_events = {
         "on_submit": [
 			"livestock.poultry.doctype.poultry_items.project_stock_entry.update_project_item_stat",
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
+			"livestock.hatchery.doctype.hatchery_batch.hatchery_stock_entry.update_item_stat",
+			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat"
 		]
     },
 	"Sales Invoice":{

@@ -42,5 +42,27 @@
   "parentfield": null,
   "parenttype": null,
   "project_type": " Hatchery"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2022-05-31 08:48:26.379254",
+  "name": "Slaughter",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "Slaughter"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2022-06-02 08:51:18.265520",
+  "name": "Broiler",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "Broiler"
  }
 ]

@@ -34,6 +34,33 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Hatchery Shed",
+   "link_to": "Hatchery Shed",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Hatchery Batch",
+   "link_to": "Hatchery Batch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Strain",
+   "link_to": "strain",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Slaughtering",
    "link_type": "DocType",
    "onboard": 0,
@@ -83,9 +110,44 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Packing Materials",
+   "link_to": "Packing Materials",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broiler",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broiler Shed",
+   "link_to": "Broiler Shed",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broiler Batch",
+   "link_to": "Broiler Batch",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-05-23 14:38:27.333372",
+ "modified": "2022-06-01 17:35:17.116718",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",

@@ -19,6 +19,7 @@
   "total_live_weight_in_kg",
   "avg_live_weight_per_cheicken",
   "section_break_13",
+  "vehicle",
   "create_sales_invoice",
   "finished_items",
   "item_processed"
@@ -102,11 +103,17 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Item Processed"
+  },
+  {
+   "fieldname": "vehicle",
+   "fieldtype": "Table",
+   "label": "Item Received Vehicle",
+   "options": "Co Vehicle"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-21 12:34:40.844010",
+ "modified": "2022-05-24 11:52:57.188196",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Co Packing",

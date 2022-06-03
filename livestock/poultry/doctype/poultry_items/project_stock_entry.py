@@ -7,6 +7,7 @@ from erpnext.stock.get_item_details import (
 	get_conversion_factor,
 	get_default_cost_center,
 )
+from erpnext.stock.utils import (get_incoming_rate)
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
@@ -31,13 +32,20 @@ def stock_entry(project):
     total_add_cost=0
 
     if sett.base_row_material:
-        base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')        
+        #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')        
         item_account_details = get_item_defaults(sett.base_row_material, udoc.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")
-        
+        base_row_rate = get_incoming_rate({
+						"item_code": sett.base_row_material,
+						"warehouse": sett.row_material_target_warehouse,
+						"posting_date": stock_entry.posting_date,
+						"posting_time": stock_entry.posting_time,
+						"qty": -1 * udoc.number_received,
+                        'company':udoc.company
+					})
         if sett.row_material_target_warehouse:
             validate_stock_qty(sett.base_row_material,udoc.number_received,sett.row_material_target_warehouse,stock_uom,stock_uom)
 
@@ -86,8 +94,7 @@ def stock_entry(project):
                 
 
                 stock_entry.append('items', {
-					's_warehouse': item.s_warehouse,
-                    't_warehouse': item.t_warehouse,
+					's_warehouse': item.t_warehouse,
 					'item_code': item.item_code,
 					'qty': item.qty,
                     'actual_qty':item.qty,
@@ -187,27 +194,4 @@ def update_project_item_stat(doc,event):
             udoc.item_processed = 1
             udoc.save()
 
-@frappe.whitelist()
-def project_item_tranfer_margin(project):
-    amount=0    
-    pjt=frappe.get_doc('Project',project) 
-    account = frappe.db.get_value('Hatchery', pjt.hatchery, 'account')
-    accu=frappe.db.get_list("Stock Entry",filters={'Project': project,'stock_entry_type':"Material Transfer","docstatus":'1'},fields=['name'])
-    
-    for ac in accu:
-        
-        acc=frappe.get_doc('Stock Entry',ac.name)        
-        exp_amt=0
-        base_amount=0
-        is_add_cost=0        
-        for cost in acc.additional_costs:
-            if cost.expense_account==account:
-                exp_amt+=cost.amount
-                is_add_cost=1
-        if is_add_cost==1:
-            for item in acc.items:
-                base_amount+=item.basic_amount
 
-        amount+=exp_amt+base_amount
-        
-    return amount

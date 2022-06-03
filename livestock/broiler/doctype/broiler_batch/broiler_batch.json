@@ -1,0 +1,234 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:broiler_batch_name",
+ "creation": "2022-06-01 13:45:45.274135",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "broiler_batch_name",
+  "broiler_shed",
+  "from_hatchery_project",
+  "supplier",
+  "strain",
+  "number_received",
+  "receiving_date",
+  "company",
+  "column_break_5",
+  "mortality",
+  "doc_placed",
+  "start_date",
+  "end_date",
+  "boiler_transferred",
+  "project",
+  "create_stock_entry",
+  "section_break_16",
+  "feed",
+  "section_break_18",
+  "medicine",
+  "vaccine_section",
+  "vaccine",
+  "section_break_12",
+  "used_items",
+  "section_break_14",
+  "daily_mortality",
+  "section_break_20",
+  "temperature",
+  "item_processed"
+ ],
+ "fields": [
+  {
+   "fieldname": "broiler_batch_name",
+   "fieldtype": "Data",
+   "label": "Broiler Batch Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "broiler_shed",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Broiler Shed",
+   "options": "Broiler Shed",
+   "reqd": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "strain",
+   "fieldtype": "Link",
+   "label": "Strain",
+   "options": "strain"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "number_received",
+   "fieldtype": "Int",
+   "label": "DOC No Received"
+  },
+  {
+   "fieldname": "receiving_date",
+   "fieldtype": "Date",
+   "label": "DOC Receiving Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "mortality",
+   "fieldtype": "Int",
+   "label": "Received DOC Mortality"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break",
+   "label": "Other Items"
+  },
+  {
+   "fieldname": "used_items",
+   "fieldtype": "Table",
+   "label": "Other Items",
+   "options": "Broiler Items"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break",
+   "label": "Mortality"
+  },
+  {
+   "fieldname": "daily_mortality",
+   "fieldtype": "Table",
+   "label": "Daily Mortality",
+   "options": "Mortality"
+  },
+  {
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break",
+   "label": "Feed"
+  },
+  {
+   "fieldname": "feed",
+   "fieldtype": "Table",
+   "label": "Feed",
+   "options": "Feed"
+  },
+  {
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "Medicine"
+  },
+  {
+   "fieldname": "medicine",
+   "fieldtype": "Table",
+   "label": "Medicine",
+   "options": "Medicine"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break",
+   "label": "Temperature"
+  },
+  {
+   "fieldname": "temperature",
+   "fieldtype": "Table",
+   "label": "Temperature",
+   "options": "Temperature"
+  },
+  {
+   "fieldname": "from_hatchery_project",
+   "fieldtype": "Link",
+   "label": "From Hatchery Project",
+   "options": "Project"
+  },
+  {
+   "default": "0",
+   "fieldname": "doc_placed",
+   "fieldtype": "Int",
+   "label": "DOC Placed"
+  },
+  {
+   "fieldname": "vaccine_section",
+   "fieldtype": "Section Break",
+   "label": "Vaccine"
+  },
+  {
+   "fieldname": "vaccine",
+   "fieldtype": "Table",
+   "label": "Vaccine",
+   "options": "Vaccine"
+  },
+  {
+   "fieldname": "item_processed",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Item Processed"
+  },
+  {
+   "fieldname": "create_stock_entry",
+   "fieldtype": "Button",
+   "label": "Transfer Broiler"
+  },
+  {
+   "default": "0",
+   "fieldname": "boiler_transferred",
+   "fieldtype": "Int",
+   "label": "Boiler Transferred"
+  },
+  {
+   "fetch_from": "broiler_shed.company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-03 17:11:03.688622",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "Broiler Batch",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

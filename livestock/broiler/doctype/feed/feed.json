@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-06-01 13:10:00.603776",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "starter_item",
+  "starter_qty",
+  "starter_uom",
+  "finisher_item",
+  "finisher_qty",
+  "finisher_uom",
+  "total"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "starter_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Starter Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "starter_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Starter Qty"
+  },
+  {
+   "fieldname": "finisher_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Finisher Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "finisher_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Finisher Qty"
+  },
+  {
+   "fieldname": "total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total"
+  },
+  {
+   "fieldname": "starter_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Uom",
+   "options": "UOM"
+  },
+  {
+   "fieldname": "finisher_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Uom",
+   "options": "UOM"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-06-03 15:20:40.557746",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "Feed",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

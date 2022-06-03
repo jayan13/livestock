@@ -7,6 +7,7 @@ from erpnext.stock.get_item_details import (
 	get_conversion_factor,
 	get_default_cost_center,
 )
+from erpnext.stock.utils import (get_incoming_rate)
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
@@ -37,7 +38,16 @@ def sales_invoice(co_packing):
             cost_center=pos.cost_center or item_account_details.get("buying_cost_center")
             expense_account=item_account_details.get("expense_account")                
             item_name=item_account_details.get("item_name")
-            precision = cint(frappe.db.get_default("float_precision")) or 3    
+            precision = cint(frappe.db.get_default("float_precision")) or 3
+            base_row_rate = get_incoming_rate({
+						"item_code": fitem.item,
+						"warehouse": pos.warehouse,
+						"posting_date": sales.posting_date,
+						"posting_time": sales.posting_time,
+						"qty": -1 * fitem.qty,
+                        'company':pos.company
+					})
+            base_rate=base_row_rate or base_rate             
             amount=flt(flt(fitem.qty) * flt(base_rate), precision)
                 
             sales.append('items', {

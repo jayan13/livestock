@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:hatchery",
+ "creation": "2022-06-01 17:32:32.922540",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "hatchery",
+  "company",
+  "cost_center",
+  "base_row_material",
+  "row_material_target_warehouse",
+  "product",
+  "product_target_warehouse",
+  "scrap",
+  "scrap_target_warehouse",
+  "account"
+ ],
+ "fields": [
+  {
+   "fieldname": "hatchery",
+   "fieldtype": "Data",
+   "label": "Hatchery",
+   "unique": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "unique": 1
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "base_row_material",
+   "fieldtype": "Link",
+   "label": "Base Row Material",
+   "options": "Item"
+  },
+  {
+   "fieldname": "row_material_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Row Material Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Link",
+   "label": "Product",
+   "options": "Item"
+  },
+  {
+   "fieldname": "product_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Product Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "scrap",
+   "fieldtype": "Link",
+   "label": "Scrap",
+   "options": "Item"
+  },
+  {
+   "fieldname": "scrap_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Scrap Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "label": "DOC Transfer Expense Account",
+   "options": "Account"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-01 17:32:32.922540",
+ "modified_by": "Administrator",
+ "module": "Hatchery",
+ "name": "Hatchery Shed",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
