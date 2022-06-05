@@ -101,7 +101,7 @@ override_doctype_class = {
 # 		"on_cancel": "method",
 # 		"on_trash": "method"
 #	}
-# }
+# }  after_insert
 doc_events = {
     "Stock Entry": {
         "on_submit": [

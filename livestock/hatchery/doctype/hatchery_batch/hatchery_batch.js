@@ -1,5 +1,10 @@
 // Copyright (c) 2022, alantechnologies and contributors
 // For license information, please see license.txt
+
+
+
+// Copyright (c) 2022, alantechnologies and contributors
+// For license information, please see license.txt
 frappe.ui.form.on("Hatchery Batch", "before_save", function(frm, cdt, cdn) {
 	var item = locals[cdt][cdn];	
 	$.each (item.used_items, function(i, d){
@@ -96,3 +101,4 @@ frappe.ui.form.on("Hatchery Items",
                     });
             } 
 });
+

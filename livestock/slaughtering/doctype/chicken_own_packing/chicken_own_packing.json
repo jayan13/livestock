@@ -14,7 +14,8 @@
   "item",
   "number_of_chicken",
   "column_break_6",
-  "mortality_in_numbers",
+  "mortality_while_receving",
+  "number_of_culls",
   "chicken_net_of_mortality",
   "total_live_weight_in_kg",
   "avg_live_weight_per_cheicken",
@@ -38,6 +39,7 @@
    "options": "Company"
   },
   {
+   "description": "Broiler chicken transfred from",
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "label": "Source Warehouse",
@@ -52,14 +54,10 @@
   {
    "fieldname": "number_of_chicken",
    "fieldtype": "Data",
-   "label": "Number Of Chicken"
+   "label": "Number of chicken received"
   },
   {
-   "fieldname": "mortality_in_numbers",
-   "fieldtype": "Data",
-   "label": "Mortality in Numbers"
-  },
-  {
+   "default": "0",
    "fieldname": "chicken_net_of_mortality",
    "fieldtype": "Data",
    "label": "Chicken net of mortality"
@@ -93,7 +91,7 @@
    "depends_on": "eval:doc.item_processed!=1",
    "fieldname": "create_stock_entry",
    "fieldtype": "Button",
-   "label": "Create Stock Entry"
+   "label": "Create Production Entry"
   },
   {
    "fieldname": "brand",
@@ -118,11 +116,23 @@
    "fieldtype": "Table",
    "label": "Item Received Vehicle",
    "options": "Own Vehicle"
+  },
+  {
+   "default": "0",
+   "fieldname": "number_of_culls",
+   "fieldtype": "Int",
+   "label": "Number Of Culls"
+  },
+  {
+   "default": "0",
+   "fieldname": "mortality_while_receving",
+   "fieldtype": "Int",
+   "label": "Mortality While Receving"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-30 09:35:45.078666",
+ "modified": "2022-06-05 14:14:07.007060",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",

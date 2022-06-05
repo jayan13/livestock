@@ -25,7 +25,16 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Hatchery Details",
+   "label": "Strain",
+   "link_to": "strain",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Htchery Details",
    "link_to": "Hatchery",
    "link_type": "DocType",
    "onboard": 0,
@@ -34,8 +43,8 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Hatchery Shed",
-   "link_to": "Hatchery Shed",
+   "label": "Hatchery Master",
+   "link_to": "Hatchery Settings",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -45,15 +54,6 @@
    "is_query_report": 0,
    "label": "Hatchery Batch",
    "link_to": "Hatchery Batch",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Strain",
-   "link_to": "strain",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -96,8 +96,8 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Chicken Co Packing",
-   "link_to": "Chicken Co Packing",
+   "label": "Chicken Own Packing",
+   "link_to": "Chicken Own Packing",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -105,8 +105,17 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Chicken Own Packing",
-   "link_to": "Chicken Own Packing",
+   "label": "Co Packing Setting",
+   "link_to": "Co Packing Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Chicken Co Packing",
+   "link_to": "Chicken Co Packing",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -147,7 +156,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-06-01 17:35:17.116718",
+ "modified": "2022-06-05 18:34:14.654837",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",

@@ -37,7 +37,8 @@
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Qty"
+   "label": "Qty",
+   "precision": "4"
   },
   {
    "fieldname": "remark",
@@ -49,7 +50,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-03 20:45:39.165642",
+ "modified": "2022-06-05 14:17:12.628327",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Vaccine",

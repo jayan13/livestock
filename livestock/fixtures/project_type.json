@@ -36,17 +36,6 @@
   "description": null,
   "docstatus": 0,
   "doctype": "Project Type",
-  "modified": "2022-03-10 13:30:13.867328",
-  "name": "Hatchery",
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "project_type": " Hatchery"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Project Type",
   "modified": "2022-05-31 08:48:26.379254",
   "name": "Slaughter",
   "parent": null,
@@ -64,5 +53,16 @@
   "parentfield": null,
   "parenttype": null,
   "project_type": "Broiler"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
+  "modified": "2022-03-10 13:30:13.867328",
+  "name": "Hatchery",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": " Hatchery"
  }
 ]

@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestHatcheryShed(unittest.TestCase):
+class TestCoPackingSettings(unittest.TestCase):
 	pass

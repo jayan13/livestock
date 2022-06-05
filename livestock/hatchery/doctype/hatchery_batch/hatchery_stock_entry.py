@@ -15,7 +15,7 @@ def stock_entry(batch):
 
     from erpnext.stock.doctype.item.item import get_item_defaults    
     udoc = frappe.get_doc('Hatchery Batch', batch)
-    sett = frappe.get_doc('Hatchery Shed',udoc.hatchery)
+    sett = frappe.get_doc('Hatchery Settings',udoc.hatchery)
     #items=[]
     #frappe.msgprint(""" projects  {0} """.format(udoc.project_name))
     if not sett:

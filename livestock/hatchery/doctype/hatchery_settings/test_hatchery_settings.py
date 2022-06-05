@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestHatchery(unittest.TestCase):
+class TestHatcherySettings(unittest.TestCase):
 	pass

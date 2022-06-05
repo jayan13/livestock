@@ -20,8 +20,9 @@
   "doc_placed",
   "start_date",
   "end_date",
-  "boiler_transferred",
+  "current_alive_chicks",
   "project",
+  "status",
   "create_stock_entry",
   "section_break_16",
   "feed",
@@ -73,12 +74,12 @@
    "default": "0",
    "fieldname": "number_received",
    "fieldtype": "Int",
-   "label": "DOC No Received"
+   "label": "Number Of DOC Received"
   },
   {
    "fieldname": "receiving_date",
    "fieldtype": "Date",
-   "label": "DOC Receiving Date"
+   "label": "DOC received date"
   },
   {
    "default": "0",
@@ -168,6 +169,7 @@
   },
   {
    "default": "0",
+   "description": "Number of doc placed in the broiler shed ",
    "fieldname": "doc_placed",
    "fieldtype": "Int",
    "label": "DOC Placed"
@@ -192,13 +194,7 @@
   {
    "fieldname": "create_stock_entry",
    "fieldtype": "Button",
-   "label": "Transfer Broiler"
-  },
-  {
-   "default": "0",
-   "fieldname": "boiler_transferred",
-   "fieldtype": "Int",
-   "label": "Boiler Transferred"
+   "label": "Create Production"
   },
   {
    "fetch_from": "broiler_shed.company",
@@ -206,11 +202,25 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "default": "0",
+   "fieldname": "current_alive_chicks",
+   "fieldtype": "Int",
+   "label": "Current Alive Chicks"
+  },
+  {
+   "fetch_from": "project.status",
+   "fetch_if_empty": 1,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nCompleted\nCancelled"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-03 17:11:03.688622",
+ "modified": "2022-06-05 21:28:36.569623",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",

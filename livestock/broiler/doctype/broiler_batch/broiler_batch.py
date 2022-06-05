@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe.utils import nowdate
 from frappe.model.document import Document
 
 class BroilerBatch(Document):
@@ -16,3 +17,12 @@ class BroilerBatch(Document):
 		project.cost_center=shed.cost_center
 		project.insert(ignore_permissions=True)
 		self.project=project.name
+
+	def on_update(self):
+		pjt=frappe.get_doc("Project", self.project)
+		
+		if pjt.status!=self.status:
+			pjt.status=	self.status
+			if self.status=='Completed':
+				pjt.expected_end_date=nowdate()
+			pjt.save()

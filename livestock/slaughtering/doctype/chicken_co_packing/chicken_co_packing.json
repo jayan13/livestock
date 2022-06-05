@@ -9,7 +9,6 @@
  "field_order": [
   "date",
   "customer",
-  "pos_profile",
   "no_of_chicken_taken_in",
   "mortality_in_numbers",
   "column_break_6",
@@ -93,12 +92,6 @@
    "label": "Create Sales Invoice"
   },
   {
-   "fieldname": "pos_profile",
-   "fieldtype": "Link",
-   "label": "POS Profile",
-   "options": "POS Profile"
-  },
-  {
    "fieldname": "item_processed",
    "fieldtype": "Data",
    "hidden": 1,
@@ -113,7 +106,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-24 11:52:57.188196",
+ "modified": "2022-06-05 13:35:49.428797",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Co Packing",

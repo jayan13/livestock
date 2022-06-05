@@ -15,15 +15,14 @@ def sales_invoice(co_packing):
 
     from erpnext.stock.doctype.item.item import get_item_defaults    
     udoc = frappe.get_doc('Chicken Co Packing', co_packing)
-    pos=frappe.get_doc('POS Profile', udoc.pos_profile)
+    pos=frappe.get_doc('Co Packing Settings')
     sales = frappe.new_doc("Sales Invoice")
     sales.pos_profile = udoc.pos_profile
     sales.cost_center=pos.cost_center
     sales.company=pos.company
     sales.set_warehouse=pos.warehouse
     sales.customer=udoc.customer
-    sales.is_pos=1
-    sales.selling_price_list=pos.selling_price_list
+    sales.selling_price_list="Standard Selling"
     sales.taxes_and_charges=pos.taxes_and_charges
     sales.currency=pos.currency
     sales.co_packing=co_packing
@@ -32,22 +31,22 @@ def sales_invoice(co_packing):
         for fitem in udoc.finished_items:
             item=frappe.get_doc('Item', fitem.item)
             item_account_details = get_item_defaults(fitem.item, pos.company)
-            base_rate = frappe.db.get_value('Item Price', {'price_list': pos.selling_price_list,'item_code':fitem.item}, 'price_list_rate') 
+            base_rate = frappe.db.get_value('Item Price', {'price_list': "Standard Selling",'item_code':fitem.item}, 'price_list_rate') 
             stock_uom = item_account_details.stock_uom
             conversion_factor = get_conversion_factor(fitem.item, fitem.uom).get("conversion_factor")
             cost_center=pos.cost_center or item_account_details.get("buying_cost_center")
             expense_account=item_account_details.get("expense_account")                
             item_name=item_account_details.get("item_name")
             precision = cint(frappe.db.get_default("float_precision")) or 3
-            base_row_rate = get_incoming_rate({
-						"item_code": fitem.item,
-						"warehouse": pos.warehouse,
-						"posting_date": sales.posting_date,
-						"posting_time": sales.posting_time,
-						"qty": -1 * fitem.qty,
-                        'company':pos.company
-					})
-            base_rate=base_row_rate or base_rate             
+            #base_row_rate = get_incoming_rate({
+			#			"item_code": fitem.item,
+			#			"warehouse": pos.warehouse,
+			#			"posting_date": sales.posting_date,
+			#			"posting_time": sales.posting_time,
+			#			"qty": -1 * fitem.qty,
+            #           'company':pos.company
+			#		})
+            #base_rate=base_row_rate or base_rate             
             amount=flt(flt(fitem.qty) * flt(base_rate), precision)
                 
             sales.append('items', {

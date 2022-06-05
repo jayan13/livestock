@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:hatchery",
- "creation": "2022-06-01 17:32:32.922540",
+ "creation": "2022-06-05 13:50:13.829369",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -83,10 +83,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-01 17:32:32.922540",
+ "modified": "2022-06-05 13:50:13.829369",
  "modified_by": "Administrator",
  "module": "Hatchery",
- "name": "Hatchery Shed",
+ "name": "Hatchery Settings",
  "owner": "Administrator",
  "permissions": [
   {

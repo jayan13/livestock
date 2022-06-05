@@ -313,7 +313,7 @@ def stock_entry(batch):
                                     
             })
 
-    if udoc.boiler_transferred:
+    if udoc.current_alive_chicks:
 
         item_account_details = get_item_defaults(sett.product, sett.company)
         stock_uom = item_account_details.stock_uom
@@ -321,13 +321,13 @@ def stock_entry(batch):
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3
-        cost=((udoc.boiler_transferred*base_row_rate) + total_add_cost) / udoc.boiler_transferred
-        amount=flt(flt(udoc.boiler_transferred) * flt(cost), precision)
+        cost=((udoc.current_alive_chicks*base_row_rate) + total_add_cost) / udoc.current_alive_chicks
+        amount=flt(flt(udoc.current_alive_chicks) * flt(cost), precision)
         stock_entry.append('items', {
                         't_warehouse': sett.product_target_warehouse,
                         'item_code': sett.product,
-                        'qty': udoc.boiler_transferred,
-                        'actual_qty':udoc.boiler_transferred,
+                        'qty': udoc.current_alive_chicks,
+                        'actual_qty':udoc.current_alive_chicks,
                         'uom': stock_uom,
                         'cost_center':cost_center,					
                         'ste_detail': item_account_details.name,
@@ -337,7 +337,7 @@ def stock_entry(batch):
                         "basic_rate":cost, 	
                         "basic_amount":amount,  
                         "amount":amount,  
-                        "transfer_qty":udoc.boiler_transferred,
+                        "transfer_qty":udoc.current_alive_chicks,
                         'conversion_factor': flt(conversion_factor),
                         'is_finished_item':1,               
         })
