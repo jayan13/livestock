@@ -105,7 +105,7 @@ def stock_entry(own_packing):
                 packed_qty=float(pcitem.qty)*float(fitem.qty)
                 amount=flt(flt(packed_qty) * flt(pck_rate), precision)
                 itemscost+=amount
-                pcitems.append({
+                stock_entry.append('items', {
                     's_warehouse': udoc.warehouse,
 					'item_code': pcitem.item,
 					'qty': packed_qty,
@@ -137,8 +137,7 @@ def stock_entry(own_packing):
             base_rate=packing_rate_of_item+(unit_cost*item_account_details.weight_per_unit)
   
             amount=flt(flt(fitem.qty) * flt(base_rate), precision)
-                
-            stock_entry.append('items', {
+            pcitems.append({            
                     't_warehouse': sett.warehouse,
 					'item_code': fitem.item,
 					'qty': fitem.qty,
@@ -161,7 +160,7 @@ def stock_entry(own_packing):
 
     if udoc.mortality_while_receving or udoc.number_of_culls:
         tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
-        item_account_details = get_item_defaults(sett.scrap_item, sett.company)
+        item_account_details = get_item_defaults(sett.scrap_item, udoc.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.scrap_item, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
@@ -169,8 +168,8 @@ def stock_entry(own_packing):
         precision = cint(frappe.db.get_default("float_precision")) or 3    
         amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
         stock_entry.append('items', {
-                        't_warehouse': sett.scrap_item__warehouse,
-                        'item_code': sett.scrap,
+                        't_warehouse': sett.scrap_item_warehouse,
+                        'item_code': sett.scrap_item,
                         'qty': tot_scrap,
                         'actual_qty':tot_scrap,
                         'uom': stock_uom,

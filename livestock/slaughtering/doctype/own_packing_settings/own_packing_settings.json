@@ -9,7 +9,7 @@
   "cost_center",
   "warehouse",
   "scrap_item",
-  "scrap_item__warehouse"
+  "scrap_item_warehouse"
  ],
  "fields": [
   {
@@ -31,7 +31,7 @@
    "options": "Item"
   },
   {
-   "fieldname": "scrap_item__warehouse",
+   "fieldname": "scrap_item_warehouse",
    "fieldtype": "Link",
    "label": "Scrap Item  Warehouse",
    "options": "Warehouse"
@@ -40,7 +40,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-06-05 11:27:24.899819",
+ "modified": "2022-06-06 22:52:11.741133",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Own Packing Settings",

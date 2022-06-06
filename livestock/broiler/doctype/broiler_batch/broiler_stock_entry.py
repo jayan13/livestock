@@ -8,12 +8,12 @@ from erpnext.stock.get_item_details import (
 	get_default_cost_center,
 )
 from erpnext.stock.utils import (get_incoming_rate)
+from erpnext.stock.doctype.item.item import get_item_defaults 
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
 def stock_entry(batch):
-
-    from erpnext.stock.doctype.item.item import get_item_defaults    
+    
     udoc = frappe.get_doc('Broiler Batch', batch)
     sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)
     #items=[]
@@ -75,7 +75,7 @@ def stock_entry(batch):
 
     if udoc.used_items:
         for item in udoc.used_items:
-            
+            if item.item_code:
                 item_account_details = get_item_defaults(item.item_code, sett.company)
                 #stock_uom = frappe.db.get_value("Item", item.item_code, "stock_uom")
                 stock_uom = item_account_details.stock_uom
@@ -118,200 +118,177 @@ def stock_entry(batch):
 					'conversion_factor': flt(conversion_factor),                    
 				})
 
-    
-    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality
-    
-    if tot_scrap:
-        item_account_details = get_item_defaults(sett.cull, sett.company)
-        stock_uom = item_account_details.stock_uom
-        conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
-        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
-        precision = cint(frappe.db.get_default("float_precision")) or 3    
-        amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
-        stock_entry.append('items', {
-                        't_warehouse': sett.cull_target_warehouse,
-                        'item_code': sett.cull,
-                        'qty': tot_scrap,
-                        'actual_qty':tot_scrap,
-                        'uom': stock_uom,
-                        'cost_center':cost_center,					
-                        'ste_detail': item_account_details.name,
-                        'stock_uom': stock_uom,
-                        'expense_account':expense_account,
-                        'valuation_rate': base_row_rate,
-                        "basic_rate":base_row_rate, 	
-                        "basic_amount":amount,  
-                        "amount":amount,  
-                        "transfer_qty":tot_scrap,
-                        'conversion_factor': flt(conversion_factor),
-                        'is_scrap_item':1,                    
-        })
 
     if udoc.vaccine:
         vaccine=frappe.db.get_list('Vaccine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in vaccine:
-            item_account_details = get_item_defaults(vc.item, sett.company)
-            stock_uom = item_account_details.stock_uom
-            conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
-            cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-            expense_account=item_account_details.get("expense_account")
-            rate = get_incoming_rate({
-                            "item_code": vc.item,
-                            "warehouse": sett.row_material_target_warehouse,
-                            "posting_date": stock_entry.posting_date,
-                            "posting_time": stock_entry.posting_time,
-                            "qty": -1 * vc.qty,
-                            'company':sett.company
-                        })
-            if sett.row_material_target_warehouse:
-                validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+            if vc.item:
+                item_account_details = get_item_defaults(vc.item, sett.company)
+                stock_uom = item_account_details.stock_uom
+                conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
+                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+                expense_account=item_account_details.get("expense_account")
+                rate = get_incoming_rate({
+                                "item_code": vc.item,
+                                "warehouse": sett.row_material_target_warehouse,
+                                "posting_date": stock_entry.posting_date,
+                                "posting_time": stock_entry.posting_time,
+                                "qty": -1 * vc.qty,
+                                'company':sett.company
+                            })
+                if sett.row_material_target_warehouse:
+                    validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
-            precision = cint(frappe.db.get_default("float_precision")) or 3    
-            amount=flt(flt(vc.qty) * flt(rate), precision)
-            total_add_cost=total_add_cost+amount
-            stock_entry.append('items', {
-                            's_warehouse': sett.row_material_target_warehouse,
-                            'item_code': vc.item,
-                            'qty': vc.qty,
-                            'actual_qty':vc.qty,
-                            'uom': vc.uom,
-                            'cost_center':cost_center,					
-                            'ste_detail': item_account_details.name,
-                            'stock_uom': stock_uom,
-                            'expense_account':expense_account,
-                            'valuation_rate': rate,
-                            "basic_rate":rate, 	
-                            "basic_amount":amount,  
-                            "amount":amount,  
-                            "transfer_qty":vc.qty,
-                            'conversion_factor': flt(conversion_factor),
-                                    
-            })
+                precision = cint(frappe.db.get_default("float_precision")) or 3    
+                amount=flt(flt(vc.qty) * flt(rate), precision)
+                total_add_cost=total_add_cost+amount
+                stock_entry.append('items', {
+                                's_warehouse': sett.row_material_target_warehouse,
+                                'item_code': vc.item,
+                                'qty': vc.qty,
+                                'actual_qty':vc.qty,
+                                'uom': vc.uom,
+                                'cost_center':cost_center,					
+                                'ste_detail': item_account_details.name,
+                                'stock_uom': stock_uom,
+                                'expense_account':expense_account,
+                                'valuation_rate': rate,
+                                "basic_rate":rate, 	
+                                "basic_amount":amount,  
+                                "amount":amount,  
+                                "transfer_qty":vc.qty,
+                                'conversion_factor': flt(conversion_factor),
+                                        
+                })
             
     if udoc.medicine:
         medicine=frappe.db.get_list('Medicine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in medicine:
-            item_account_details = get_item_defaults(vc.item, sett.company)
-            stock_uom = item_account_details.stock_uom
-            conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
-            cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-            expense_account=item_account_details.get("expense_account")
-            rate = get_incoming_rate({
-                            "item_code": vc.item,
-                            "warehouse": sett.row_material_target_warehouse,
-                            "posting_date": stock_entry.posting_date,
-                            "posting_time": stock_entry.posting_time,
-                            "qty": -1 * vc.qty,
-                            'company':sett.company
-                        })
-            if sett.row_material_target_warehouse:
-                validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+            if vc.item:
+                item_account_details = get_item_defaults(vc.item, sett.company)
+                stock_uom = item_account_details.stock_uom
+                conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
+                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+                expense_account=item_account_details.get("expense_account")
+                rate = get_incoming_rate({
+                                "item_code": vc.item,
+                                "warehouse": sett.row_material_target_warehouse,
+                                "posting_date": stock_entry.posting_date,
+                                "posting_time": stock_entry.posting_time,
+                                "qty": -1 * vc.qty,
+                                'company':sett.company
+                            })
+                if sett.row_material_target_warehouse:
+                    validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
-            precision = cint(frappe.db.get_default("float_precision")) or 3    
-            amount=flt(flt(vc.qty) * flt(rate), precision)
-            total_add_cost=total_add_cost+amount
-            stock_entry.append('items', {
-                            's_warehouse': sett.row_material_target_warehouse,
-                            'item_code': vc.item,
-                            'qty': vc.qty,
-                            'actual_qty':vc.qty,
-                            'uom': vc.uom,
-                            'cost_center':cost_center,					
-                            'ste_detail': item_account_details.name,
-                            'stock_uom': stock_uom,
-                            'expense_account':expense_account,
-                            'valuation_rate': rate,
-                            "basic_rate":rate, 	
-                            "basic_amount":amount,  
-                            "amount":amount,  
-                            "transfer_qty":vc.qty,
-                            'conversion_factor': flt(conversion_factor),
-                                    
-            })
+                precision = cint(frappe.db.get_default("float_precision")) or 3    
+                amount=flt(flt(vc.qty) * flt(rate), precision)
+                total_add_cost=total_add_cost+amount
+                stock_entry.append('items', {
+                                's_warehouse': sett.row_material_target_warehouse,
+                                'item_code': vc.item,
+                                'qty': vc.qty,
+                                'actual_qty':vc.qty,
+                                'uom': vc.uom,
+                                'cost_center':cost_center,					
+                                'ste_detail': item_account_details.name,
+                                'stock_uom': stock_uom,
+                                'expense_account':expense_account,
+                                'valuation_rate': rate,
+                                "basic_rate":rate, 	
+                                "basic_amount":amount,  
+                                "amount":amount,  
+                                "transfer_qty":vc.qty,
+                                'conversion_factor': flt(conversion_factor),
+                                        
+                })
 
     if udoc.feed:
         sfeed=frappe.db.get_list('Feed',filters={'parent': udoc.name},fields=['starter_item as item', 'sum(starter_qty) as qty','starter_uom as uom'],group_by='starter_item')
         
         for vc in sfeed:
-            item_account_details = get_item_defaults(vc.item, sett.company)
-            stock_uom = item_account_details.stock_uom
-            conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
-            cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-            expense_account=item_account_details.get("expense_account")
-            rate = get_incoming_rate({
-                            "item_code": vc.item,
-                            "warehouse": sett.feed_warehouse,
-                            "posting_date": stock_entry.posting_date,
-                            "posting_time": stock_entry.posting_time,
-                            "qty": -1 * vc.qty,
-                            'company':sett.company
-                        })
-            if sett.feed_warehouse:
-                validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
+            if vc.item:
+                item_account_details = get_item_defaults(vc.item, sett.company)
+                stock_uom = item_account_details.stock_uom
+                conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
+                #frappe.msgprint("conf1"+str(conversion_factor))
+                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+                expense_account=item_account_details.get("expense_account")
+                rate = get_incoming_rate({
+                                "item_code": vc.item,
+                                "warehouse": sett.feed_warehouse,
+                                "posting_date": stock_entry.posting_date,
+                                "posting_time": stock_entry.posting_time,
+                                "qty": -1 * vc.qty,
+                                'company':sett.company
+                            })
+                if sett.feed_warehouse:
+                    validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
 
-            precision = cint(frappe.db.get_default("float_precision")) or 3    
-            amount=flt(flt(vc.qty) * flt(rate), precision)
-            total_add_cost=total_add_cost+amount
-            stock_entry.append('items', {
-                            's_warehouse': sett.feed_warehouse,
-                            'item_code': vc.item,
-                            'qty': vc.qty,
-                            'actual_qty':vc.qty,
-                            'uom': vc.uom,
-                            'cost_center':cost_center,					
-                            'ste_detail': item_account_details.name,
-                            'stock_uom': stock_uom,
-                            'expense_account':expense_account,
-                            'valuation_rate': rate,
-                            "basic_rate":rate, 	
-                            "basic_amount":amount,  
-                            "amount":amount,  
-                            "transfer_qty":vc.qty,
-                            'conversion_factor': flt(conversion_factor),
-                                    
-            })
+                precision = cint(frappe.db.get_default("float_precision")) or 3    
+                amount=flt(flt(vc.qty) * flt(rate), precision)
+                total_add_cost=total_add_cost+amount
+                stock_entry.append('items', {
+                                's_warehouse': sett.feed_warehouse,
+                                'item_code': vc.item,
+                                'qty': vc.qty,
+                                'actual_qty':vc.qty,
+                                'uom': vc.uom,
+                                'cost_center':cost_center,					
+                                'ste_detail': item_account_details.name,
+                                'stock_uom': stock_uom,
+                                'expense_account':expense_account,
+                                'valuation_rate': rate,
+                                "basic_rate":rate, 	
+                                "basic_amount":amount,  
+                                "amount":amount,  
+                                "transfer_qty":vc.qty,
+                                'conversion_factor': flt(conversion_factor),
+                                        
+                })
 
         ffeed=frappe.db.get_list('Feed',filters={'parent': udoc.name},fields=['finisher_item as item', 'sum(finisher_qty) as qty','finisher_uom as uom'],group_by='finisher_item')
 
         for vc in ffeed:
-            item_account_details = get_item_defaults(vc.item, sett.company)
-            stock_uom = item_account_details.stock_uom
-            conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
-            cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-            expense_account=item_account_details.get("expense_account")
-            rate = get_incoming_rate({
-                            "item_code": vc.item,
-                            "warehouse": sett.feed_warehouse,
-                            "posting_date": stock_entry.posting_date,
-                            "posting_time": stock_entry.posting_time,
-                            "qty": -1 * vc.qty,
-                            'company':sett.company
-                        })
-            if sett.feed_warehouse:
-                validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
+            if vc.item:
+                item_account_details = get_item_defaults(vc.item, sett.company)
+                stock_uom = item_account_details.stock_uom
+                conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
+                #frappe.msgprint("conf2"+str(conversion_factor))
+                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+                expense_account=item_account_details.get("expense_account")
+                rate = get_incoming_rate({
+                                "item_code": vc.item,
+                                "warehouse": sett.feed_warehouse,
+                                "posting_date": stock_entry.posting_date,
+                                "posting_time": stock_entry.posting_time,
+                                "qty": -1 * vc.qty,
+                                'company':sett.company
+                            })
+                if sett.feed_warehouse:
+                    validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
 
-            precision = cint(frappe.db.get_default("float_precision")) or 3    
-            amount=flt(flt(vc.qty) * flt(rate), precision)
-            total_add_cost=total_add_cost+amount
-            stock_entry.append('items', {
-                            's_warehouse': sett.feed_warehouse,
-                            'item_code': vc.item,
-                            'qty': vc.qty,
-                            'actual_qty':vc.qty,
-                            'uom': vc.uom,
-                            'cost_center':cost_center,					
-                            'ste_detail': item_account_details.name,
-                            'stock_uom': stock_uom,
-                            'expense_account':expense_account,
-                            'valuation_rate': rate,
-                            "basic_rate":rate, 	
-                            "basic_amount":amount,  
-                            "amount":amount,  
-                            "transfer_qty":vc.qty,
-                            'conversion_factor': flt(conversion_factor),
-                                    
-            })
+                precision = cint(frappe.db.get_default("float_precision")) or 3    
+                amount=flt(flt(vc.qty) * flt(rate), precision)
+                total_add_cost=total_add_cost+amount
+                stock_entry.append('items', {
+                                's_warehouse': sett.feed_warehouse,
+                                'item_code': vc.item,
+                                'qty': vc.qty,
+                                'actual_qty':vc.qty,
+                                'uom': vc.uom,
+                                'cost_center':cost_center,					
+                                'ste_detail': item_account_details.name,
+                                'stock_uom': stock_uom,
+                                'expense_account':expense_account,
+                                'valuation_rate': rate,
+                                "basic_rate":rate, 	
+                                "basic_amount":amount,  
+                                "amount":amount,  
+                                "transfer_qty":vc.qty,
+                                'conversion_factor': flt(conversion_factor),
+                                        
+                })
 
     if udoc.current_alive_chicks:
 
@@ -341,7 +318,34 @@ def stock_entry(batch):
                         'conversion_factor': flt(conversion_factor),
                         'is_finished_item':1,               
         })
+    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality
     
+    if tot_scrap:
+        item_account_details = get_item_defaults(sett.cull, sett.company)
+        stock_uom = item_account_details.stock_uom
+        conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
+        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+        expense_account=item_account_details.get("expense_account")                                
+        precision = cint(frappe.db.get_default("float_precision")) or 3    
+        amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
+        stock_entry.append('items', {
+                        't_warehouse': sett.cull_target_warehouse,
+                        'item_code': sett.cull,
+                        'qty': tot_scrap,
+                        'actual_qty':tot_scrap,
+                        'uom': stock_uom,
+                        'cost_center':cost_center,					
+                        'ste_detail': item_account_details.name,
+                        'stock_uom': stock_uom,
+                        'expense_account':expense_account,
+                        'valuation_rate': base_row_rate,
+                        "basic_rate":base_row_rate, 	
+                        "basic_amount":amount,  
+                        "amount":amount,  
+                        "transfer_qty":tot_scrap,
+                        'conversion_factor': flt(conversion_factor),
+                        'is_scrap_item':1,                    
+        })
 
     return stock_entry.as_dict()
 

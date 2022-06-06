@@ -17,7 +17,7 @@ def sales_invoice(co_packing):
     udoc = frappe.get_doc('Chicken Co Packing', co_packing)
     pos=frappe.get_doc('Co Packing Settings')
     sales = frappe.new_doc("Sales Invoice")
-    sales.pos_profile = udoc.pos_profile
+    #sales.pos_profile = udoc.pos_profile
     sales.cost_center=pos.cost_center
     sales.company=pos.company
     sales.set_warehouse=pos.warehouse
@@ -26,6 +26,7 @@ def sales_invoice(co_packing):
     sales.taxes_and_charges=pos.taxes_and_charges
     sales.currency=pos.currency
     sales.chicken_co_packing=co_packing
+    sales.update_stock=1
 
     if udoc.finished_items:
         for fitem in udoc.finished_items:
