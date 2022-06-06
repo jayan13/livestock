@@ -2,7 +2,52 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Chicken Own Packing', {
-    
+    refresh: function(frm) { 
+        if (frm.doc.item_processed!=1)
+        {       
+            frm.add_custom_button(__('Production Entry'), function(){
+        
+                if(frm.doc.__unsaved){
+					frappe.throw(__("Please save document before Create Stock Entry"));
+					return false;
+					}
+					if(frm.doc.warehouse===""){
+					frappe.throw(__("Please Enter warehouse "));
+					return false;
+					}
+					
+				if(frm.doc.item===''){
+					frappe.throw(__("Please Enter item"));
+					return false;
+					}
+					
+					if(frm.doc.number_of_chicken===''){
+					frappe.throw(__("Please Enter Number of chicken"));
+					return false;
+					}
+					
+					
+			//console.log(frm.doc);  
+				frappe.call(
+                    { 
+                        method: "livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.stock_entry",
+                        args: { 
+                            //doc: d,
+                            own_packing:frm.doc.name
+                        },
+                        callback: function(r) 
+                            { 
+                                if(r.message) 
+                                    { 
+				                    	var doclist = frappe.model.sync(r.message);
+				                        frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                    } 
+                            }
+                    });
+           
+            });
+        }
+        },
     chicken_net_of_mortality: function(frm) {
     if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
     {

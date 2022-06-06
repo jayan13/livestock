@@ -19,7 +19,6 @@
   "avg_live_weight_per_cheicken",
   "section_break_13",
   "vehicle",
-  "create_sales_invoice",
   "finished_items",
   "item_processed"
  ],
@@ -86,12 +85,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval: doc.item_processed!=1",
-   "fieldname": "create_sales_invoice",
-   "fieldtype": "Button",
-   "label": "Create Sales Invoice"
-  },
-  {
    "fieldname": "item_processed",
    "fieldtype": "Data",
    "hidden": 1,
@@ -105,8 +98,14 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2022-06-05 13:35:49.428797",
+ "links": [
+  {
+   "group": "Sales Invoice",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "chicken_co_packing"
+  }
+ ],
+ "modified": "2022-06-06 16:29:58.805967",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Co Packing",

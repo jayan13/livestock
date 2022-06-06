@@ -22,7 +22,6 @@
   "project",
   "section_break_11",
   "vehicle",
-  "create_stock_entry",
   "finished_items",
   "item_processed"
  ],
@@ -88,12 +87,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval:doc.item_processed!=1",
-   "fieldname": "create_stock_entry",
-   "fieldtype": "Button",
-   "label": "Create Production Entry"
-  },
-  {
    "fieldname": "brand",
    "fieldtype": "Link",
    "label": "Brand Name",
@@ -131,8 +124,21 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2022-06-05 14:14:07.007060",
+ "links": [
+  {
+   "custom": 1,
+   "group": "Stock Entry",
+   "link_doctype": "Stock Entry",
+   "link_fieldname": "chicken_own_packing"
+  },
+  {
+   "custom": 1,
+   "group": "Sales Invoice",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "chicken_own_packing"
+  }
+ ],
+ "modified": "2022-06-06 16:44:15.264488",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",

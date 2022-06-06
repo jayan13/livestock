@@ -23,6 +23,46 @@ frappe.ui.form.on('Broiler Batch', {
 		}
 			};
 		});
+
+        if (frm.doc.item_processed!=1)
+			{       
+				frm.add_custom_button(__('Production Entry'), function(){
+            
+                    if(frm.doc.number_received < 1 || frm.doc.number_received===''){
+                        frappe.throw(__("Please Enter Number Of DOC received"));
+                        return false;
+                        }
+                        
+                    if(frm.doc.doc_placed < 1 || frm.doc.doc_placed===''){
+                        frappe.throw(__("Please Enter Chicks Placed "));
+                        return false;
+                        }	
+                        
+                    if(frm.doc.__unsaved){
+                        frappe.throw(__("Please save document before generate stock entry"));
+                        return false;
+                        }
+                        
+                        
+                //console.log(frm.doc);  
+                    frappe.call(
+                        { 
+                            method: "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.stock_entry",
+                            args: {
+                                batch:frm.doc.name
+                            },
+                            callback: function(r) 
+                                { 
+                                    if(r.message) 
+                                        { 
+                                            var doclist = frappe.model.sync(r.message);
+                                            frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                        } 
+                                }
+                        });
+               
+                    });
+			}
 	},
 	create_stock_entry: function(frm, cdt, cdn) 
             { 

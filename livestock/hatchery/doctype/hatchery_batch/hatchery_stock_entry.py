@@ -11,6 +11,10 @@ from erpnext.stock.utils import (get_incoming_rate)
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
+def stock_entry_test(doc):
+    frappe.msgprint(str(doc))
+
+@frappe.whitelist()
 def stock_entry(batch):
 
     from erpnext.stock.doctype.item.item import get_item_defaults    
@@ -94,7 +98,7 @@ def stock_entry(batch):
                 
 
                 stock_entry.append('items', {
-					's_warehouse': item.t_warehouse,
+					's_warehouse': item.t_warehouse or item.s_warehouse,
 					'item_code': item.item_code,
 					'qty': item.qty,
                     'actual_qty':item.qty,

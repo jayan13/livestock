@@ -25,7 +25,7 @@ def sales_invoice(co_packing):
     sales.selling_price_list="Standard Selling"
     sales.taxes_and_charges=pos.taxes_and_charges
     sales.currency=pos.currency
-    sales.co_packing=co_packing
+    sales.chicken_co_packing=co_packing
 
     if udoc.finished_items:
         for fitem in udoc.finished_items:
@@ -85,7 +85,7 @@ def sales_invoice(co_packing):
 
 @frappe.whitelist()
 def update_item_stat(doc,event):
-    if doc.co_packing:
-        udoc = frappe.get_doc('Chicken Co Packing', doc.co_packing)
+    if doc.chicken_co_packing:
+        udoc = frappe.get_doc('Chicken Co Packing', doc.chicken_co_packing)
         udoc.item_processed = 1
         udoc.save()

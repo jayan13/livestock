@@ -18,6 +18,11 @@ class BroilerBatch(Document):
 		project.insert(ignore_permissions=True)
 		self.project=project.name
 
+	def after_insert(self):
+		pjt=frappe.get_doc("Project", self.project)
+		pjt.broiler_batch=self.name
+		pjt.save()
+
 	def on_update(self):
 		pjt=frappe.get_doc("Project", self.project)
 		

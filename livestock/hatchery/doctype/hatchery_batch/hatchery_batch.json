@@ -32,7 +32,6 @@
   "av_chicks_wt",
   "status",
   "section_break_23",
-  "create_stock_entry",
   "used_items",
   "item_processed"
  ],
@@ -166,12 +165,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval:doc.item_processed!=1",
-   "fieldname": "create_stock_entry",
-   "fieldtype": "Button",
-   "label": "Create DOC Production"
-  },
-  {
    "fieldname": "used_items",
    "fieldtype": "Table",
    "label": "Used items",
@@ -193,8 +186,21 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2022-06-05 21:28:06.633326",
+ "links": [
+  {
+   "custom": 1,
+   "group": "Stock Entry",
+   "link_doctype": "Stock Entry",
+   "link_fieldname": "project"
+  },
+  {
+   "custom": 1,
+   "group": "Sales Invoice",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "project"
+  }
+ ],
+ "modified": "2022-06-06 15:38:33.417096",
  "modified_by": "Administrator",
  "module": "Hatchery",
  "name": "Hatchery Batch",

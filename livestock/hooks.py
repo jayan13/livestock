@@ -177,8 +177,11 @@ fixtures = [
 					"Project-hatchery",
 					"Project-total_transfer_amount",
 					"Stock Entry-manufacturing_type",
-					"Stock Entry-own_packing",
-					"Sales Invoice-co_packing"
+					"Stock Entry-chicken_own_packing",
+					"Sales Invoice-chicken_own_packing",
+					"Sales Invoice-chicken_co_packing",
+					"Project-hatchery_batch",
+					"Project-broiler_batch"
                     
                 ),
             ]

@@ -22,7 +22,7 @@ def stock_entry(own_packing):
     stock_entry.purpose = "Manufacture"
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Chicken Slaughtering"
-    stock_entry.own_packing=own_packing
+    stock_entry.chicken_own_packing=own_packing
 	#stock_entry.set_stock_entry_type()
     precision = cint(frappe.db.get_default("float_precision")) or 3
     base_row_rate=0
@@ -205,8 +205,8 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
 
 @frappe.whitelist()
 def update_item_stat(doc,event):
-    if doc.own_packing:
-        udoc = frappe.get_doc('Chicken Own Packing', doc.own_packing)
+    if doc.chicken_own_packing:
+        udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)
         if doc.manufacturing_type == "Chicken Slaughtering":
             udoc.item_processed = 1
             udoc.save()
