@@ -26,7 +26,7 @@ frappe.ui.form.on('Broiler Batch', {
 
         if (frm.doc.item_processed!=1)
 			{       
-				frm.add_custom_button(__('Production Entry'), function(){
+				frm.add_custom_button(__('Broiler Production Entry'), function(){
             
                     if(frm.doc.number_received < 1 || frm.doc.number_received===''){
                         frappe.throw(__("Please Enter Number Of DOC received"));
@@ -61,7 +61,7 @@ frappe.ui.form.on('Broiler Batch', {
                                 }
                         });
                
-                    });
+                    }).removeClass("btn-default").addClass("btn-success");
 			}
 	},
 	create_stock_entry: function(frm, cdt, cdn) 

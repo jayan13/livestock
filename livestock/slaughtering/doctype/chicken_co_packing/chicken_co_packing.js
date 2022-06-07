@@ -31,7 +31,7 @@ frappe.ui.form.on('Chicken Co Packing', {
                             }
                     });
            
-            });
+            }).removeClass("btn-default").addClass("btn-success");
         }
         },
     chicken_net_of_mortality: function(frm) {

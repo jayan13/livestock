@@ -45,7 +45,7 @@ frappe.ui.form.on('Chicken Own Packing', {
                             }
                     });
            
-            });
+            }).removeClass("btn-default").addClass("btn-success");
         }
         },
     chicken_net_of_mortality: function(frm) {

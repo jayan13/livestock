@@ -16,7 +16,7 @@ frappe.ui.form.on('Hatchery Batch', {
     refresh: function(frm) { 
         if (frm.doc.item_processed!=1)
         {       
-          frm.add_custom_button(__('Production Entry'), function(){
+          frm.add_custom_button(__('DOC Production Entry'), function(){
             
                  
                 if(frm.doc.number_received < 1 || frm.doc.number_received===''){
@@ -52,7 +52,7 @@ frappe.ui.form.on('Hatchery Batch', {
                                     } 
                             }
                     });
-        });
+        }).removeClass("btn-default").addClass("btn-success");
     }
       },
 	create_stock_entry: function(frm, cdt, cdn) 
