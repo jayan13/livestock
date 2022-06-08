@@ -22,6 +22,7 @@
   "project",
   "section_break_11",
   "vehicle",
+  "number_of_b_grade_chicken",
   "finished_items",
   "item_processed"
  ],
@@ -114,13 +115,19 @@
    "default": "0",
    "fieldname": "number_of_culls",
    "fieldtype": "Int",
-   "label": "Number Of Culls"
+   "label": "Number Of Culls (Condamend)"
   },
   {
    "default": "0",
    "fieldname": "mortality_while_receving",
    "fieldtype": "Int",
    "label": "Mortality While Receving"
+  },
+  {
+   "default": "0",
+   "fieldname": "number_of_b_grade_chicken",
+   "fieldtype": "Int",
+   "label": "Number of B Grade Chicken"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -138,7 +145,7 @@
    "link_fieldname": "chicken_own_packing"
   }
  ],
- "modified": "2022-06-06 16:44:15.264488",
+ "modified": "2022-06-08 15:56:08.015419",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",

@@ -132,6 +132,15 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "Own Packing Report Setting",
+   "link_to": "Own Packing Report Setting",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "Broiler",
    "link_type": "DocType",
    "onboard": 0,
@@ -156,7 +165,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-06-05 18:34:14.654837",
+ "modified": "2022-06-08 16:49:56.830175",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",

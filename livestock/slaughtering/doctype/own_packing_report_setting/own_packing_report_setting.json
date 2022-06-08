@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:item",
+ "creation": "2022-06-08 16:48:25.409886",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_group",
+  "item_sub_group",
+  "item"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Item Group",
+   "options": "Portion\nGiblets"
+  },
+  {
+   "depends_on": "eval:doc.item_group=='Giblets'",
+   "fieldname": "item_sub_group",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Item Sub Group",
+   "options": "\nLIver\nGizzard"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item",
+   "options": "Item",
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-08 17:01:26.122015",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Own Packing Report Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "item"
+}
