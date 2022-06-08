@@ -63,7 +63,13 @@ frappe.ui.form.on('Broiler Batch', {
                
                     }).removeClass("btn-default").addClass("btn-success");
 			}
+            
 	},
+    mortality:function(frm, cdt, cdn) 
+    { 
+        frm.doc.doc_placed=frm.doc.number_received-frm.doc.mortality;
+        frm.refresh_fields()
+    },
 	create_stock_entry: function(frm, cdt, cdn) 
             { 
                  var d = locals[cdt][cdn];
@@ -103,6 +109,40 @@ frappe.ui.form.on('Broiler Batch', {
 			}
 });
 
+frappe.ui.form.on("Mortality", 
+    {
+        evening:function(frm, cdt, cdn) 
+        { 
+            var d = locals[cdt][cdn];
+            d.total=d.evening+d.morning
+            var totom=0
+            $.each (frm.doc.daily_mortality, function(i, dt){
+    
+                totom+=dt.total;
+                
+            });
+
+            frm.doc.total_mortaliy=totom
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality
+            frm.refresh_fields() 
+        },
+        morning:function(frm, cdt, cdn) 
+        { 
+            var d = locals[cdt][cdn]; 
+            d.total=d.evening+d.morning
+            
+            var totom=0
+            $.each (frm.doc.daily_mortality, function(i, dt){
+    
+                totom+=dt.total;
+                
+            });
+
+            frm.doc.total_mortaliy=totom
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality
+            frm.refresh_fields()
+        }
+    });
 frappe.ui.form.on("Broiler Items", 
     {
 		item_code: function(frm, cdt, cdn) 

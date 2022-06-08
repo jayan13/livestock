@@ -47,12 +47,45 @@ frappe.ui.form.on('Chicken Own Packing', {
            
             }).removeClass("btn-default").addClass("btn-success");
         }
+        frm.doc.chicken_net_of_mortality=frm.doc.number_of_chicken-frm.doc.mortality_while_receving-frm.doc.number_of_culls;
+        if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
+            {        
+            frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);           
+       
+            }
+        },
+        number_of_chicken: function(frm) {
+            frm.doc.chicken_net_of_mortality=frm.doc.number_of_chicken-frm.doc.mortality_while_receving-frm.doc.number_of_culls;
+            if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
+                {        
+                frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);           
+           
+                }
+            frm.refresh_fields();
+        },
+        mortality_while_receving: function(frm) {
+            frm.doc.chicken_net_of_mortality=frm.doc.number_of_chicken-frm.doc.mortality_while_receving-frm.doc.number_of_culls;
+            if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
+                {        
+                frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);           
+           
+                }
+            frm.refresh_fields();
+        },
+        number_of_culls: function(frm) {
+            frm.doc.chicken_net_of_mortality=frm.doc.number_of_chicken-frm.doc.mortality_while_receving-frm.doc.number_of_culls;
+            if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
+                {        
+                frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);           
+           
+                }
+            frm.refresh_fields();
         },
     chicken_net_of_mortality: function(frm) {
     if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
     {
         
-            frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,2);
+            frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);
             frm.refresh_fields();
            
     }
@@ -61,7 +94,7 @@ total_live_weight_in_kg: function(frm) {
     if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
     {
         
-            frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,2);
+            frm.doc.avg_live_weight_per_cheicken = flt(frm.doc.total_live_weight_in_kg/frm.doc.chicken_net_of_mortality,4);
             frm.refresh_fields();
            
     }

@@ -33,6 +33,7 @@
   "used_items",
   "section_break_14",
   "daily_mortality",
+  "total_mortaliy",
   "section_break_20",
   "temperature",
   "item_processed"
@@ -210,6 +211,13 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Open\nCompleted\nCancelled"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_mortaliy",
+   "fieldtype": "Int",
+   "label": "Total Mortaliy",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -227,7 +235,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2022-06-06 15:40:11.089060",
+ "modified": "2022-06-08 20:47:24.819948",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",

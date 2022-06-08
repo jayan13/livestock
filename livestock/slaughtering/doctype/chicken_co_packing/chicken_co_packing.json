@@ -35,18 +35,21 @@
    "options": "Customer"
   },
   {
+   "default": "0",
    "fieldname": "no_of_chicken_taken_in",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "No of chicken taken in"
   },
   {
+   "default": "0",
    "fieldname": "mortality_in_numbers",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Mortality in Numbers"
   },
   {
+   "default": "0",
    "fieldname": "chicken_net_of_mortality",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Chicken net of mortality"
   },
   {
@@ -105,7 +108,7 @@
    "link_fieldname": "chicken_co_packing"
   }
  ],
- "modified": "2022-06-06 16:29:58.805967",
+ "modified": "2022-06-08 19:05:35.116533",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Co Packing",

@@ -55,6 +55,41 @@ frappe.ui.form.on('Hatchery Batch', {
         }).removeClass("btn-default").addClass("btn-success");
     }
       },
+      number_received: function(frm, cdt, cdn) 
+      { 
+        frm.doc.number_set=frm.doc.number_received-frm.doc.cull_eggs;
+        frm.refresh_fields();
+      },
+      cull_eggs: function(frm, cdt, cdn) 
+      { 
+        frm.doc.number_set=frm.doc.number_received-frm.doc.cull_eggs;
+        frm.refresh_fields();
+      },
+      fertile_eggs: function(frm, cdt, cdn) 
+      { 
+        frm.doc.number_hatched=frm.doc.fertile_eggs-frm.doc.infertile_eggs-frm.doc.spoiled_fertility;
+        frm.refresh_fields();
+      },
+      infertile_eggs: function(frm, cdt, cdn) 
+      { 
+        frm.doc.number_hatched=frm.doc.fertile_eggs-frm.doc.infertile_eggs-frm.doc.spoiled_fertility;
+        frm.refresh_fields();
+      },
+      spoiled_fertility: function(frm, cdt, cdn) 
+      { 
+        frm.doc.number_hatched=frm.doc.fertile_eggs-frm.doc.infertile_eggs-frm.doc.spoiled_fertility;
+        frm.refresh_fields();
+      },
+      number_hatched: function(frm, cdt, cdn) 
+      { 
+        frm.doc.chicks_transferred=frm.doc.number_hatched-frm.doc.culls_no;
+        frm.refresh_fields();
+      },
+      culls_no: function(frm, cdt, cdn) 
+      { 
+        frm.doc.chicks_transferred=frm.doc.number_hatched-frm.doc.culls_no;
+        frm.refresh_fields();
+      }, 
 	create_stock_entry: function(frm, cdt, cdn) 
             { 
                  var d = locals[cdt][cdn];

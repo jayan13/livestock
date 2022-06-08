@@ -100,6 +100,7 @@
    "label": "Item Processed"
   },
   {
+   "description": "Chicken received from",
    "fieldname": "project",
    "fieldtype": "Link",
    "label": "Project",
@@ -145,7 +146,7 @@
    "link_fieldname": "chicken_own_packing"
   }
  ],
- "modified": "2022-06-08 15:56:08.015419",
+ "modified": "2022-06-08 18:43:12.077277",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",
