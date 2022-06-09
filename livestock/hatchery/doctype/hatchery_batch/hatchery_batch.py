@@ -11,6 +11,7 @@ class HatcheryBatch(Document):
 		project = frappe.new_doc("Project")
 		project.project_name=self.hatchery_batch_name
 		project.project_type="Hatchery"
+		project.hatchery=self.hatchery
 		project.expected_start_date=self.setting_date
 		#project.expected_end_date=self.date_of_hatching
 		project.company=shed.company

@@ -3,6 +3,16 @@
 
 frappe.ui.form.on('Chicken Own Packing', {
     refresh: function(frm) { 
+
+        frm.set_query('project', function(doc, cdt, cdn) {
+		  
+			return {
+			   "filters": {
+			"project_type": "Broiler",
+		}
+			};
+		});
+
         if (frm.doc.item_processed!=1)
         {       
             frm.add_custom_button(__('Production Entry'), function(){

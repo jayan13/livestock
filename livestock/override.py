@@ -79,7 +79,7 @@ class HatcheryProject(Document):
 		self.total_billed_amount = total_billed_amount and total_billed_amount[0][0] or 0
 	def calculate_tranfer_amount(self):
 		amount=0		
-		account = frappe.db.get_value('Hatchery', self.hatchery, 'account')
+		account = frappe.db.get_value('Hatchery Settings', self.hatchery, 'account')
 		accu=frappe.db.get_list("Stock Entry",filters={'Project': self.name,'stock_entry_type':"Material Transfer","docstatus":'1'},fields=['name'])
 		
 		for ac in accu:
