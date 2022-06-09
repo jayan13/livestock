@@ -105,7 +105,6 @@ override_doctype_class = {
 doc_events = {
     "Stock Entry": {
         "on_submit": [
-			"livestock.poultry.doctype.poultry_items.project_stock_entry.update_project_item_stat",
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
 			"livestock.hatchery.doctype.hatchery_batch.hatchery_stock_entry.update_item_stat",
 			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat"
@@ -148,32 +147,7 @@ fixtures = [
             [
                 "name",
                 "in",
-                (
-                    "Project-column_break_25",                    
-                    "Project-hatchery_details",
-                    "Project-strain",
-                    "Project-supplier",
-                    "Project-receiving_date",
-                    "Project-setting_date",
-                    "Project-setter_no",
-					"Project-number_received",
-					"Project-number_set",
-					"Project-cull_eggs",
-					"Project-eggs_wt_gm",
-					"Project-date_of_hatching",
-					"Project-fertile_eggs",
-					"Project-infertile_eggs",
-					"Project-chicks_transfer_date",
-					"Project-number_hatched",
-					"Project-chicks_transferred",
-					"Project-culls_no",
-					"Project-shed_no",
-					"Project-spoiled_fertility",
-					"Project-av_chicks_wt",
-					"Project-items",
-					"Project-section_break_35",
-					"Project-create_stock_entry",
-					"Project-item_processed",
+                (                  
 					"Project-hatchery",
 					"Project-total_transfer_amount",
 					"Stock Entry-manufacturing_type",

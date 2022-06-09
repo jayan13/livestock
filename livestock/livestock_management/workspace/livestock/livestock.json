@@ -34,15 +34,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Htchery Details",
-   "link_to": "Hatchery",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Hatchery Master",
    "link_to": "Hatchery Settings",
    "link_type": "DocType",
@@ -165,7 +156,7 @@
    "type": "Link"
   }
  ],
- "modified": "2022-06-08 16:49:56.830175",
+ "modified": "2022-06-09 20:39:53.226943",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",
