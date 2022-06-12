@@ -110,7 +110,7 @@ doc_events = {
 			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat"
 		],
 		"on_trash": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
-		"on_cancel": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
+		"on_cancel": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.cancel_item",
     },
 	"Sales Invoice":{
 		"on_submit":"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat"

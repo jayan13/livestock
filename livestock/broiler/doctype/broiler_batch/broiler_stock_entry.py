@@ -475,3 +475,19 @@ def delete_item(doc,event):
 
         frappe.db.delete("Broiler Transfer Consumable", {"parent": doc.item_transfer })
         frappe.db.delete("Broiler Item Transfer", {"name": doc.item_transfer })
+
+@frappe.whitelist()
+def cancel_item(doc,event):
+    if doc.item_transfer:
+        
+        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty'])
+        if trn:
+            batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
+            trns=chick_transferred-trn
+            trns2=current_alive_chicks+trn
+            frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
+            frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', trns2)
+            frappe.db.set_value('Broiler Batch', batch, 'item_processed', '0')
+
+        frappe.db.set_value('Broiler Item Transfer', doc.item_transfer, 'processed', '0')
+        frappe.db.sql("""update `tabBroiler Transfer Consumable` set processed='0' where parent=%s""",doc.item_transfer)
