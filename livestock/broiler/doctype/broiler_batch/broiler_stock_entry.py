@@ -416,7 +416,8 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                         "amount":amount,  
                         "transfer_qty":tot_scrap,
                         'conversion_factor': flt(conversion_factor),
-                        'is_scrap_item':1,                    
+                        'is_scrap_item':1,
+                        'is_process_loss':1,                    
         })
     
     stock_entry.item_transfer=broiler_item.name
