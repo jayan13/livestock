@@ -29,8 +29,7 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company",
-   "unique": 1
+   "options": "Company"
   },
   {
    "fieldname": "cost_center",
@@ -83,7 +82,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-05 13:50:13.829369",
+ "modified": "2022-06-12 11:02:33.599427",
  "modified_by": "Administrator",
  "module": "Hatchery",
  "name": "Hatchery Settings",

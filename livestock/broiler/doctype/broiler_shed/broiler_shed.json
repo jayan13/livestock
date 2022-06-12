@@ -30,8 +30,7 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company",
-   "unique": 1
+   "options": "Company"
   },
   {
    "fieldname": "cost_center",
@@ -88,7 +87,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-01 15:27:26.085776",
+ "modified": "2022-06-12 11:03:01.755085",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Shed",
