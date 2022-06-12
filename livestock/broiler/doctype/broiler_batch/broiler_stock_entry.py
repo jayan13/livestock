@@ -20,13 +20,13 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     broiler_item_transfer=frappe.db.get_list('Broiler Item Transfer',filters={'processed': '1','broiler_bach':batch},
     fields=['sum(transfer_qty) as transfer_qty,max(scrap) as scrap'],group_by='broiler_bach')
     pv_qty={}
-    pv_transfer_qty = 0
+    #pv_transfer_qty = 0
     pv_scrap = 0
     for trn in broiler_item_transfer:
-        pv_transfer_qty = trn.transfer_qty
+        #pv_transfer_qty = trn.transfer_qty
         pv_scrap = trn.scrap
 
-    cur_live=udoc.current_alive_chicks-pv_transfer_qty
+    cur_live=udoc.current_alive_chicks
     materials=frappe.db.get_list('Broiler Transfer Consumable',filters={'processed': '1','batch':batch},
     fields=['sum(used_quantity) as used_quantity,materal'],group_by='materal')
     for mat in materials:
@@ -359,7 +359,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                                         
                 })
 
-    if udoc.current_alive_chicks:
+    if transfer_qty:
 
         item_account_details = get_item_defaults(sett.product, sett.company)
         stock_uom = item_account_details.stock_uom
@@ -425,8 +425,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                         "amount":amount,  
                         "transfer_qty":tot_scrap,
                         'conversion_factor': flt(conversion_factor),
-                        'is_scrap_item':1,
-                        'is_process_loss':1,                    
+                        'is_scrap_item':1,          
         })
     
     stock_entry.item_transfer=broiler_item.name
@@ -456,8 +455,9 @@ def update_item_stat(doc,event):
     if batch:
         udoc = frappe.get_doc('Broiler Batch', batch)
         if udoc:            
-            if (transfer_qty+udoc.chick_transferred)==udoc.current_alive_chicks:
+            if (udoc.current_alive_chicks-transfer_qty) < 1:
                 udoc.item_processed = 1
+            udoc.current_alive_chicks =udoc.current_alive_chicks-transfer_qty
             udoc.chick_transferred = transfer_qty+udoc.chick_transferred
             udoc.save()
 
@@ -467,9 +467,11 @@ def delete_item(doc,event):
         
         trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty'])
         if trn:
-            batch,chick_transferred=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred'])
+            batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
             trns=chick_transferred-trn
+            trns2=current_alive_chicks+trn
             frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
+            frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', trns2)
 
         frappe.db.delete("Broiler Transfer Consumable", {"parent": doc.item_transfer })
         frappe.db.delete("Broiler Item Transfer", {"name": doc.item_transfer })

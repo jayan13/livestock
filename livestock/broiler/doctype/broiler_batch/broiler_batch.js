@@ -94,7 +94,7 @@ frappe.ui.form.on('Broiler Batch', {
                 totom+=dt.total;
                 
             });
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom
+        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom-frm.doc.chick_transferred
         frm.refresh_fields()
     },
 	create_stock_entry: function(frm, cdt, cdn) 
@@ -150,7 +150,7 @@ frappe.ui.form.on("Mortality",
             });
 
             frm.doc.total_mortaliy=totom
-            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred
             frm.refresh_fields() 
         },
         morning:function(frm, cdt, cdn) 
@@ -166,7 +166,7 @@ frappe.ui.form.on("Mortality",
             });
 
             frm.doc.total_mortaliy=totom
-            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred
             frm.refresh_fields()
         }
     });
