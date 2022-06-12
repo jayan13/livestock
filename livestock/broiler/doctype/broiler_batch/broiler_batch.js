@@ -43,23 +43,42 @@ frappe.ui.form.on('Broiler Batch', {
                         return false;
                         }
                         
-                        
-                //console.log(frm.doc);  
-                    frappe.call(
-                        { 
-                            method: "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.stock_entry",
-                            args: {
-                                batch:frm.doc.name
+                        frappe.prompt(
+                            [
+                            {  fieldtype: "Int",
+                                label: __("Transfer Quantity"),
+                                fieldname: "transfer_qty",
+                                reqd:'1'                                
+                            },{  fieldtype: "Link",
+                            label: __("Transfer Warehouse"),
+                            fieldname: "transfer_warehouse",
+                            options:"Warehouse"                                
+                        }],
+                            function(data) {
+                                
+                                frappe.call(
+                                    { 
+                                        method: "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.stock_entry",
+                                        args: {
+                                            batch:frm.doc.name,
+                                            transfer_qty:data.transfer_qty,
+                                            transfer_warehouse:data.transfer_warehouse
+                                        },
+                                        callback: function(r) 
+                                            { 
+                                                if(r.message) 
+                                                    { 
+                                                        var doclist = frappe.model.sync(r.message);
+                                                        frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                                    } 
+                                            }
+                                    });
                             },
-                            callback: function(r) 
-                                { 
-                                    if(r.message) 
-                                        { 
-                                            var doclist = frappe.model.sync(r.message);
-                                            frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
-                                        } 
-                                }
-                        });
+                            __("Finish Item Transfer"),
+                            __("Confirm")
+                        );       
+                //console.log(frm.doc);  
+                    
                
                     }).removeClass("btn-default").addClass("btn-success");
 			}

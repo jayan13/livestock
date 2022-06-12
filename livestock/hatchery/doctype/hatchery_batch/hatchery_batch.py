@@ -1,9 +1,11 @@
 # Copyright (c) 2022, alantechnologies and contributors
 # For license information, please see license.txt
 
+from distutils.log import debug
 import frappe
 from frappe.utils import nowdate
 from frappe.model.document import Document
+#from erpnext.projects.doctype.project.project import Project
 
 class HatcheryBatch(Document):
 	def before_insert(self):
@@ -32,5 +34,22 @@ class HatcheryBatch(Document):
 			if self.status=='Completed':
 				pjt.expected_end_date=nowdate()
 			pjt.save()
-			
 
+
+def update_transfer_amount():		
+	exists_query = '(SELECT 1 from `tab{doctype}` where docstatus = 1 and project = `tabProject`.name and stock_entry_type="Material Transfer" and (CURDATE() between DATE(modified)  and DATE_ADD(DATE(modified), INTERVAL 2 DAY)))'
+	project_map = {}
+	for project_details in frappe.db.sql('''
+				SELECT name, 1 as order_exists, null as invoice_exists from `tabProject` where
+				exists {order_exists} and project_type="Hatchery"
+			'''.format(
+				order_exists=exists_query.format(doctype="Stock Entry")
+			), as_dict=True):
+		project = project_map.setdefault(project_details.name, frappe.get_doc('Project', project_details.name))
+		
+		if project_details.order_exists:
+			project.calculate_tranfer_amount()
+			#will call override project class - livestock/override.py
+			
+	for project in project_map.values():
+		project.save()

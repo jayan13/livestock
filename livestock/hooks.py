@@ -108,7 +108,9 @@ doc_events = {
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
 			"livestock.hatchery.doctype.hatchery_batch.hatchery_stock_entry.update_item_stat",
 			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat"
-		]
+		],
+		"on_trash": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
+		"on_cancel": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
     },
 	"Sales Invoice":{
 		"on_submit":"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat"
@@ -116,7 +118,13 @@ doc_events = {
 }
 # Scheduled Tasks
 # ---------------
+scheduler_events = {
 
+ 	"daily": [
+ 		"livestock.override.hatchery_project.update_transfer_amount"
+ 	],
+
+    }
 # scheduler_events = {
 # 	"all": [
 # 		"livestock.tasks.all"
@@ -155,7 +163,8 @@ fixtures = [
 					"Sales Invoice-chicken_own_packing",
 					"Sales Invoice-chicken_co_packing",
 					"Project-hatchery_batch",
-					"Project-broiler_batch"
+					"Project-broiler_batch",
+					"Stock Entry-item_transfer"
                     
                 ),
             ]

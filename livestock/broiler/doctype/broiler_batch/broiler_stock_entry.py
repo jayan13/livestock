@@ -1,3 +1,4 @@
+from distutils.log import debug
 from itertools import product
 import frappe
 import erpnext
@@ -12,15 +13,34 @@ from erpnext.stock.doctype.item.item import get_item_defaults
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
-def stock_entry(batch):
+def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     
     udoc = frappe.get_doc('Broiler Batch', batch)
-    sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)
-    #items=[]
-    #frappe.msgprint(""" projects  {0} """.format(udoc.project_name))
+    sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)    
+    broiler_item_transfer=frappe.db.get_list('Broiler Item Transfer',filters={'processed': '1','broiler_bach':batch},
+    fields=['sum(transfer_qty) as transfer_qty,max(scrap) as scrap'],group_by='broiler_bach')
+    pv_qty={}
+    pv_transfer_qty = 0
+    pv_scrap = 0
+    for trn in broiler_item_transfer:
+        pv_transfer_qty = trn.transfer_qty
+        pv_scrap = trn.scrap
+
+    cur_live=udoc.current_alive_chicks-pv_transfer_qty
+    materials=frappe.db.get_list('Broiler Transfer Consumable',filters={'processed': '1','batch':batch},
+    fields=['sum(used_quantity) as used_quantity,materal'],group_by='materal')
+    for mat in materials:
+        pv_qty.update({mat.materal:mat.used_quantity})
+
     if not sett:
         frappe.throw(_("Please add Broiler settings for {0} ").format(sett.company))
 
+    broiler_item = frappe.new_doc("Broiler Item Transfer")
+    broiler_item.transfer_date=nowdate()
+    broiler_item.transfer_qty=transfer_qty
+    broiler_item.transfer_warehouse=transfer_warehouse
+    broiler_item.broiler_bach=batch
+    
     stock_entry = frappe.new_doc("Stock Entry")    
     stock_entry.company = sett.company
     stock_entry.purpose = "Manufacture"
@@ -32,7 +52,15 @@ def stock_entry(batch):
     total_add_cost=0
 
     if sett.base_row_material:
-        #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')        
+        #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')
+        pv_item_qty=pv_qty.get(sett.base_row_material) or 0
+        itmqty=((udoc.doc_placed-pv_item_qty)/cur_live)*int(transfer_qty)
+        broiler_item.append('materials', {
+        'materal':sett.base_row_material,
+        'used_quantity':itmqty,
+        'batch':batch
+        })
+
         item_account_details = get_item_defaults(sett.base_row_material, sett.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
@@ -43,19 +71,19 @@ def stock_entry(batch):
 						"warehouse": sett.row_material_target_warehouse,
 						"posting_date": stock_entry.posting_date,
 						"posting_time": stock_entry.posting_time,
-						"qty": -1 * udoc.number_received,
+						"qty": -1 * itmqty,
                         'company':sett.company
 					})
         if sett.row_material_target_warehouse:
-            validate_stock_qty(sett.base_row_material,udoc.number_received,sett.row_material_target_warehouse,stock_uom,stock_uom)
+            validate_stock_qty(sett.base_row_material,itmqty,sett.row_material_target_warehouse,stock_uom,stock_uom)
 
         precision = cint(frappe.db.get_default("float_precision")) or 3    
-        amount=flt(flt(udoc.number_received) * flt(base_row_rate), precision)
+        amount=flt(itmqty * flt(base_row_rate), precision)
         stock_entry.append('items', {
                         's_warehouse': sett.row_material_target_warehouse,
                         'item_code': sett.base_row_material,
-                        'qty': udoc.number_received,
-                        'actual_qty':udoc.number_received,
+                        'qty': itmqty,
+                        'actual_qty':itmqty,
                         'uom': stock_uom,
                         'cost_center':cost_center,					
                         'ste_detail': item_account_details.name,
@@ -65,7 +93,7 @@ def stock_entry(batch):
                         "basic_rate":base_row_rate, 	
                         "basic_amount":amount,  
                         "amount":amount,  
-                        "transfer_qty":udoc.number_received,
+                        "transfer_qty":itmqty,
                         'conversion_factor': flt(conversion_factor),
                                   
         })
@@ -76,6 +104,15 @@ def stock_entry(batch):
     if udoc.used_items:
         for item in udoc.used_items:
             if item.item_code:
+
+                pv_item_qty=pv_qty.get(item.item_code) or 0
+                itmqty=((item.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                broiler_item.append('materials', {
+                'materal':item.item_code,
+                'used_quantity':itmqty,
+                'batch':batch
+                })
+
                 item_account_details = get_item_defaults(item.item_code, sett.company)
                 #stock_uom = frappe.db.get_value("Item", item.item_code, "stock_uom")
                 stock_uom = item_account_details.stock_uom
@@ -87,14 +124,14 @@ def stock_entry(batch):
 						"warehouse": sett.row_material_target_warehouse,
 						"posting_date": stock_entry.posting_date,
 						"posting_time": stock_entry.posting_time,
-						"qty": -1 * item.qty,
+						"qty": -1 * itmqty,
                         'company':sett.company
 					})
                 if sett.row_material_target_warehouse:
-                    validate_stock_qty(item.item_code,item.qty,sett.row_material_target_warehouse,item.uom,stock_uom)                
+                    validate_stock_qty(item.item_code,itmqty,sett.row_material_target_warehouse,item.uom,stock_uom)                
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
-                amount=flt(flt(item.qty) * flt(rate), precision)
+                amount=flt(itmqty * flt(rate), precision)
 
                 if sett.base_row_material != item.item_code:
                     total_add_cost=total_add_cost+amount
@@ -103,8 +140,8 @@ def stock_entry(batch):
                 stock_entry.append('items', {
 					's_warehouse': sett.row_material_target_warehouse,
 					'item_code': item.item_code,
-					'qty': item.qty,
-                    'actual_qty':item.qty,
+					'qty': itmqty,
+                    'actual_qty':itmqty,
 					'uom': item.uom,
                     'cost_center':cost_center,					
 					'ste_detail': item.name,
@@ -114,7 +151,7 @@ def stock_entry(batch):
                     "basic_rate":rate, 	
                     "basic_amount":amount,  
                     "amount":amount,  
-                    "transfer_qty":item.qty,
+                    "transfer_qty":itmqty,
 					'conversion_factor': flt(conversion_factor),                    
 				})
 
@@ -123,6 +160,15 @@ def stock_entry(batch):
         vaccine=frappe.db.get_list('Vaccine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in vaccine:
             if vc.item:
+
+                pv_item_qty=pv_qty.get(vc.item) or 0
+                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                broiler_item.append('materials', {
+                'materal':vc.item,
+                'used_quantity':itmqty,
+                'batch':batch
+                })
+
                 item_account_details = get_item_defaults(vc.item, sett.company)
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
@@ -133,20 +179,20 @@ def stock_entry(batch):
                                 "warehouse": sett.row_material_target_warehouse,
                                 "posting_date": stock_entry.posting_date,
                                 "posting_time": stock_entry.posting_time,
-                                "qty": -1 * vc.qty,
+                                "qty": -1 * itmqty,
                                 'company':sett.company
                             })
                 if sett.row_material_target_warehouse:
-                    validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+                    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
-                amount=flt(flt(vc.qty) * flt(rate), precision)
+                amount=flt(itmqty * flt(rate), precision)
                 total_add_cost=total_add_cost+amount
                 stock_entry.append('items', {
                                 's_warehouse': sett.row_material_target_warehouse,
                                 'item_code': vc.item,
-                                'qty': vc.qty,
-                                'actual_qty':vc.qty,
+                                'qty': itmqty,
+                                'actual_qty':itmqty,
                                 'uom': vc.uom,
                                 'cost_center':cost_center,					
                                 'ste_detail': item_account_details.name,
@@ -156,7 +202,7 @@ def stock_entry(batch):
                                 "basic_rate":rate, 	
                                 "basic_amount":amount,  
                                 "amount":amount,  
-                                "transfer_qty":vc.qty,
+                                "transfer_qty":itmqty,
                                 'conversion_factor': flt(conversion_factor),
                                         
                 })
@@ -165,6 +211,14 @@ def stock_entry(batch):
         medicine=frappe.db.get_list('Medicine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in medicine:
             if vc.item:
+
+                pv_item_qty=pv_qty.get(vc.item) or 0
+                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                broiler_item.append('materials', {
+                'materal':vc.item,
+                'used_quantity':itmqty,
+                'batch':batch
+                })
                 item_account_details = get_item_defaults(vc.item, sett.company)
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
@@ -175,20 +229,20 @@ def stock_entry(batch):
                                 "warehouse": sett.row_material_target_warehouse,
                                 "posting_date": stock_entry.posting_date,
                                 "posting_time": stock_entry.posting_time,
-                                "qty": -1 * vc.qty,
+                                "qty": -1 * itmqty,
                                 'company':sett.company
                             })
                 if sett.row_material_target_warehouse:
-                    validate_stock_qty(vc.item,vc.qty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+                    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
-                amount=flt(flt(vc.qty) * flt(rate), precision)
+                amount=flt(itmqty * flt(rate), precision)
                 total_add_cost=total_add_cost+amount
                 stock_entry.append('items', {
                                 's_warehouse': sett.row_material_target_warehouse,
                                 'item_code': vc.item,
-                                'qty': vc.qty,
-                                'actual_qty':vc.qty,
+                                'qty': itmqty,
+                                'actual_qty':itmqty,
                                 'uom': vc.uom,
                                 'cost_center':cost_center,					
                                 'ste_detail': item_account_details.name,
@@ -198,7 +252,7 @@ def stock_entry(batch):
                                 "basic_rate":rate, 	
                                 "basic_amount":amount,  
                                 "amount":amount,  
-                                "transfer_qty":vc.qty,
+                                "transfer_qty":itmqty,
                                 'conversion_factor': flt(conversion_factor),
                                         
                 })
@@ -208,6 +262,13 @@ def stock_entry(batch):
         
         for vc in sfeed:
             if vc.item:
+                pv_item_qty=pv_qty.get(vc.item) or 0
+                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                broiler_item.append('materials', {
+                'materal':vc.item,
+                'used_quantity':itmqty,
+                'batch':batch
+                })
                 item_account_details = get_item_defaults(vc.item, sett.company)
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
@@ -219,11 +280,11 @@ def stock_entry(batch):
                                 "warehouse": sett.feed_warehouse,
                                 "posting_date": stock_entry.posting_date,
                                 "posting_time": stock_entry.posting_time,
-                                "qty": -1 * vc.qty,
+                                "qty": -1 * itmqty,
                                 'company':sett.company
                             })
                 if sett.feed_warehouse:
-                    validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
+                    validate_stock_qty(vc.item,itmqty,sett.feed_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(flt(vc.qty) * flt(rate), precision)
@@ -231,8 +292,8 @@ def stock_entry(batch):
                 stock_entry.append('items', {
                                 's_warehouse': sett.feed_warehouse,
                                 'item_code': vc.item,
-                                'qty': vc.qty,
-                                'actual_qty':vc.qty,
+                                'qty': itmqty,
+                                'actual_qty':itmqty,
                                 'uom': vc.uom,
                                 'cost_center':cost_center,					
                                 'ste_detail': item_account_details.name,
@@ -242,7 +303,7 @@ def stock_entry(batch):
                                 "basic_rate":rate, 	
                                 "basic_amount":amount,  
                                 "amount":amount,  
-                                "transfer_qty":vc.qty,
+                                "transfer_qty":itmqty,
                                 'conversion_factor': flt(conversion_factor),
                                         
                 })
@@ -251,6 +312,13 @@ def stock_entry(batch):
 
         for vc in ffeed:
             if vc.item:
+                pv_item_qty=pv_qty.get(vc.item) or 0
+                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                broiler_item.append('materials', {
+                'materal':vc.item,
+                'used_quantity':itmqty,
+                'batch':batch
+                })
                 item_account_details = get_item_defaults(vc.item, sett.company)
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
@@ -262,20 +330,20 @@ def stock_entry(batch):
                                 "warehouse": sett.feed_warehouse,
                                 "posting_date": stock_entry.posting_date,
                                 "posting_time": stock_entry.posting_time,
-                                "qty": -1 * vc.qty,
+                                "qty": -1 * itmqty,
                                 'company':sett.company
                             })
                 if sett.feed_warehouse:
-                    validate_stock_qty(vc.item,vc.qty,sett.feed_warehouse,vc.uom,stock_uom)
+                    validate_stock_qty(vc.item,itmqty,sett.feed_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
-                amount=flt(flt(vc.qty) * flt(rate), precision)
+                amount=flt(itmqty * flt(rate), precision)
                 total_add_cost=total_add_cost+amount
                 stock_entry.append('items', {
                                 's_warehouse': sett.feed_warehouse,
                                 'item_code': vc.item,
-                                'qty': vc.qty,
-                                'actual_qty':vc.qty,
+                                'qty': itmqty,
+                                'actual_qty':itmqty,
                                 'uom': vc.uom,
                                 'cost_center':cost_center,					
                                 'ste_detail': item_account_details.name,
@@ -285,7 +353,7 @@ def stock_entry(batch):
                                 "basic_rate":rate, 	
                                 "basic_amount":amount,  
                                 "amount":amount,  
-                                "transfer_qty":vc.qty,
+                                "transfer_qty":itmqty,
                                 'conversion_factor': flt(conversion_factor),
                                         
                 })
@@ -298,13 +366,13 @@ def stock_entry(batch):
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3
-        cost=((udoc.current_alive_chicks*base_row_rate) + total_add_cost) / udoc.current_alive_chicks
-        amount=flt(flt(udoc.current_alive_chicks) * flt(cost), precision)
+        cost=((int(transfer_qty)*base_row_rate) + total_add_cost) / int(transfer_qty)
+        amount=flt(int(transfer_qty) * flt(cost), precision)
         stock_entry.append('items', {
-                        't_warehouse': sett.product_target_warehouse,
+                        't_warehouse': transfer_warehouse or sett.product_target_warehouse,
                         'item_code': sett.product,
-                        'qty': udoc.current_alive_chicks,
-                        'actual_qty':udoc.current_alive_chicks,
+                        'qty': transfer_qty,
+                        'actual_qty':transfer_qty,
                         'uom': stock_uom,
                         'cost_center':cost_center,					
                         'ste_detail': item_account_details.name,
@@ -314,13 +382,17 @@ def stock_entry(batch):
                         "basic_rate":cost, 	
                         "basic_amount":amount,  
                         "amount":amount,  
-                        "transfer_qty":udoc.current_alive_chicks,
+                        "transfer_qty":transfer_qty,
                         'conversion_factor': flt(conversion_factor),
                         'is_finished_item':1,               
         })
-    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality
+
+    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality-pv_scrap
+    broiler_item.scrap=tot_scrap
+    broiler_item.insert(ignore_permissions=True)
     
     if tot_scrap:
+
         item_account_details = get_item_defaults(sett.cull, sett.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
@@ -346,6 +418,8 @@ def stock_entry(batch):
                         'conversion_factor': flt(conversion_factor),
                         'is_scrap_item':1,                    
         })
+    
+    stock_entry.item_transfer=broiler_item.name
 
     return stock_entry.as_dict()
 
@@ -364,11 +438,28 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
 
 @frappe.whitelist()
 def update_item_stat(doc,event):
+    frappe.db.set_value('Broiler Item Transfer', doc.item_transfer, 'processed', '1')
+    frappe.db.sql("""update `tabBroiler Transfer Consumable` set processed='1' where parent=%s""",doc.item_transfer)
+    transfer_qty=frappe.db.get_value('Broiler Item Transfer', {'name': doc.item_transfer}, ['transfer_qty'])    
+
     batch=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name'])
     if batch:
         udoc = frappe.get_doc('Broiler Batch', batch)
-        if udoc:
-            udoc.item_processed = 1
+        if udoc:            
+            if (transfer_qty+udoc.chick_transferred)==udoc.current_alive_chicks:
+                udoc.item_processed = 1
+            udoc.chick_transferred = transfer_qty+udoc.chick_transferred
             udoc.save()
 
+@frappe.whitelist()
+def delete_item(doc,event):
+    if doc.item_transfer:
+        
+        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['item_transfer'])
+        if trn:
+            batch,chick_transferred=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred'])
+            trns=chick_transferred-trn
+            frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
 
+        frappe.db.delete("Broiler Transfer Consumable", {"parent": doc.item_transfer })
+        frappe.db.delete("Broiler Item Transfer", {"name": doc.item_transfer })

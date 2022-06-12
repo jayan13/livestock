@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-06-11 10:34:25.567029",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "broiler_bach",
+  "transfer_date",
+  "transfer_qty",
+  "transfer_warehouse",
+  "scrap",
+  "processed",
+  "materials"
+ ],
+ "fields": [
+  {
+   "fieldname": "broiler_bach",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Broiler Bach",
+   "options": "Broiler Batch"
+  },
+  {
+   "fieldname": "transfer_date",
+   "fieldtype": "Date",
+   "label": "Transfer Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "transfer_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Transfer Qty"
+  },
+  {
+   "fieldname": "transfer_warehouse",
+   "fieldtype": "Link",
+   "label": "Transfer Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "default": "0",
+   "fieldname": "processed",
+   "fieldtype": "Data",
+   "label": "Processed"
+  },
+  {
+   "fieldname": "materials",
+   "fieldtype": "Table",
+   "label": "Materials",
+   "options": "Broiler Transfer Consumable"
+  },
+  {
+   "default": "0",
+   "fieldname": "scrap",
+   "fieldtype": "Int",
+   "label": "Scrap"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-11 23:22:35.477721",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "Broiler Item Transfer",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

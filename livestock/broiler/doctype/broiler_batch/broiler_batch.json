@@ -14,13 +14,14 @@
   "strain",
   "number_received",
   "receiving_date",
+  "mortality",
   "company",
   "column_break_5",
-  "mortality",
   "doc_placed",
   "start_date",
   "end_date",
   "current_alive_chicks",
+  "chick_transferred",
   "project",
   "status",
   "section_break_16",
@@ -202,7 +203,8 @@
    "default": "0",
    "fieldname": "current_alive_chicks",
    "fieldtype": "Int",
-   "label": "Current Alive Chicks"
+   "label": "Total Alive Chicks",
+   "read_only": 1
   },
   {
    "fetch_from": "project.status",
@@ -217,6 +219,13 @@
    "fieldname": "total_mortaliy",
    "fieldtype": "Int",
    "label": "Total Mortaliy",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "chick_transferred",
+   "fieldtype": "Int",
+   "label": "Chick Transferred",
    "read_only": 1
   }
  ],
@@ -235,7 +244,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2022-06-08 20:47:24.819948",
+ "modified": "2022-06-11 15:53:28.835558",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",
