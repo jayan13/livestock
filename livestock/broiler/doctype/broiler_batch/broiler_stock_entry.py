@@ -18,7 +18,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     udoc = frappe.get_doc('Broiler Batch', batch)
     sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)    
     broiler_item_transfer=frappe.db.get_list('Broiler Item Transfer',filters={'processed': '1','broiler_bach':batch},
-    fields=['sum(transfer_qty) as transfer_qty,max(scrap) as scrap'],group_by='broiler_bach')
+    fields=['sum(transfer_qty) as transfer_qty,sum(scrap) as scrap'],group_by='broiler_bach')
     pv_qty={}
     #pv_transfer_qty = 0
     pv_scrap = 0
