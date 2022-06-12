@@ -36,15 +36,16 @@ class HatcheryProject(Document):
 		self.actual_time = from_time_sheet.time
 
 		self.total_expense_claim = from_expense_claim.total_sanctioned_amount
-		Project.update_purchase_costing(self)
-		Project.update_sales_amount(self)
-		Project.update_billed_amount(self)
-		
+		self.update_purchase_costing()
+		self.update_sales_amount()
+		self.update_billed_amount()
+
 		if self.project_type=='Hatchery':
 			self.calculate_tranfer_amount()
-		Project.calculate_gross_margin(self)		
 
-	
+		self.calculate_gross_margin()
+
+
 	def calculate_tranfer_amount(self):		
 		amount=0		
 		account = frappe.db.get_value('Hatchery Settings', self.hatchery, 'account')
@@ -68,3 +69,38 @@ class HatcheryProject(Document):
 		self.total_transfer_amount=amount
 
 
+	def calculate_gross_margin(self):
+		if self.project_type=='Hatchery':
+			expense_amount = (flt(self.total_costing_amount) + flt(self.total_expense_claim)
+                                + flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
+			inc=self.total_billed_amount+self.total_transfer_amount
+			self.gross_margin = flt(inc) - expense_amount
+			if inc:
+				self.per_gross_margin = (self.gross_margin / flt(inc)) * 100
+		else:
+			expense_amount = (flt(self.total_costing_amount) + flt(self.total_expense_claim)
+                        + flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
+
+			self.gross_margin = flt(self.total_billed_amount) - expense_amount
+			if self.total_billed_amount:
+				self.per_gross_margin = (self.gross_margin / flt(self.total_billed_amount)) * 100       
+
+	def update_purchase_costing(self):
+		total_purchase_cost = frappe.db.sql("""select sum(base_net_amount)
+                        from `tabPurchase Invoice Item` where project = %s and docstatus=1""", self.name)
+
+		self.total_purchase_cost = total_purchase_cost and total_purchase_cost[0][0] or 0
+
+
+	def update_sales_amount(self):
+		total_sales_amount = frappe.db.sql("""select sum(base_net_total)
+                        from `tabSales Order` where project = %s and docstatus=1""", self.name)
+
+		self.total_sales_amount = total_sales_amount and total_sales_amount[0][0] or 0
+
+	def update_billed_amount(self):
+		total_billed_amount = frappe.db.sql("""select sum(base_net_total)
+                        from `tabSales Invoice` where project = %s and docstatus=1""", self.name)
+
+		self.total_billed_amount = total_billed_amount and total_billed_amount[0][0] or 0
+		
