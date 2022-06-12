@@ -103,7 +103,8 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     
 
     if udoc.used_items:
-        for item in udoc.used_items:
+        used_items=frappe.db.get_list('Broiler Items',filters={'parent': udoc.name},fields=['item_code', 'sum(qty) as qty','uom'],group_by='item_code')
+        for item in used_items:
             if item.item_code:
 
                 pv_item_qty=pv_qty.get(item.item_code) or 0
@@ -145,7 +146,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                     'actual_qty':itmqty,
 					'uom': item.uom,
                     'cost_center':cost_center,					
-					'ste_detail': item.name,
+					'ste_detail': item_account_details.name,
 					'stock_uom': stock_uom,
                     'expense_account':expense_account,
                     'valuation_rate': rate,
