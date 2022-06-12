@@ -50,11 +50,12 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
 	#stock_entry.set_stock_entry_type()
     base_row_rate=0
     total_add_cost=0
-
+    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality-pv_scrap or 0
+    
     if sett.base_row_material:
         #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')
         pv_item_qty=pv_qty.get(sett.base_row_material) or 0
-        itmqty=((udoc.doc_placed-pv_item_qty)/cur_live)*int(transfer_qty)
+        itmqty=int(tot_scrap)+int(transfer_qty)
         broiler_item.append('materials', {
         'materal':sett.base_row_material,
         'used_quantity':itmqty,
@@ -387,7 +388,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                         'is_finished_item':1,               
         })
 
-    tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality-pv_scrap
+    
     broiler_item.scrap=tot_scrap
     broiler_item.insert(ignore_permissions=True)
     
@@ -398,8 +399,16 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
         expense_account=item_account_details.get("expense_account")                                
-        precision = cint(frappe.db.get_default("float_precision")) or 3    
-        amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
+        precision = cint(frappe.db.get_default("float_precision")) or 3
+        base_row_rate = get_incoming_rate({
+						"item_code": sett.base_row_material,
+						"warehouse": sett.cull_target_warehouse,
+						"posting_date": stock_entry.posting_date,
+						"posting_time": stock_entry.posting_time,
+						"qty": -1 * tot_scrap,
+                        'company':sett.company
+					})    
+        amount=flt(flt(tot_scrap) * base_row_rate, precision)
         stock_entry.append('items', {
                         't_warehouse': sett.cull_target_warehouse,
                         'item_code': sett.cull,

@@ -45,7 +45,8 @@
    "fieldname": "total",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Total"
+   "label": "Total",
+   "read_only": 1
   },
   {
    "fieldname": "remark",
@@ -57,7 +58,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-05 14:55:16.833218",
+ "modified": "2022-06-12 12:15:45.723224",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Mortality",
