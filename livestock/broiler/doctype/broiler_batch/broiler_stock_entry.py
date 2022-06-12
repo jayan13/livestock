@@ -455,7 +455,7 @@ def update_item_stat(doc,event):
 def delete_item(doc,event):
     if doc.item_transfer:
         
-        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['item_transfer'])
+        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty'])
         if trn:
             batch,chick_transferred=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred'])
             trns=chick_transferred-trn
