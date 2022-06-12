@@ -80,6 +80,7 @@ def stock_entry(batch):
     if udoc.used_items:
         for item in udoc.used_items:
             if item.s_warehouse or item.t_warehouse:
+                wareh=item.t_warehouse or item.s_warehouse
                 item_account_details = get_item_defaults(item.item_code, sett.company)
                 #stock_uom = frappe.db.get_value("Item", item.item_code, "stock_uom")
                 stock_uom = item_account_details.stock_uom
@@ -87,8 +88,8 @@ def stock_entry(batch):
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
                 expense_account=item_account_details.get("expense_account")                
                 
-                if item.s_warehouse:
-                    validate_stock_qty(item.item_code,item.qty,item.s_warehouse,item.uom,stock_uom)                
+                if wareh:
+                    validate_stock_qty(item.item_code,item.qty,wareh,item.uom,stock_uom)                
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(flt(item.qty) * flt(item.rate), precision)
@@ -98,7 +99,7 @@ def stock_entry(batch):
                 
 
                 stock_entry.append('items', {
-					's_warehouse': item.t_warehouse or item.s_warehouse,
+					's_warehouse': wareh,
 					'item_code': item.item_code,
 					'qty': item.qty,
                     'actual_qty':item.qty,
