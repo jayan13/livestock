@@ -54,14 +54,16 @@ def update_transfer_amount():
 	for project in project_map.values():
 		project.save()
 
-def update_project_costing(doc,event):		
-	project=frappe.get_doc('Project', doc.project)
-	if project.hatchery and project.project_type=='Hatchery':
-		project.update_costing_from_trn(doc)
-		project.save()
+def update_project_costing(doc,event):
+	if doc.project:		
+		project=frappe.get_doc('Project', doc.project)
+		if project.hatchery and project.project_type=='Hatchery':
+			project.update_costing_from_trn(doc)
+			project.save()
 
 def cancel_project_costing(doc,event):		
-	project=frappe.get_doc('Project', doc.project)
-	if project.hatchery and project.project_type=='Hatchery':
-		project.cancel_costing_from_trn(doc)
-		project.save()
+	if doc.project:
+		project=frappe.get_doc('Project', doc.project)
+		if project.hatchery and project.project_type=='Hatchery':
+			project.cancel_costing_from_trn(doc)
+			project.save()
