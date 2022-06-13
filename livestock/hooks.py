@@ -118,13 +118,7 @@ doc_events = {
 }
 # Scheduled Tasks
 # ---------------
-scheduler_events = {
 
- 	"daily": [
- 		"livestock.override.hatchery_project.update_transfer_amount"
- 	],
-
-    }
 # scheduler_events = {
 # 	"all": [
 # 		"livestock.tasks.all"
