@@ -152,7 +152,8 @@ def stock_entry(own_packing):
                     "basic_amount":amount,  
                     "amount":amount,  
                     "transfer_qty":fitem.qty,
-					'conversion_factor': flt(conversion_factor),                    
+					'conversion_factor': flt(conversion_factor),
+                    'is_finished_item':1,                    
 			})
 
             for pc in pcitems:

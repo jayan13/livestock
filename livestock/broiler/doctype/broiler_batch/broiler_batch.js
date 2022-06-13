@@ -23,7 +23,7 @@ frappe.ui.form.on('Broiler Batch', {
 		}
 			};
 		});
-
+        
         if (frm.doc.item_processed!=1)
 			{       
 				frm.add_custom_button(__('Broiler Production Entry'), function(){
