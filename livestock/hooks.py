@@ -107,10 +107,14 @@ doc_events = {
         "on_submit": [
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
 			"livestock.hatchery.doctype.hatchery_batch.hatchery_stock_entry.update_item_stat",
-			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat"
+			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.update_item_stat",
+			"livestock.hatchery.doctype.hatchery_batch.hatchery_batch.update_project_costing",
 		],
 		"on_trash": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
-		"on_cancel": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.cancel_item",
+		"on_cancel": [
+			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.cancel_item",
+			"livestock.hatchery.doctype.hatchery_batch.hatchery_batch.cancel_project_costing"
+		],
     },
 	"Sales Invoice":{
 		"on_submit":"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat"

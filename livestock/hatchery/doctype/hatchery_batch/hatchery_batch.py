@@ -5,7 +5,7 @@ from distutils.log import debug
 import frappe
 from frappe.utils import nowdate
 from frappe.model.document import Document
-#from erpnext.projects.doctype.project.project import Project
+from erpnext.projects.doctype.project.project import Project
 
 class HatcheryBatch(Document):
 	def before_insert(self):
@@ -52,4 +52,16 @@ def update_transfer_amount():
 			#will call override project class - livestock/override.py
 			
 	for project in project_map.values():
+		project.save()
+
+def update_project_costing(doc,event):		
+	project=frappe.get_doc('Project', doc.project)
+	if project.hatchery and project.project_type=='Hatchery':
+		project.update_costing_from_trn(doc)
+		project.save()
+
+def cancel_project_costing(doc,event):		
+	project=frappe.get_doc('Project', doc.project)
+	if project.hatchery and project.project_type=='Hatchery':
+		project.cancel_costing_from_trn(doc)
 		project.save()
