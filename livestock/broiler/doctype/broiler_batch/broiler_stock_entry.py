@@ -450,27 +450,27 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
 def update_item_stat(doc,event):
     frappe.db.set_value('Broiler Item Transfer', doc.item_transfer, 'processed', '1')
     frappe.db.sql("""update `tabBroiler Transfer Consumable` set processed='1' where parent=%s""",doc.item_transfer)
-    transfer_qty=frappe.db.get_value('Broiler Item Transfer', {'name': doc.item_transfer}, ['transfer_qty'])    
+    transfer_qty=frappe.db.get_value('Broiler Item Transfer', {'name': doc.item_transfer}, ['transfer_qty']) or 0   
 
     batch=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name'])
     if batch:
         udoc = frappe.get_doc('Broiler Batch', batch)
         if udoc:            
-            if (udoc.current_alive_chicks-transfer_qty) < 1:
+            if (int(udoc.current_alive_chicks)-int(transfer_qty)) < 1:
                 udoc.item_processed = 1
-            udoc.current_alive_chicks =udoc.current_alive_chicks-transfer_qty
-            udoc.chick_transferred = transfer_qty+udoc.chick_transferred
+            udoc.current_alive_chicks =udoc.current_alive_chicks-int(transfer_qty)
+            udoc.chick_transferred = int(transfer_qty)+udoc.chick_transferred
             udoc.save()
 
 @frappe.whitelist()
 def delete_item(doc,event):
     if doc.item_transfer:
         
-        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty'])
+        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty']) or 0
         if trn:
             batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
-            trns=chick_transferred-trn
-            trns2=current_alive_chicks+trn
+            trns=int(chick_transferred)-int(trn)
+            trns2=int(current_alive_chicks)+int(trn)
             frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
             frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', trns2)
 
@@ -481,11 +481,11 @@ def delete_item(doc,event):
 def cancel_item(doc,event):
     if doc.item_transfer:
         
-        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty'])
+        trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty']) or 0
         if trn:
             batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
-            trns=chick_transferred-trn
-            trns2=current_alive_chicks+trn
+            trns=int(chick_transferred)-int(trn)
+            trns2=int(current_alive_chicks)+int(trn)
             frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
             frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', trns2)
             frappe.db.set_value('Broiler Batch', batch, 'item_processed', '0')
