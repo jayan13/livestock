@@ -162,7 +162,8 @@ fixtures = [
 					"Sales Invoice-chicken_co_packing",
 					"Project-hatchery_batch",
 					"Project-broiler_batch",
-					"Stock Entry-item_transfer"
+					"Stock Entry-item_transfer",
+					"Project-packing_cost"
                     
                 ),
             ]

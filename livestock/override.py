@@ -44,8 +44,27 @@ class HatcheryProject(Document):
 		if self.project_type=='Hatchery':
 			self.calculate_tranfer_amount()
 
+		if self.project_type=='Broiler':
+			self.packing_cost=0
+			self.calculate_packing_cost()
+
 		self.calculate_gross_margin()
 
+
+	def calculate_packing_cost(self):
+		own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+		pkcost=0
+		if own_packing:
+			stock=frappe.db.get_list("Stock Entry",filters={'chicken_own_packing': own_packing,'stock_entry_type':"Manufacture","docstatus":'1'},fields=['name'])
+			
+			for stitm in stock:
+				itm=frappe.get_doc('Stock Entry',stitm.name)
+				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
+				for pacitem in itm.items:
+					if pacitem.item_code in usedpacitem:
+						pkcost+=pacitem.amount
+
+		self.packing_cost=pkcost
 
 	def calculate_tranfer_amount(self):
 		amount=0		
@@ -71,16 +90,17 @@ class HatcheryProject(Document):
 
 
 	def calculate_gross_margin(self):
+		packing_cost=self.packing_cost or 0
 		if self.project_type=='Hatchery':
 			expense_amount = (flt(self.total_costing_amount) + flt(self.total_expense_claim)
-                                + flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
+                                + flt(packing_cost)+ flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
 			inc=self.total_billed_amount+self.total_transfer_amount
 			self.gross_margin = flt(inc) - expense_amount
 			if inc:
 				self.per_gross_margin = (self.gross_margin / flt(inc)) * 100
 		else:
 			expense_amount = (flt(self.total_costing_amount) + flt(self.total_expense_claim)
-                        + flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
+                        + flt(packing_cost)+ flt(self.total_purchase_cost) + flt(self.get('total_consumed_material_cost', 0)))
 
 			self.gross_margin = flt(self.total_billed_amount) - expense_amount
 			if self.total_billed_amount:
@@ -150,6 +170,17 @@ class HatcheryProject(Document):
 				amount+=exp_amt+base_amount
 			self.total_transfer_amount=amount
 
+		if self.project_type=='Broiler':
+			own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+			pkcost=0
+			if own_packing==doc.chicken_own_packing:
+				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
+				for pacitem in doc.items:
+					if pacitem.item_code in usedpacitem:
+						pkcost+=pacitem.amount
+
+			self.packing_cost=pkcost
+
 		self.calculate_gross_margin()
 
 	def cancel_costing_from_trn(self,doc):
@@ -196,6 +227,17 @@ class HatcheryProject(Document):
 
 				amount+=exp_amt+base_amount
 			self.total_transfer_amount=self.total_transfer_amount-amount
-			
+
+		if self.project_type=='Broiler':
+			own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+			pkcost=0
+			if own_packing==doc.chicken_own_packing:
+				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
+				for pacitem in doc.items:
+					if pacitem.item_code in usedpacitem:
+						pkcost+=pacitem.amount
+
+			self.packing_cost=self.packing_cost-pkcost
+
 		self.calculate_gross_margin()
 		

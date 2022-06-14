@@ -57,13 +57,13 @@ def update_transfer_amount():
 def update_project_costing(doc,event):
 	if doc.project:		
 		project=frappe.get_doc('Project', doc.project)
-		if project.hatchery and project.project_type=='Hatchery':
+		if (project.hatchery and project.project_type=='Hatchery') or project.project_type=='Broiler':
 			project.update_costing_from_trn(doc)
 			project.save()
 
 def cancel_project_costing(doc,event):		
 	if doc.project:
 		project=frappe.get_doc('Project', doc.project)
-		if project.hatchery and project.project_type=='Hatchery':
+		if (project.hatchery and project.project_type=='Hatchery') or project.project_type=='Broiler':
 			project.cancel_costing_from_trn(doc)
 			project.save()
