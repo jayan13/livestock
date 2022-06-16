@@ -13,7 +13,7 @@ from erpnext.stock.doctype.item.item import get_item_defaults
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
-def stock_entry(batch,transfer_qty,transfer_warehouse=''):
+def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
     
     udoc = frappe.get_doc('Broiler Batch', batch)
     sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)    
@@ -36,7 +36,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         frappe.throw(_("Please add Broiler settings for {0} ").format(sett.company))
 
     broiler_item = frappe.new_doc("Broiler Item Transfer")
-    broiler_item.transfer_date=nowdate()
+    broiler_item.transfer_date=transfer_date
     broiler_item.transfer_qty=transfer_qty
     broiler_item.transfer_warehouse=transfer_warehouse
     broiler_item.broiler_bach=batch
@@ -103,7 +103,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     
 
     if udoc.used_items:
-        used_items=frappe.db.get_list('Broiler Items',filters={'parent': udoc.name},fields=['item_code', 'sum(qty) as qty','uom'],group_by='item_code')
+        used_items=frappe.db.get_list('Broiler Items',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['item_code', 'sum(qty) as qty','uom'],group_by='item_code')
         for item in used_items:
             if item.item_code:
 
@@ -159,7 +159,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
 
 
     if udoc.vaccine:
-        vaccine=frappe.db.get_list('Vaccine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
+        vaccine=frappe.db.get_list('Vaccine',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in vaccine:
             if vc.item:
 
@@ -210,7 +210,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 })
             
     if udoc.medicine:
-        medicine=frappe.db.get_list('Medicine',filters={'parent': udoc.name},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
+        medicine=frappe.db.get_list('Medicine',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['item', 'sum(qty) as qty','uom'],group_by='item')
         for vc in medicine:
             if vc.item:
 
@@ -260,7 +260,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 })
 
     if udoc.feed:
-        sfeed=frappe.db.get_list('Feed',filters={'parent': udoc.name},fields=['starter_item as item', 'sum(starter_qty) as qty','starter_uom as uom'],group_by='starter_item')
+        sfeed=frappe.db.get_list('Feed',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['starter_item as item', 'sum(starter_qty) as qty','starter_uom as uom'],group_by='starter_item')
         
         for vc in sfeed:
             if vc.item:
@@ -310,7 +310,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                                         
                 })
 
-        ffeed=frappe.db.get_list('Feed',filters={'parent': udoc.name},fields=['finisher_item as item', 'sum(finisher_qty) as qty','finisher_uom as uom'],group_by='finisher_item')
+        ffeed=frappe.db.get_list('Feed',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['finisher_item as item', 'sum(finisher_qty) as qty','finisher_uom as uom'],group_by='finisher_item')
 
         for vc in ffeed:
             if vc.item:

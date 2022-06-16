@@ -49,7 +49,12 @@ frappe.ui.form.on('Broiler Batch', {
                                 label: __("Transfer Quantity"),
                                 fieldname: "transfer_qty",
                                 reqd:'1'                                
-                            },{  fieldtype: "Link",
+                            },{  fieldtype: "Date",
+                            label: __("Transfer Date"),
+                            fieldname: "transfer_date",
+                            reqd:'1'                                
+                            }
+                            ,{  fieldtype: "Link",
                             label: __("Transfer Warehouse"),
                             fieldname: "transfer_warehouse",
                             options:"Warehouse"                                
@@ -62,6 +67,7 @@ frappe.ui.form.on('Broiler Batch', {
                                         args: {
                                             batch:frm.doc.name,
                                             transfer_qty:data.transfer_qty,
+                                            transfer_date:data.transfer_date,
                                             transfer_warehouse:data.transfer_warehouse
                                         },
                                         callback: function(r) 
