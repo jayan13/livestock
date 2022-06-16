@@ -440,10 +440,10 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
     else:
         stock_qty=req_qty
 
-    qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=1)
+    qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=0)
     qty=qty or 0
     if(stock_qty > qty):
-        frappe.throw(_("There is no sufficient qty in {0} Please select another warehouse for {1}").format(warehouse,item_code))
+        frappe.throw(_("Req Qty {0}. There is no sufficient qty in {1} Please select another warehouse for {2}").format(stock_qty,warehouse,item_code))
 
 
 @frappe.whitelist()
