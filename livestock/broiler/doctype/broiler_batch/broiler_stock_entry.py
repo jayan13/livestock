@@ -28,7 +28,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
 
     cur_live=udoc.current_alive_chicks
     materials=frappe.db.get_list('Broiler Transfer Consumable',filters={'processed': '1','batch':batch},
-    fields=['sum(ROUND(used_quantity, 2)) as used_quantity,materal'],group_by='materal',debug=1)
+    fields=['sum(ROUND(used_quantity, 2)) as used_quantity,materal'],group_by='materal',debug=0)
     for mat in materials:
         pv_qty.update({mat.materal:mat.used_quantity})
 
@@ -440,7 +440,7 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
     else:
         stock_qty=req_qty
 
-    qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=0)
+    qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=1)
     qty=qty or 0
     if(stock_qty > qty):
         frappe.throw(_("There is no sufficient qty in {0} Please select another warehouse for {1}").format(warehouse,item_code))
