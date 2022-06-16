@@ -47,6 +47,7 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Broiler Chicken"
     stock_entry.project = udoc.project
+    stock_entry.posting_date=transfer_date
 	#stock_entry.set_stock_entry_type()
     base_row_rate=0
     total_add_cost=0
