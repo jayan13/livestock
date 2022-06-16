@@ -28,7 +28,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
 
     cur_live=udoc.current_alive_chicks
     materials=frappe.db.get_list('Broiler Transfer Consumable',filters={'processed': '1','batch':batch},
-    fields=['sum(used_quantity) as used_quantity,materal'],group_by='materal')
+    fields=['sum(ROUND(used_quantity, 2)) as used_quantity,materal'],group_by='materal')
     for mat in materials:
         pv_qty.update({mat.materal:mat.used_quantity})
 
@@ -58,7 +58,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         itmqty=int(tot_scrap)+int(transfer_qty)
         broiler_item.append('materials', {
         'materal':sett.base_row_material,
-        'used_quantity':itmqty,
+        'used_quantity':flt(itmqty,2),
         'batch':batch
         })
 
@@ -111,7 +111,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 itmqty=((item.qty-pv_item_qty)/cur_live)*int(transfer_qty)
                 broiler_item.append('materials', {
                 'materal':item.item_code,
-                'used_quantity':itmqty,
+                'used_quantity':flt(itmqty,2),
                 'batch':batch
                 })
 
@@ -167,7 +167,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':itmqty,
+                'used_quantity':flt(itmqty,2),
                 'batch':batch
                 })
 
@@ -218,7 +218,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':itmqty,
+                'used_quantity':flt(itmqty,2),
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
@@ -268,7 +268,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':itmqty,
+                'used_quantity':flt(itmqty,2),
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
@@ -318,7 +318,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
                 itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':itmqty,
+                'used_quantity':flt(itmqty,2),
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
