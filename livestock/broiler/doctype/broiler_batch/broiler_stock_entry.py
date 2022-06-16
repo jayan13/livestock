@@ -28,7 +28,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
 
     cur_live=udoc.current_alive_chicks
     materials=frappe.db.get_list('Broiler Transfer Consumable',filters={'processed': '1','batch':batch},
-    fields=['sum(ROUND(used_quantity, 2)) as used_quantity,materal'],group_by='materal')
+    fields=['sum(ROUND(used_quantity, 2)) as used_quantity,materal'],group_by='materal',debug=1)
     for mat in materials:
         pv_qty.update({mat.materal:mat.used_quantity})
 
