@@ -58,7 +58,7 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         itmqty=int(tot_scrap)+int(transfer_qty)
         broiler_item.append('materials', {
         'materal':sett.base_row_material,
-        'used_quantity':flt(itmqty,2),
+        'used_quantity':itmqty,
         'batch':batch
         })
 
@@ -108,10 +108,10 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
             if item.item_code:
 
                 pv_item_qty=pv_qty.get(item.item_code) or 0
-                itmqty=((item.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                itmqty=flt(((item.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
                 broiler_item.append('materials', {
                 'materal':item.item_code,
-                'used_quantity':flt(itmqty,2),
+                'used_quantity':itmqty,
                 'batch':batch
                 })
 
@@ -164,10 +164,10 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
             if vc.item:
 
                 pv_item_qty=pv_qty.get(vc.item) or 0
-                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':flt(itmqty,2),
+                'used_quantity':itmqty,
                 'batch':batch
                 })
 
@@ -215,10 +215,10 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
             if vc.item:
 
                 pv_item_qty=pv_qty.get(vc.item) or 0
-                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':flt(itmqty,2),
+                'used_quantity':itmqty,
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
@@ -265,10 +265,10 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         for vc in sfeed:
             if vc.item:
                 pv_item_qty=pv_qty.get(vc.item) or 0
-                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':flt(itmqty,2),
+                'used_quantity':itmqty,
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
@@ -315,10 +315,10 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
         for vc in ffeed:
             if vc.item:
                 pv_item_qty=pv_qty.get(vc.item) or 0
-                itmqty=((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty)
+                itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
                 broiler_item.append('materials', {
                 'materal':vc.item,
-                'used_quantity':flt(itmqty,2),
+                'used_quantity':itmqty,
                 'batch':batch
                 })
                 item_account_details = get_item_defaults(vc.item, sett.company)
@@ -434,11 +434,12 @@ def stock_entry(batch,transfer_qty,transfer_warehouse=''):
     return stock_entry.as_dict()
 
 def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
+    
     if uom != stock_uom:
         conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor") or 1
-        stock_qty=req_qty*flt(conversion_factor)
+        stock_qty=flt(req_qty*flt(conversion_factor),2)
     else:
-        stock_qty=req_qty
+        stock_qty=flt(req_qty,2)
 
     qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=0)
     qty=qty or 0
