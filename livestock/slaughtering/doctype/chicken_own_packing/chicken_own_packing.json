@@ -55,7 +55,7 @@
   },
   {
    "fieldname": "number_of_chicken",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Number of chicken received"
   },
   {
@@ -105,7 +105,7 @@
    "description": "Chicken received from",
    "fieldname": "project",
    "fieldtype": "Link",
-   "label": "Project",
+   "label": "Broiler Batch",
    "options": "Project"
   },
   {
@@ -148,7 +148,7 @@
    "link_fieldname": "chicken_own_packing"
   }
  ],
- "modified": "2022-06-14 15:46:58.474720",
+ "modified": "2022-06-15 19:52:17.551358",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",

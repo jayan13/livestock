@@ -103,7 +103,7 @@
   {
    "fieldname": "project",
    "fieldtype": "Link",
-   "label": "Broiler Batch",
+   "label": "Project",
    "options": "Project",
    "read_only": 1
   },
@@ -244,7 +244,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2022-06-14 15:17:34.302596",
+ "modified": "2022-06-15 18:38:44.935908",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",
