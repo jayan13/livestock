@@ -117,7 +117,11 @@ doc_events = {
 		],
     },
 	"Sales Invoice":{
-		"on_submit":"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat"
+		"on_submit":[
+			"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat",
+			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_selling_cost"
+		],
+		"on_cancel":"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.cancel_selling_cost"
 	}
 }
 # Scheduled Tasks
@@ -163,7 +167,8 @@ fixtures = [
 					"Project-hatchery_batch",
 					"Project-broiler_batch",
 					"Stock Entry-item_transfer",
-					"Project-packing_cost"
+					"Project-packing_cost",
+					"Project-own_packing_selling_cost"
                     
                 ),
             ]

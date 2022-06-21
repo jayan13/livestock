@@ -209,3 +209,84 @@ def update_item_stat(doc,event):
         if doc.manufacturing_type == "Chicken Slaughtering":
             udoc.item_processed = 1
             udoc.save()
+
+def update_selling_cost(doc,event):
+    itemary=[]
+    ownpacking_items=frappe.db.sql("select d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s  on d.parent=s.name where s.manufacturing_type='Chicken Slaughtering' and d.is_finished_item=1 group by d.item_code",as_dict=1)
+    
+    for it in ownpacking_items:
+        itemary.append(str(it.item_code))
+    
+    for i in doc.items:
+        if i.item_code in itemary:
+            update_project(doc,i.item_code,i.qty,i.rate)
+            
+
+
+def update_project(doc,item_code,qty,rate):
+
+    own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
+    `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name where l.is_billing_updated<>'1' 
+    and o.item_processed=1 and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
+    
+    remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
+    if qty > remqty:
+        ownqty=qty-remqty
+        selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+        selling_cost=selling_cost+(remqty*rate)
+        frappe.db.set_value('Own Packing List', own_pack[0]['name'], {'updated_qty':own_pack[0]['qty'],'is_billing_updated':'1'})
+        frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+        
+        project=frappe.get_doc('Project', own_pack[0]['project'])
+        project.update_costing()
+        project.save()
+        sales_cost=frappe.new_doc("Own Pack Sales Cost")
+        sales_cost.sales_invoice=doc.name
+        sales_cost.project=own_pack[0]['project']
+        sales_cost.item=item_code
+        sales_cost.amount=remqty*rate
+        sales_cost.qty=remqty
+        sales_cost.own_pack_list=own_pack[0]['name']
+        sales_cost.insert(ignore_permissions=True)
+
+        update_project(doc,item_code,ownqty,rate)
+    else:
+        cqty=remqty-qty
+        selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+        selling_cost=selling_cost+(qty*rate)
+        frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+        upqty=own_pack[0]['updated_qty']+qty
+        frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'updated_qty',upqty)    
+        if cqty==0:
+            frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'is_billing_updated', '1')
+
+        project=frappe.get_doc('Project', own_pack[0]['project'])
+        project.update_costing()
+        project.save()
+        sales_cost=frappe.new_doc("Own Pack Sales Cost")
+        sales_cost.sales_invoice=doc.name
+        sales_cost.project=own_pack[0]['project']
+        sales_cost.item=item_code
+        sales_cost.amount=qty*rate
+        sales_cost.own_pack_list=own_pack[0]['name']
+        sales_cost.qty=qty
+        sales_cost.insert(ignore_permissions=True)
+
+def cancel_selling_cost(doc,event):
+    own_pack=frappe.db.sql("""select sum(amount) as amount,project from  `tabOwn Pack Sales Cost`  
+    where sales_invoice=%s group by project""", doc.name,as_dict=1)
+    for pck in own_pack:
+        project=frappe.get_doc('Project', pck.project)
+        project.own_packing_selling_cost=project.own_packing_selling_cost-pck.amount
+        project.update_costing()
+        project.save()
+
+    own_pack_list=frappe.db.sql("""select qty,own_pack_list,item,name from  `tabOwn Pack Sales Cost` where sales_invoice=%s """, doc.name,as_dict=1)
+    for pklist in own_pack_list:        
+        updated_qty=frappe.db.get_value('Own Packing List', pklist.own_pack_list, ['updated_qty']) or 0
+        updated_qty=updated_qty-pklist.qty
+        frappe.db.set_value('Own Packing List', pklist.own_pack_list, {'updated_qty':updated_qty,'is_billing_updated':'0'})
+        frappe.db.delete('Own Pack Sales Cost',{'name':pklist.name})
+    
+
+

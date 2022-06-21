@@ -9,7 +9,9 @@
   "grade",
   "item",
   "uom",
-  "qty"
+  "qty",
+  "is_billing_updated",
+  "updated_qty"
  ],
  "fields": [
   {
@@ -39,12 +41,26 @@
    "in_list_view": 1,
    "label": "Quantity",
    "precision": "4"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_billing_updated",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Is Billing Updated"
+  },
+  {
+   "default": "0",
+   "fieldname": "updated_qty",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Updated Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-05 14:19:50.941032",
+ "modified": "2022-06-20 09:03:32.433139",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Own Packing List",
