@@ -241,6 +241,4 @@ class HatcheryProject(Document):
 
 		self.calculate_gross_margin()
 
-	def ownpacking_billing_cost(self):
-		ownpacking_items=frappe.db.sql()
 		
