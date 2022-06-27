@@ -46,9 +46,20 @@ MyPage =Class.extend({
 		
 
 		let field2 = this.page.add_field({
-			label: 'Date',
+			label: 'Date From',
 			fieldtype: 'Date',
-			fieldname: 'posting_date',
+			fieldname: 'from_date',
+			change() {
+				
+				get_report();
+				
+			}
+		});
+
+		let field3 = this.page.add_field({
+			label: 'Date To',
+			fieldtype: 'Date',
+			fieldname: 'to_date',
 			change() {
 				
 				get_report();
@@ -56,7 +67,8 @@ MyPage =Class.extend({
 			}
 		});
 		
-		field2.set_value(frappe.datetime.get_today());		
+		field2.set_value(frappe.datetime.get_today());
+		field3.set_value(frappe.datetime.get_today());		
 		//this.page.add_inner_button('Get  Report', () => get_report());
 		this.page.add_inner_button('Print', () => print_rep());
 		let data='';
@@ -74,7 +86,8 @@ MyPage =Class.extend({
 					freeze_message: 'Data loading ...please waite',
 					args: {
 					  company: field.get_value(),
-					  posted_on: field2.get_value(),
+					  from_date: field2.get_value(),
+					  to_date: field3.get_value(),
 					},
 					callback: function (r) {
 					  if (r.message) {
