@@ -40,124 +40,84 @@ padding:4px;
 <p>
 <div style="width: 86%;    font-size: 20px;    font-weight: bold;    float: left;    padding-bottom: 10px;">
 {% if(company){  %}
-&nbsp;&nbsp;&nbsp;&nbsp;Daily Egg room Layer report - {{company}} 
+&nbsp;&nbsp;&nbsp;&nbsp;{{company}} 
 {%  }  %}
 </div>
 <div style="width: 13%;    font-size: 20px;    font-weight: bold;    float: left;    text-align: end;    padding-bottom: 10px;">
 {{posted_on}} </div></p>
-<table >
-	<tr>
-		<td style="width:18%">Description</td>
-		
-		{% for item in items %}
-        <td style="width:6%">{{ item.item_name }} <br> Ctn</td>
+<br><br>
+<p>Daily Loading per Area</p>
+<table>
+	<tr><td>Area</td> 
+		{% for wer in warehouse %}
+        <td style="width:20%">{{wer}}</td>
 		{% endfor %}
-		<td style="width:10%">Total</td>
 	</tr>
+	<tr><td>Total</td>
+		
+		{% for wert in daily_load_tot %}
+		
+        <td style="width:20%">{{wert}} Ctn</td>
+		{% endfor %}
+
+	</tr>
+	<tr><td>Grand total</td><td colspan="4">{{daily_load_gtot}} Ctn</td></tr>
+</table>
+<br><br>
+<p>PER SKU Loading</p>
+<table>
+	<tr><td>Categories</td> 
+		{% for wer in warehouse %}
+        <td style="width:20%">{{wer}}</td>
+		{% endfor %}
+	</tr>
+	{% for wert in store_items %}
+	<tr>
+		{% for wei in wert %}
+        <td style="width:20%">{{wei}} </td>
+		{% endfor %}
+	</tr>
+	{% endfor %}
 	
-	<tr>
-		<td >Oppenning Stock</td>
-		
-		{% for opn in store_oppenning_total %}
-        <td style="width:6%">{{ opn }}</td>
-		{% endfor %}
-		
-	</tr>
-	<tr><td colspan="{{colum_count}}">&nbsp;</td></tr>
-	{% for project in projects %}
-		
-	<tr>
-			<td style="width:18%">{{ project.layers }}</td>
-			{% for qty in project.itemqty %}
-			<td style="width:6%">{{ qty }}</td>			
-			{% endfor %}
-			
-	</tr>		
-	 {% endfor %}
-	<tr>
-		<td>Total Daily Production</td>
-		{% for itemtot in item_total %}
-        <td >{{ itemtot }} </td>
+</table>
+
+<br><br>
+<p>EGG Stock Daily Inventory</p>
+
+<table>
+	<tr><td>Area</td>
+		<td>FARM</td> 
+		{% for wer in stwarehouses %}
+        <td style="width:20%">{{wer.name}}</td>
 		{% endfor %}
 	</tr>
-	<tr>
-		<td>GRV Repacking</td>
-		{% for itemtot in grv_repacking_total %}
-        <td >{{ itemtot }} </td>
-		{% endfor %}
-	</tr>
-	<tr>
-		<td>Old Stock Repacking</td>
-		{% for itemtot in old_repacking_total %}
-        <td >{{ itemtot }} </td>
-		{% endfor %}
-	</tr>
-	<tr>
-		<td>Organic Packing</td>
-		{% for itemtot in org_repacking_total %}
-        <td >{{ itemtot }} </td>
-		{% endfor %}
-	</tr>	 
-	<tr>
-		<td>Repacking</td>
-		{% for itemtot in store_repacking_total %}
-        <td >{{ itemtot }} </td>
-		{% endfor %}
-	</tr>
-	<tr>
-		<td>Active stock</td>
-		{% for itemtot in active_stock %}
-        <td >{{ itemtot }} </td>
+	<tr><td>Total</td>
+		{% for wert in daily_stock_tot %}
+        <td style="width:20%">{{wert}} Ctn</td>
 		{% endfor %}
 	</tr>
 	
- <tr><td colspan="{{colum_count}}">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
-	
-	
-	{% for warehouse in warehouses %}
-		
-	<tr>
-			<td style="width:18%">{{ warehouse.name }}</td>
-			{% for qty in warehouse.itemqty %}
-			
-			<td style="width:6%">{{ qty }}</td>
-			{% endfor %}
-			
-	</tr>		
-	 {% endfor %}
-	<tr>
-		<td>Total Loading</td>
-		{% for itemtot in store_item_total %}
-        <td >{{ itemtot }} </td>
+</table>
+<br><br>
+<p>PER SKU Stock</p>
+<table>
+	<tr><td>Categories</td> 
+		<td>FARM</td>
+		{% for wer in stwarehouses %}
+        <td style="width:20%">{{wer.name}}</td>
 		{% endfor %}
 	</tr>
+	{% for wert in daily_stock %}
 	<tr>
-		<td>CLOSSING STOCK</td>
-		{% for itemtot in closing_stock %}
-        <td >{{ itemtot }} </td>
+		{% for wei in wert %}
+        <td style="width:20%">{{wei}} </td>
 		{% endfor %}
 	</tr>
-	 <tr><td colspan="{{colum_count}}">&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
-	 <tr><td colspan="{{colum_count}}"><b>Returned Items</b></td></tr>
-	{% for warehouse in retwarehouses %}
-		
-	<tr>
-			<td style="width:18%">{{ warehouse.name }}</td>
-			{% for qty in warehouse.itemqty %}
-			
-			<td style="width:6%">{{ qty }}</td>
-			{% endfor %}
-			
-	</tr>		
-	 {% endfor %}
-	 <tr>
-		<td>Total Returned </td>
-		{% for itemtot in retstore_item_total %}
-        <td >{{ itemtot }} </td>
-		{% endfor %}
-	</tr>
+	{% endfor %}
 	
- </table>
+</table>
+
+
  
 </div>
     
