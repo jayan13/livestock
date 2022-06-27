@@ -1,0 +1,20 @@
+{
+ "content": null,
+ "creation": "2022-06-27 20:07:58.412667",
+ "docstatus": 0,
+ "doctype": "Page",
+ "icon": "file",
+ "idx": 0,
+ "modified": "2022-06-27 20:07:58.412667",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "broiler-production-r",
+ "owner": "Administrator",
+ "page_name": "Broiler Production Report",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Broiler Production Report"
+}
