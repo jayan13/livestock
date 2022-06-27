@@ -1,0 +1,52 @@
+<style>
+#report_eggs table{
+width: 100%;
+border-collapse: collapse;
+border: 2px solid black;
+}
+#report_eggs table tr{
+border: 2px solid black;
+}
+#report_eggs table tr td{
+border: 2px solid black;
+text-align:center;
+padding:4px;
+}
+#report_eggs table tr td:first-child { text-align: left !important; }
+#report_eggs table tr td:last-child { width:10%; }
+@media print {
+   * { color: black; background: white; }
+   table { page-break-inside:auto }
+    tr    { page-break-inside:avoid; page-break-after:auto }
+   #report_eggs table { font-size: 80%; }
+   #report_eggs table{
+	width: 100%;
+	border-collapse: collapse;
+	border: 2px solid black;
+	}
+	#report_eggs table tr{
+	border: 2px solid black;
+	}
+	#report_eggs table tr td{
+	border: 2px solid black;
+	text-align:center;
+	padding:4px;
+	}
+	#report_eggs table tr td:first-child { text-align: left !important; }
+	#report_eggs table tr td:last-child { width:10%; }
+} 
+</style>
+<div id="report_eggs" >
+<p>
+<div style="width: 86%;    font-size: 20px;    font-weight: bold;    float: left;    padding-bottom: 10px;">
+{% if(company){  %}
+&nbsp;&nbsp;&nbsp;&nbsp;{{company}} 
+{%  }  %}
+</div>
+<div style="width: 13%;    font-size: 20px;    font-weight: bold;    float: left;    text-align: end;    padding-bottom: 10px;">
+{{posted_on}} </div></p>
+
+
+ 
+</div>
+    
