@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-06-28 17:10:37.581481",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "weight",
+  "quantity"
+ ],
+ "fields": [
+  {
+   "fieldname": "weight",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Weight",
+   "options": "400\n450\n500\n550\n600\n650\n700\n750\n800\n850\n900\n950\n1000\n1050\n1100\n1150\n1200\n1250\n1300\n1350\n1400\n1450\n1500\n1550\n1600\n1650\n1700"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Quantity"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-06-28 17:10:37.581481",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Co Packing Full Chicken",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -20,7 +20,9 @@
   "section_break_13",
   "vehicle",
   "finished_items",
-  "item_processed"
+  "item_processed",
+  "section_break_15",
+  "whole_chicken"
  ],
  "fields": [
   {
@@ -98,6 +100,16 @@
    "fieldtype": "Table",
    "label": "Item Received Vehicle",
    "options": "Co Vehicle"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "whole_chicken",
+   "fieldtype": "Table",
+   "label": "Whole Chicken",
+   "options": "Co Packing Full Chicken"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -108,7 +120,7 @@
    "link_fieldname": "chicken_co_packing"
   }
  ],
- "modified": "2022-06-08 19:05:35.116533",
+ "modified": "2022-06-28 17:12:20.866303",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Co Packing",

@@ -154,9 +154,44 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Broiler Production Report",
+   "link_to": "broiler-production-r",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Layer poultry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Daily Egg Production Report",
+   "link_to": "daily-egg-report",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Daily Egg Stock Report",
+   "link_to": "daily-eggs-loading-a",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-06-09 20:39:53.226943",
+ "modified": "2022-06-28 16:11:04.845008",
  "modified_by": "Administrator",
  "module": "Livestock Management",
  "name": "livestock",

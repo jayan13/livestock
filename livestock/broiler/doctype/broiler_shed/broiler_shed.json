@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:broiler_shed",
  "creation": "2022-06-01 11:48:58.051073",
@@ -87,7 +88,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-12 11:03:01.755085",
+ "modified": "2022-06-28 10:24:34.848146",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Shed",

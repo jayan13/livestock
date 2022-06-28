@@ -9,7 +9,9 @@
   "grade",
   "item",
   "uom",
-  "qty"
+  "qty",
+  "item_code",
+  "item_name"
  ],
  "fields": [
   {
@@ -38,12 +40,24 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Quantity"
+  },
+  {
+   "fetch_from": "item.item_code",
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "label": "item"
+  },
+  {
+   "fetch_from": "item.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "item name"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-05-18 12:39:51.340208",
+ "modified": "2022-06-28 14:36:32.170174",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Co Packing List",
