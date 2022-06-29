@@ -45,26 +45,48 @@ def get_report(company=None,from_date=None,to_date=None):
         for shdg in shedgps:            
             sectiontot=['Total',0,0,0,0,0,0,0,0,0,0]       
             for shd in shdg:
-                batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and ('{1}' between start_date and end_date) """.format(shd,dts),as_dict=1,debug=1)
+                batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and ('{1}' between start_date and end_date) """.format(shd,dts),as_dict=1,debug=0)
                 row=[shd,0,0,0,0,0,0,0,0,0,0]                
                 if batches:
                     batch=batches[0].name                    
                     row[1]=batches[0].doc_placed
-                    delta = getdate(batches[0].start_date) - getdate(dts)
+                    delta =  getdate(dts)- getdate(batches[0].start_date)
                     days=delta.days
                     row[2]=days
+                    today_mortality=0
+                    prev_mor=0
+                    tran_cnt=0
+                    tmor=frappe.db.sql("""select total from `tabMortality` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=0)
+                    if tmor:
+                        today_mortality=tmor[0].total
+                    pmor=frappe.db.sql("""select sum(total) as prevmor from `tabMortality` where  parent='{0}' and `date` <'{1}' group by parent""".format(batch,dts),as_dict=1,debug=0)
+                    if pmor:
+                        prev_mor=pmor[0].prevmor
+                    totmor=prev_mor+today_mortality
+
+                    totran=frappe.db.sql("""select sum(transfer_qty) as tottrn from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date <='{1}' group by broiler_bach """.format(batch,dts),as_dict=1,debug=0)
+                    if totran:
+                        tran_cnt=totran[0].tottrn
+
+                    vc_med=''
+                    vccqr=frappe.db.sql("""select item_name,remark from `tabVaccine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=0)
+                    if vccqr:
+                        vc_med+=str(vccqr[0].item_name)
+                    medqr=frappe.db.sql("""select item_name,remark from `tabMedicine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=0)
+                    if medqr:
+                        vc_med+=' - '+str(medqr[0].item_name)
                     
-                    #frappe.db.sql("""select transfer_qty from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date ='{1}' """.format(batch,dts),as_dict=1,debug=1)
+                    row[3]=batches[0].doc_placed-prev_mor
+                    row[4]=today_mortality
+                    row[5]=tran_cnt
+                    if today_mortality:
+                        row[6]=round((batches[0].doc_placed/today_mortality),2)
+                    row[7]=totmor
+                    if totmor:
+                        row[8]=round((batches[0].doc_placed/totmor),2)
+                    row[9]=batches[0].doc_placed-totmor
+                    row[10]=vc_med
 
-                    #frappe.db.sql("""select item_name,remark from `tabVaccine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
-
-                    #frappe.db.sql("""select item_name,remark from `tabMedicine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
-
-                    #frappe.db.sql("""select total from `tabMortality` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
-
-                    #frappe.db.sql("""select sum(total) as totmortality from `tabMortality` where  parent='{0}' and `date` <='{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
-
-                    #frappe.db.sql("""select sum(total) as prevmortality from `tabMortality` where  parent='{0}' and `date` <'{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
                 sections.append(row)
             sections.append(sectiontot)
         sections.append(grandtot)
@@ -77,7 +99,7 @@ def get_report(company=None,from_date=None,to_date=None):
     for rep in report:
         datahtml+='<table>	<tr><th colspan="9">'+company+'</th><th colspan="2">'+str(rep[0])+'</th></tr>'        
         datahtml+='<tr><td colspan="4"><td colspan="3">Daily Depletion</td><td colspan="2">Cumulative Depletion</td><td colspan="2"></td></tr>'
-        datahtml+='<tr><td>Fram Shed</td>	<td>Placed Chik</td><td>Age</td><td>Open Balance</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Mortality</td><td>%</td><td>Closing Balance</td><td>Med/Vacc Details</td></tr>'
+        datahtml+='<tr><td>Fram Shed</td>	<td>Placed Chick</td><td>Age</td><td>Open Balance</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Mortality</td><td>%</td><td>Closing Balance</td><td>Med/Vacc Details</td></tr>'
         
         for re in rep[1]:
             datahtml+='<tr>'
