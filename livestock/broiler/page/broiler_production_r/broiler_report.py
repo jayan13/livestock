@@ -40,10 +40,10 @@ def get_report(company=None,from_date=None,to_date=None):
 
     for dts in dates:
         datesection=[dts]
-        grandtot=['Birds Total',0,0,0,0,0,0,0,0,0,0]
+        grandtot=['Birds Total',0,'',0,0,0,'',0,'',0,'']
         sections=[]
         for shdg in shedgps:            
-            sectiontot=['Total',0,0,0,0,0,0,0,0,0,0]       
+            sectiontot=['Total',0,'',0,0,0,'',0,'',0,'']       
             for shd in shdg:
                 batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and ('{1}' between start_date and end_date) """.format(shd,dts),as_dict=1,debug=0)
                 row=[shd,0,0,0,0,0,0,0,0,0,0]                
@@ -86,6 +86,21 @@ def get_report(company=None,from_date=None,to_date=None):
                         row[8]=round((batches[0].doc_placed/totmor),2)
                     row[9]=batches[0].doc_placed-totmor
                     row[10]=vc_med
+
+                    sectiontot[1]=sectiontot[1]+row[1]                    
+                    sectiontot[3]=sectiontot[3]+row[3]
+                    sectiontot[4]=sectiontot[4]+row[4]
+                    sectiontot[5]=sectiontot[5]+row[5]                    
+                    sectiontot[7]=sectiontot[7]+row[7]                    
+                    sectiontot[9]=sectiontot[9]+row[9]
+
+                    grandtot[1]=grandtot[1]+row[1]                    
+                    grandtot[3]=grandtot[3]+row[3]
+                    grandtot[4]=grandtot[4]+row[4]
+                    grandtot[5]=grandtot[5]+row[5]                    
+                    grandtot[7]=grandtot[7]+row[7]                    
+                    grandtot[9]=grandtot[9]+row[9]
+                    
 
                 sections.append(row)
             sections.append(sectiontot)
