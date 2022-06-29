@@ -36,30 +36,59 @@ def get_report(company=None,from_date=None,to_date=None):
     
     #.......................... report date range created....................................................................
     #.......................... creating report by looping date for creating report on that date ............................
+    report=[]
 
     for dts in dates:
-        for shdg in shedgps:
+        datesection=[dts]
+        grandtot=['Birds Total',0,0,0,0,0,0,0,0,0,0]
+        sections=[]
+        for shdg in shedgps:            
+            sectiontot=['Total',0,0,0,0,0,0,0,0,0,0]       
             for shd in shdg:
-                batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and start_date >='{1}' """.format(shd,from_date),as_dict=1,debug=0)
-                #batches.doc_placed
+                batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and ('{1}' between start_date and end_date) """.format(shd,dts),as_dict=1,debug=1)
+                row=[shd,0,0,0,0,0,0,0,0,0,0]                
                 if batches:
-                    batch=batches[0].name
-                    frappe.db.sql("""select transfer_qty from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date ='{1}' """.format(batch,dts),as_dict=1,debug=1)
+                    batch=batches[0].name                    
+                    row[1]=batches[0].doc_placed
+                    delta = getdate(batches[0].start_date) - getdate(dts)
+                    days=delta.days
+                    row[2]=days
+                    
+                    #frappe.db.sql("""select transfer_qty from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date ='{1}' """.format(batch,dts),as_dict=1,debug=1)
 
-                    frappe.db.sql("""select item_name,remark from `tabVaccine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
+                    #frappe.db.sql("""select item_name,remark from `tabVaccine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
 
-                    frappe.db.sql("""select item_name,remark from `tabMedicine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
+                    #frappe.db.sql("""select item_name,remark from `tabMedicine` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
 
-                    frappe.db.sql("""select total from `tabMortality` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
+                    #frappe.db.sql("""select total from `tabMortality` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=1)
 
-                    frappe.db.sql("""select sum(total) as totmortality from `tabMortality` where  parent='{0}' and `date` <='{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
+                    #frappe.db.sql("""select sum(total) as totmortality from `tabMortality` where  parent='{0}' and `date` <='{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
 
-                    frappe.db.sql("""select sum(total) as prevmortality from `tabMortality` where  parent='{0}' and `date` <'{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
+                    #frappe.db.sql("""select sum(total) as prevmortality from `tabMortality` where  parent='{0}' and `date` <'{1}' group by parent""".format(batch,dts),as_dict=1,debug=1)
+                sections.append(row)
+            sections.append(sectiontot)
+        sections.append(grandtot)
+        datesection.append(sections)
+        #datesection.append(grandtot)    
+        report.append(datesection)
 
-
-     
-    
-       
+    #........................ html data creation ........................................
+    datahtml=''
+    for rep in report:
+        datahtml+='<table>	<tr><th colspan="9">'+company+'</th><th colspan="2">'+str(rep[0])+'</th></tr>'        
+        datahtml+='<tr><td colspan="4"><td colspan="3">Daily Depletion</td><td colspan="2">Cumulative Depletion</td><td colspan="2"></td></tr>'
+        datahtml+='<tr><td>Fram Shed</td>	<td>Placed Chik</td><td>Age</td><td>Open Balance</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Mortality</td><td>%</td><td>Closing Balance</td><td>Med/Vacc Details</td></tr>'
+        
+        for re in rep[1]:
+            datahtml+='<tr>'
+            for r in re:
+                datahtml+='<td>'+str(r)+'</td>'
+            datahtml+='</tr>'
+        
+        datahtml+='</tr></table><br><br>'
+    #........................ html data creation end ....................................
+    data['datahtml']=datahtml
+    #data['report']=report   
     data['company']=company
     data['from_date']=from_date
     data['to_date']=to_date

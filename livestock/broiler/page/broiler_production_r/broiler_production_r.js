@@ -24,9 +24,7 @@ MyPage =Class.extend({
 			fieldtype: 'Select',
 			fieldname: 'company',
 			options: [],
-			change() {
-				get_report();
-			}
+			
 		});
 		
 		frappe.call({
@@ -49,24 +47,25 @@ MyPage =Class.extend({
 			label: 'Date From',
 			fieldtype: 'Date',
 			fieldname: 'from_date',
-			change() {
-				
-				get_report();
-				
-			}
+			
 		});
 
 		let field3 = this.page.add_field({
 			label: 'Date To',
 			fieldtype: 'Date',
 			fieldname: 'to_date',
-			change() {
+			
+		});
+		let field4 = this.page.add_field({
+			label: 'Create report',
+			fieldtype: 'Button',
+			fieldname: 'create_report',
+			click() {
 				
 				get_report();
 				
 			}
 		});
-		
 		field2.set_value(frappe.datetime.get_today());
 		field3.set_value(frappe.datetime.get_today());		
 		//this.page.add_inner_button('Get  Report', () => get_report());
