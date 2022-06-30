@@ -300,3 +300,4 @@ frappe.ui.form.on("Medicine",
                     });
             } 
 });
+

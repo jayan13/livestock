@@ -80,7 +80,7 @@ def get_report(company=None,from_date=None,to_date=None):
                     row[4]=today_mortality
                     row[5]=tran_cnt
                     if today_mortality:
-                        row[6]=round(((100*today_mortality)/batches[0].doc_placed),2)
+                        row[6]=round(((100*today_mortality)/row[3]),2)
                     row[7]=totmor
                     if totmor:
                         row[8]=round(((100*totmor)/batches[0].doc_placed),2)

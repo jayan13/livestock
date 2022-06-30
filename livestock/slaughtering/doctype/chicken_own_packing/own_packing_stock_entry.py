@@ -27,7 +27,7 @@ def stock_entry(own_packing):
     precision = cint(frappe.db.get_default("float_precision")) or 3
     base_row_rate=0
     row_cost=0
-
+    
     if udoc.item:
         #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':udoc.item}, 'price_list_rate')        
         item_account_details = get_item_defaults(udoc.item, udoc.company)
@@ -96,7 +96,7 @@ def stock_entry(own_packing):
                 item_name=pack_item_details.get("item_name")
                 pck_rate = get_incoming_rate({
 						"item_code": pcitem.item,
-						"warehouse": udoc.warehouse,
+						"warehouse": sett.packing_item_warehouse,
 						"posting_date": stock_entry.posting_date,
 						"posting_time": stock_entry.posting_time,
 						"qty": -1 * pcitem.qty,
@@ -106,7 +106,7 @@ def stock_entry(own_packing):
                 amount=flt(flt(packed_qty) * flt(pck_rate), precision)
                 itemscost+=amount
                 stock_entry.append('items', {
-                    's_warehouse': udoc.warehouse,
+                    's_warehouse': sett.packing_item_warehouse,
 					'item_code': pcitem.item,
 					'qty': packed_qty,
                     'actual_qty':packed_qty,
