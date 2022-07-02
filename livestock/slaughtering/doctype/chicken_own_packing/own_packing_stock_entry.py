@@ -46,10 +46,10 @@ def stock_entry(own_packing):
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
 
-        tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
+        
 
         amount=flt(udoc.number_of_chicken * flt(base_row_rate),precision)
-        row_cost+=((udoc.number_of_chicken-tot_scrap) * base_row_rate)
+        row_cost+=(udoc.number_of_chicken * base_row_rate)
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
                         'item_code': udoc.item,
@@ -166,33 +166,7 @@ def stock_entry(own_packing):
         for pc in pcitems:
             stock_entry.append('items',pc)
 
-    if udoc.mortality_while_receving or udoc.number_of_culls:
-        tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
-        item_account_details = get_item_defaults(sett.scrap_item, udoc.company)
-        stock_uom = item_account_details.stock_uom
-        conversion_factor = get_conversion_factor(sett.scrap_item, stock_uom).get("conversion_factor")
-        cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
-        precision = cint(frappe.db.get_default("float_precision")) or 3    
-        amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
-        stock_entry.append('items', {
-                        't_warehouse': sett.scrap_item_warehouse,
-                        'item_code': sett.scrap_item,
-                        'qty': tot_scrap,
-                        'actual_qty':tot_scrap,
-                        'uom': stock_uom,
-                        'cost_center':cost_center,					
-                        'ste_detail': item_account_details.name,
-                        'stock_uom': stock_uom,
-                        'expense_account':expense_account,
-                        'valuation_rate': base_row_rate,
-                        "basic_rate":base_row_rate, 	
-                        "basic_amount":amount,  
-                        "amount":amount,  
-                        "transfer_qty":tot_scrap,
-                        'conversion_factor': flt(conversion_factor),
-                        'is_scrap_item':1,                                           
-        })
+    
 
     return stock_entry.as_dict()
 
