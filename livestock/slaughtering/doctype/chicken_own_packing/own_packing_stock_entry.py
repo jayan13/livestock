@@ -83,9 +83,9 @@ def stock_entry(own_packing):
 
         unit_cost=(row_cost/total_finished_item)
         
-        pcitems=[]
+        
         for fitem in udoc.finished_items:
-            
+            pcitems=[]
             itemscost=0
             item_account_details = get_item_defaults(fitem.item, udoc.company)
             pcmaterials=frappe.get_doc('Packing Materials',fitem.item)           
@@ -160,8 +160,8 @@ def stock_entry(own_packing):
                     'set_basic_rate_manually':1                  
 			})
 
-        for pc in pcitems:
-            stock_entry.append('items',pc)
+            for pc in pcitems:
+                stock_entry.append('items',pc)
 
     if udoc.mortality_while_receving or udoc.number_of_culls:
         tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
