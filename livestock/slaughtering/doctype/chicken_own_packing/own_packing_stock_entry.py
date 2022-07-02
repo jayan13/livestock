@@ -49,7 +49,7 @@ def stock_entry(own_packing):
         tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
 
         amount=flt(udoc.number_of_chicken * flt(base_row_rate),precision)
-        row_cost+=(udoc.number_of_chicken * base_row_rate)
+        row_cost+=((udoc.number_of_chicken-tot_scrap) * base_row_rate)
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
                         'item_code': udoc.item,
@@ -86,9 +86,9 @@ def stock_entry(own_packing):
 
         unit_cost=(row_cost/flt(total_finished_item,3))
         
-        
+        pcitems=[]
         for fitem in udoc.finished_items:
-            pcitems=[]
+            
             itemscost=0
             item_account_details = get_item_defaults(fitem.item, udoc.company)
             pcmaterials=frappe.get_doc('Packing Materials',fitem.item)           
@@ -163,8 +163,8 @@ def stock_entry(own_packing):
                     'set_basic_rate_manually':1                  
 			})
 
-            for pc in pcitems:
-                stock_entry.append('items',pc)
+        for pc in pcitems:
+            stock_entry.append('items',pc)
 
     if udoc.mortality_while_receving or udoc.number_of_culls:
         tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
