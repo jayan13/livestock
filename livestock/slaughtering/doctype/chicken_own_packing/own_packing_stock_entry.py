@@ -125,7 +125,8 @@ def stock_entry(own_packing):
                     "basic_amount":amount,  
                     "amount":amount,  
                     "transfer_qty":transfer_qty,
-					'conversion_factor': flt(conversion_factor),                    
+					'conversion_factor': flt(conversion_factor),
+                    'set_basic_rate_manually':1                    
 			        })    
                 
 
