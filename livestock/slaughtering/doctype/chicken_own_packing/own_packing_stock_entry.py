@@ -46,7 +46,7 @@ def stock_entry(own_packing):
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
             
-        amount=flt(udoc.number_of_chicken) * base_row_rate
+        amount=flt(udoc.number_of_chicken) * flt(base_row_rate)
         row_cost+=amount
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
@@ -81,7 +81,7 @@ def stock_entry(own_packing):
                 #weight_per_unit=weight_per_unit*1000
             total_finished_item+=int(fitem.qty)*weight_per_unit
 
-        unit_cost=flt(row_cost/total_finished_item)
+        unit_cost=flt((row_cost/total_finished_item),2)
         
         pcitems=[]
         for fitem in udoc.finished_items:
@@ -108,7 +108,7 @@ def stock_entry(own_packing):
 					})
                                 
                 transfer_qty=flt(flt(packed_qty) * flt(conversion_factor))
-                amount=flt(flt(transfer_qty) * flt(pck_rate), 2)
+                amount=flt(flt(transfer_qty) * flt(pck_rate), precision)
                 itemscost+=amount
                 stock_entry.append('items', {
                     's_warehouse': sett.packing_item_warehouse,
