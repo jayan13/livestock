@@ -46,10 +46,10 @@ def stock_entry(own_packing):
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
 
-        tot_scrap=udoc.mortality_while_receving or 0 + udoc.number_of_culls or 0
+        tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
 
         amount=flt(udoc.number_of_chicken * flt(base_row_rate),precision)
-        row_cost+=(udoc.number_of_chicken * base_row_rate)-(tot_scrap * base_row_rate)
+        row_cost+=(udoc.number_of_chicken * base_row_rate)
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
                         'item_code': udoc.item,
