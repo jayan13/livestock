@@ -46,7 +46,7 @@ def stock_entry(own_packing):
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
             
-        amount=flt(udoc.number_of_chicken) * flt(base_row_rate)
+        amount=udoc.number_of_chicken * base_row_rate
         row_cost+=amount
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
