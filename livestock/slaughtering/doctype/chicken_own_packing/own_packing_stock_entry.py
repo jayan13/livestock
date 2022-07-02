@@ -46,7 +46,7 @@ def stock_entry(own_packing):
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
             
-        amount=flt(flt(udoc.number_of_chicken) * flt(base_row_rate), precision)
+        amount=flt(udoc.number_of_chicken) * base_row_rate
         row_cost+=amount
         stock_entry.append('items', {
                         's_warehouse': udoc.warehouse,
@@ -75,14 +75,17 @@ def stock_entry(own_packing):
         
         for fitem in udoc.finished_items:
             item_account_details = get_item_defaults(fitem.item, udoc.company)            
-            #weight_per_unit=item_account_details.get("weight_per_unit")
-            #weight_uom=item_account_details.get("weight_uom")
-            total_finished_item+=int(fitem.qty)*item_account_details.weight_per_unit
+            weight_per_unit=item_account_details.get("weight_per_unit")
+            weight_uom=item_account_details.get("weight_uom")
+            #if weight_uom=='Kg':
+                #weight_per_unit=weight_per_unit*1000
+            total_finished_item+=int(fitem.qty)*weight_per_unit
 
         unit_cost=(row_cost/total_finished_item)
-
+        
+        pcitems=[]
         for fitem in udoc.finished_items:
-            pcitems=[]
+            
             itemscost=0
             item_account_details = get_item_defaults(fitem.item, udoc.company)
             pcmaterials=frappe.get_doc('Packing Materials',fitem.item)           
@@ -94,16 +97,18 @@ def stock_entry(own_packing):
                 cost_center=sett.cost_center or pack_item_details.get("buying_cost_center")
                 expense_account=pack_item_details.get("expense_account")                
                 item_name=pack_item_details.get("item_name")
+                packed_qty=float(pcitem.qty)*float(fitem.qty)
                 pck_rate = get_incoming_rate({
 						"item_code": pcitem.item,
 						"warehouse": sett.packing_item_warehouse,
 						"posting_date": stock_entry.posting_date,
 						"posting_time": stock_entry.posting_time,
-						"qty": -1 * pcitem.qty,
+						"qty": -1 * packed_qty,
                         'company':udoc.company
 					})
-                packed_qty=float(pcitem.qty)*float(fitem.qty)
-                amount=flt(flt(packed_qty) * flt(pck_rate), precision)
+                                
+                transfer_qty=flt(flt(packed_qty) * flt(conversion_factor))
+                amount=flt(flt(transfer_qty) * flt(pck_rate), 2)
                 itemscost+=amount
                 stock_entry.append('items', {
                     's_warehouse': sett.packing_item_warehouse,
@@ -119,7 +124,7 @@ def stock_entry(own_packing):
                     "basic_rate":pck_rate, 	
                     "basic_amount":amount,  
                     "amount":amount,  
-                    "transfer_qty":packed_qty,
+                    "transfer_qty":transfer_qty,
 					'conversion_factor': flt(conversion_factor),                    
 			        })    
                 
@@ -133,10 +138,8 @@ def stock_entry(own_packing):
             item_name=item_account_details.get("item_name")
             #weight_per_unit=item_account_details.get("weight_per_unit")
             packing_rate_of_item=itemscost/float(fitem.qty)
-
             base_rate=packing_rate_of_item+(unit_cost*item_account_details.weight_per_unit)
-  
-            amount=flt(flt(fitem.qty) * flt(base_rate), precision)
+            amount=flt(flt(fitem.qty) * base_rate, precision)
             pcitems.append({            
                     't_warehouse': sett.warehouse,
 					'item_code': fitem.item,
@@ -153,11 +156,12 @@ def stock_entry(own_packing):
                     "amount":amount,  
                     "transfer_qty":fitem.qty,
 					'conversion_factor': flt(conversion_factor),
-                    'is_finished_item':1,                    
+                    'is_finished_item':1,
+                    'set_basic_rate_manually':1                  
 			})
 
-            for pc in pcitems:
-                stock_entry.append('items',pc)
+        for pc in pcitems:
+            stock_entry.append('items',pc)
 
     if udoc.mortality_while_receving or udoc.number_of_culls:
         tot_scrap=udoc.mortality_while_receving+udoc.number_of_culls
@@ -186,7 +190,7 @@ def stock_entry(own_packing):
                         'conversion_factor': flt(conversion_factor),
                         'is_scrap_item':1,                                           
         })
-    
+
     return stock_entry.as_dict()
 
 def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):

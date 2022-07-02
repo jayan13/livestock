@@ -23,6 +23,7 @@
   "section_break_11",
   "vehicle",
   "number_of_b_grade_chicken",
+  "weight_of_b_grade_chicken",
   "finished_items",
   "item_processed"
  ],
@@ -131,6 +132,12 @@
    "fieldname": "number_of_b_grade_chicken",
    "fieldtype": "Int",
    "label": "Number of B Grade Chicken"
+  },
+  {
+   "fieldname": "weight_of_b_grade_chicken",
+   "fieldtype": "Float",
+   "label": "Weight Of B Grade Chicken",
+   "precision": "2"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -148,7 +155,7 @@
    "link_fieldname": "chicken_own_packing"
   }
  ],
- "modified": "2022-06-15 19:52:17.551358",
+ "modified": "2022-06-30 13:27:23.668126",
  "modified_by": "Administrator",
  "module": "Slaughtering",
  "name": "Chicken Own Packing",
