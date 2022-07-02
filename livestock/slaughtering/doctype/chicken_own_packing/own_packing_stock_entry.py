@@ -81,7 +81,7 @@ def stock_entry(own_packing):
                 #weight_per_unit=weight_per_unit*1000
             total_finished_item+=int(fitem.qty)*weight_per_unit
 
-        unit_cost=flt((row_cost/flt(total_finished_item,3)),2)
+        unit_cost=(row_cost/flt(total_finished_item,3))
         
         
         for fitem in udoc.finished_items:
