@@ -107,7 +107,7 @@ def stock_entry(own_packing):
                         'company':udoc.company
 					})
                                 
-                transfer_qty=flt(flt(packed_qty) * flt(conversion_factor,2))
+                transfer_qty=flt(flt(packed_qty) * flt(conversion_factor,2),2)
                 amount=flt(flt(transfer_qty) * flt(pck_rate), precision)
                 itemscost+=amount
                 stock_entry.append('items', {
