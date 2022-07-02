@@ -137,7 +137,7 @@ def stock_entry(own_packing):
             expense_account=item_account_details.get("expense_account")                
             item_name=item_account_details.get("item_name")
             #weight_per_unit=item_account_details.get("weight_per_unit")
-            packing_rate_of_item=flt(itemscost/float(fitem.qty),2)
+            packing_rate_of_item=itemscost/float(fitem.qty)
             base_rate=packing_rate_of_item+(unit_cost*item_account_details.weight_per_unit)
             amount=flt(fitem.qty) * base_rate
             pcitems.append({            
