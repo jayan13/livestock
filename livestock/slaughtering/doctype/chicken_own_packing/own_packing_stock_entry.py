@@ -81,7 +81,7 @@ def stock_entry(own_packing):
                 #weight_per_unit=weight_per_unit*1000
             total_finished_item+=int(fitem.qty)*weight_per_unit
 
-        unit_cost=(row_cost/total_finished_item)
+        unit_cost=flt(row_cost/total_finished_item)
         
         pcitems=[]
         for fitem in udoc.finished_items:
@@ -126,7 +126,6 @@ def stock_entry(own_packing):
                     "amount":amount,  
                     "transfer_qty":transfer_qty,
 					'conversion_factor': flt(conversion_factor),
-                    'set_basic_rate_manually':1                    
 			        })    
                 
 
@@ -138,9 +137,9 @@ def stock_entry(own_packing):
             expense_account=item_account_details.get("expense_account")                
             item_name=item_account_details.get("item_name")
             #weight_per_unit=item_account_details.get("weight_per_unit")
-            packing_rate_of_item=itemscost/float(fitem.qty)
+            packing_rate_of_item=flt(flt(itemscost)/float(fitem.qty))
             base_rate=packing_rate_of_item+(unit_cost*item_account_details.weight_per_unit)
-            amount=flt(flt(fitem.qty) * base_rate, precision)
+            amount=flt(flt(fitem.qty) * flt(base_rate), precision)
             pcitems.append({            
                     't_warehouse': sett.warehouse,
 					'item_code': fitem.item,
