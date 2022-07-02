@@ -109,7 +109,7 @@ def stock_entry(own_packing):
                                 
                 transfer_qty=flt(flt(packed_qty) * flt(conversion_factor),2)
                 amount=flt(flt(transfer_qty) * flt(pck_rate), precision)
-                itemscost+=amount
+                itemscost+=transfer_qty * pck_rate
                 stock_entry.append('items', {
                     's_warehouse': sett.packing_item_warehouse,
 					'item_code': pcitem.item,
