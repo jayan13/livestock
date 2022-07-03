@@ -103,17 +103,16 @@ total_live_weight_in_kg: function(frm) {
                     });
 			}
 })
-frappe.ui.form.on("Chicken Co Packing", "onload", function(frm){
-    
-    frm.set_query('item', 'finished_items', () => {
-    return {
-        filters: {
-            item_group: 'CO-PACKING'
-        }
-    }
-})
-    
-});
+
+
+cur_frm.fields_dict["finished_items"].grid.get_field("item").get_query = function(doc) {
+	return {
+		filters: {
+			item_group: 'CO-PACKING'
+		}
+	}
+}
+
 frappe.ui.form.on("Co Packing List", 
     { 
         item: function(frm, cdt, cdn) 

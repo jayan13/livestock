@@ -1,14 +1,15 @@
 // Copyright (c) 2022, alantechnologies and contributors
 // For license information, please see license.txt
-frappe.ui.form.on("Chicken Own Packing", "onload", function(frm){
-	frm.set_query('item', 'finished_items', () => {
+
+cur_frm.fields_dict["finished_items"].grid.get_field("item").get_query = function(doc) {
 	return {
-	filters: {
-	item_group: ['in', ['CHICKEN PRODUCTS - ACACIA', 'CHICKEN PRODUCTS - AL FAKHER', 'CHICKEN PRODUCTS - AUH']],
+		filters: {
+			item_group: ['in', ['CHICKEN PRODUCTS - ACACIA', 'CHICKEN PRODUCTS - AL FAKHER', 'CHICKEN PRODUCTS - AUH']]
+		}
 	}
-	}
-	})
-	});
+}
+
+
 frappe.ui.form.on('Chicken Own Packing', {
     refresh: function(frm) { 
 
