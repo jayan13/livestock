@@ -191,6 +191,14 @@ def update_item_stat(doc,event):
             udoc.item_processed = 1
             udoc.save()
 
+@frappe.whitelist()
+def cancel_item(doc,event):
+    if doc.chicken_own_packing:
+        udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)
+        if doc.manufacturing_type == "Chicken Slaughtering":
+            udoc.item_processed = 0
+            udoc.save()
+
 def update_selling_cost(doc,event):
     itemary=[]
     ownpacking_items=frappe.db.sql("select d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s  on d.parent=s.name where s.manufacturing_type='Chicken Slaughtering' and d.is_finished_item=1 group by d.item_code",as_dict=1)

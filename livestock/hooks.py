@@ -113,6 +113,7 @@ doc_events = {
 		"on_trash": "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.delete_item",
 		"on_cancel": [
 			"livestock.broiler.doctype.broiler_batch.broiler_stock_entry.cancel_item",
+			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.cancel_item",
 			"livestock.hatchery.doctype.hatchery_batch.hatchery_batch.cancel_project_costing"
 		],
     },
