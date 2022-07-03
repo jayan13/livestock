@@ -8,6 +8,7 @@ from erpnext.stock.get_item_details import (
 	get_default_cost_center,
 )
 from erpnext.stock.utils import (get_incoming_rate)
+from erpnext.stock.stock_ledger import get_valuation_rate
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
@@ -38,14 +39,15 @@ def stock_entry(own_packing):
         base_row_rate = get_incoming_rate({
 						"item_code": udoc.item,
 						"warehouse": udoc.warehouse,
-						"posting_date": stock_entry.posting_date,
-						"posting_time": stock_entry.posting_time,
-                        "qty": udoc.warehouse and -1*flt(udoc.number_of_chicken) or flt(udoc.number_of_chicken),
+						"posting_date": udoc.date,
+						"posting_time": '00:00:00.00000',
+                        "qty": -1*flt(udoc.number_of_chicken),
 			            "voucher_type": stock_entry.doctype,
 			            "voucher_no": stock_entry.name,
 			            "company": stock_entry.company,
-			            "allow_zero_valuation": '0',
+			            "allow_zero_valuation": '',
 					})
+                    
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
 
