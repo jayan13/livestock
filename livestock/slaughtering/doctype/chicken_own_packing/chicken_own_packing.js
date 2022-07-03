@@ -153,7 +153,15 @@ total_live_weight_in_kg: function(frm) {
                     });
 			}
 })
-
+frappe.ui.form.on("Chicken Own Packing", "onload", function(frm){
+	frm.set_query('item', 'finished_items', () => {
+	return {
+	filters: {
+	item_group: ['in', ['CHICKEN PRODUCTS - ACACIA', 'CHICKEN PRODUCTS - AL FAKHER', 'CHICKEN PRODUCTS - AUH']]
+	}
+	}
+	})
+	});
 frappe.ui.form.on("Own Packing List", 
     { 
         item: function(frm, cdt, cdn) 
