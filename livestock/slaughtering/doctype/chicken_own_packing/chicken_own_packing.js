@@ -157,7 +157,7 @@ frappe.ui.form.on("Chicken Own Packing", "onload", function(frm){
 	frm.set_query('item', 'finished_items', () => {
 	return {
 	filters: {
-	item_group: ['in', ['CHICKEN PRODUCTS - ACACIA', 'CHICKEN PRODUCTS - AL FAKHER', 'CHICKEN PRODUCTS - AUH']]
+	item_group: 'CHICKEN PRODUCTS - AUH',
 	}
 	}
 	})
