@@ -40,8 +40,11 @@ def stock_entry(own_packing):
 						"warehouse": udoc.warehouse,
 						"posting_date": stock_entry.posting_date,
 						"posting_time": stock_entry.posting_time,
-						"qty": -1 * udoc.number_of_chicken,
-                        'company':udoc.company
+                        "qty": udoc.warehouse and -1*flt(udoc.number_of_chicken) or flt(udoc.number_of_chicken),
+			            "voucher_type": stock_entry.doctype,
+			            "voucher_no": stock_entry.name,
+			            "company": stock_entry.company,
+			            "allow_zero_valuation": '0',
 					})
         if udoc.warehouse:
             validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
