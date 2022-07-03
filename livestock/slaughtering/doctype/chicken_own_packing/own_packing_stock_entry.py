@@ -19,8 +19,8 @@ def stock_entry(own_packing):
     sett = frappe.get_doc('Own Packing Settings')
     stock_entry = frappe.new_doc("Stock Entry")    
     stock_entry.company = udoc.company
-    stock_entry.posting_date = udoc.date
-    stock_entry.posting_time = '00:00:00'
+    #stock_entry.posting_date = udoc.date
+    #stock_entry.posting_time = '00:00:00'
     stock_entry.purpose = "Manufacture"
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Chicken Slaughtering"
@@ -40,8 +40,8 @@ def stock_entry(own_packing):
         base_row_rate = get_incoming_rate({
 						"item_code": udoc.item,
 						"warehouse": udoc.warehouse,
-						"posting_date": stock_entry.posting_date,
-						"posting_time": stock_entry.posting_time,
+						"posting_date": udoc.date,
+						"posting_time": '00:00:00',
                         "qty": -1*flt(udoc.number_of_chicken),
 			            "voucher_type": stock_entry.doctype,
 			            "voucher_no": stock_entry.name,
@@ -110,8 +110,8 @@ def stock_entry(own_packing):
                 pck_rate = get_incoming_rate({
 						"item_code": pcitem.item,
 						"warehouse": sett.packing_item_warehouse,
-						"posting_date": stock_entry.posting_date,
-						"posting_time": stock_entry.posting_time,
+						"posting_date": udoc.date,
+						"posting_time": '00:00:00',
 						"qty": -1 * packed_qty,
                         'company':udoc.company
 					})
