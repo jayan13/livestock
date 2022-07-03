@@ -21,14 +21,6 @@ frappe.ui.form.on('Chicken Own Packing', {
 			};
 		});
 
-        frm.set_query('item', 'finished_items', () => {
-            return {
-            filters: {
-            item_group: ['in', ['CHICKEN PRODUCTS - ACACIA', 'CHICKEN PRODUCTS - AL FAKHER', 'CHICKEN PRODUCTS - AUH']],
-            }
-            }
-            });
-
         if (frm.doc.item_processed!=1)
         {       
             frm.add_custom_button(__('Production Entry'), function(){
@@ -176,6 +168,8 @@ frappe.ui.form.on("Own Packing List",
             { 
 		var d = locals[cdt][cdn];
                 
+                if(d.item){
+
                     frappe.call(
                     { 
                         method: "livestock.poultry.doctype.poultry_items.poultry_items.get_item_stock_uom",
@@ -191,6 +185,7 @@ frappe.ui.form.on("Own Packing List",
                                     } 
                             }
                     });
+                }
             } 
     }
 );

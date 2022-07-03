@@ -119,7 +119,7 @@ frappe.ui.form.on("Co Packing List",
         item: function(frm, cdt, cdn) 
             { 
 		var d = locals[cdt][cdn];
-                
+            if(d.item){
                     frappe.call(
                     { 
                         method: "livestock.poultry.doctype.poultry_items.poultry_items.get_item_stock_uom",
@@ -135,6 +135,7 @@ frappe.ui.form.on("Co Packing List",
                                     } 
                             }
                     });
+                }
             } 
     }
 );
