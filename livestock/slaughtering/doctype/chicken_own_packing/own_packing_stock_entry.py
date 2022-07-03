@@ -109,8 +109,8 @@ def stock_entry(own_packing):
                 pck_rate = get_incoming_rate({
 						"item_code": pcitem.item,
 						"warehouse": sett.packing_item_warehouse,
-						"posting_date": stock_entry.posting_date,
-						"posting_time": stock_entry.posting_time,
+						"posting_date": udoc.date,
+						"posting_time": '00:00:00.00000',
 						"qty": -1 * packed_qty,
                         'company':udoc.company
 					})
