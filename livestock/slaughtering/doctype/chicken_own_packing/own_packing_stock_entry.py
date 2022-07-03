@@ -20,7 +20,8 @@ def stock_entry(own_packing):
     stock_entry = frappe.new_doc("Stock Entry")    
     stock_entry.company = udoc.company
     #stock_entry.posting_date = udoc.date
-    #stock_entry.posting_time = '00:00:00'
+    #stock_entry.posting_time = '00:00:00'    
+    frappe.throw(str(udoc.modified))
     stock_entry.purpose = "Manufacture"
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Chicken Slaughtering"
@@ -224,48 +225,49 @@ def update_project(doc,item_code,qty,rate):
     `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name where l.is_billing_updated<>'1' 
     and o.item_processed=1 and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
     
-    remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
-    if qty > remqty:
-        ownqty=qty-remqty
-        selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
-        selling_cost=selling_cost+(remqty*rate)
-        frappe.db.set_value('Own Packing List', own_pack[0]['name'], {'updated_qty':own_pack[0]['qty'],'is_billing_updated':'1'})
-        frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
-        
-        project=frappe.get_doc('Project', own_pack[0]['project'])
-        project.update_costing()
-        project.save()
-        sales_cost=frappe.new_doc("Own Pack Sales Cost")
-        sales_cost.sales_invoice=doc.name
-        sales_cost.project=own_pack[0]['project']
-        sales_cost.item=item_code
-        sales_cost.amount=remqty*rate
-        sales_cost.qty=remqty
-        sales_cost.own_pack_list=own_pack[0]['name']
-        sales_cost.insert(ignore_permissions=True)
+    if own_pack:
+        remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
+        if qty > remqty:
+            ownqty=qty-remqty
+            selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+            selling_cost=selling_cost+(remqty*rate)
+            frappe.db.set_value('Own Packing List', own_pack[0]['name'], {'updated_qty':own_pack[0]['qty'],'is_billing_updated':'1'})
+            frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+            
+            project=frappe.get_doc('Project', own_pack[0]['project'])
+            project.update_costing()
+            project.save()
+            sales_cost=frappe.new_doc("Own Pack Sales Cost")
+            sales_cost.sales_invoice=doc.name
+            sales_cost.project=own_pack[0]['project']
+            sales_cost.item=item_code
+            sales_cost.amount=remqty*rate
+            sales_cost.qty=remqty
+            sales_cost.own_pack_list=own_pack[0]['name']
+            sales_cost.insert(ignore_permissions=True)
 
-        update_project(doc,item_code,ownqty,rate)
-    else:
-        cqty=remqty-qty
-        selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
-        selling_cost=selling_cost+(qty*rate)
-        frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
-        upqty=own_pack[0]['updated_qty']+qty
-        frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'updated_qty',upqty)    
-        if cqty==0:
-            frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'is_billing_updated', '1')
+            update_project(doc,item_code,ownqty,rate)
+        else:
+            cqty=remqty-qty
+            selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+            selling_cost=selling_cost+(qty*rate)
+            frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+            upqty=own_pack[0]['updated_qty']+qty
+            frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'updated_qty',upqty)    
+            if cqty==0:
+                frappe.db.set_value('Own Packing List', own_pack[0]['name'], 'is_billing_updated', '1')
 
-        project=frappe.get_doc('Project', own_pack[0]['project'])
-        project.update_costing()
-        project.save()
-        sales_cost=frappe.new_doc("Own Pack Sales Cost")
-        sales_cost.sales_invoice=doc.name
-        sales_cost.project=own_pack[0]['project']
-        sales_cost.item=item_code
-        sales_cost.amount=qty*rate
-        sales_cost.own_pack_list=own_pack[0]['name']
-        sales_cost.qty=qty
-        sales_cost.insert(ignore_permissions=True)
+            project=frappe.get_doc('Project', own_pack[0]['project'])
+            project.update_costing()
+            project.save()
+            sales_cost=frappe.new_doc("Own Pack Sales Cost")
+            sales_cost.sales_invoice=doc.name
+            sales_cost.project=own_pack[0]['project']
+            sales_cost.item=item_code
+            sales_cost.amount=qty*rate
+            sales_cost.own_pack_list=own_pack[0]['name']
+            sales_cost.qty=qty
+            sales_cost.insert(ignore_permissions=True)
 
 def cancel_selling_cost(doc,event):
     own_pack=frappe.db.sql("""select sum(amount) as amount,project from  `tabOwn Pack Sales Cost`  
