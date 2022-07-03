@@ -21,7 +21,7 @@ def stock_entry(own_packing):
     stock_entry.company = udoc.company
     #stock_entry.posting_date = udoc.date
     #stock_entry.posting_time = '00:00:00'    
-    frappe.throw(str(udoc.modified))
+    #frappe.throw(str(udoc.modified))
     stock_entry.purpose = "Manufacture"
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Chicken Slaughtering"
