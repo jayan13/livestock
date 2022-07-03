@@ -86,9 +86,9 @@ def stock_entry(own_packing):
 
         unit_cost=(row_cost/flt(total_finished_item,3))
         
-        pcitems=[]
+        
         for fitem in udoc.finished_items:
-            
+            pcitems=[]
             itemscost=0
             item_account_details = get_item_defaults(fitem.item, udoc.company)
             pcmaterials=frappe.get_doc('Packing Materials',fitem.item)           
@@ -163,8 +163,8 @@ def stock_entry(own_packing):
                     'set_basic_rate_manually':1                  
 			})
 
-        for pc in pcitems:
-            stock_entry.append('items',pc)
+            for pc in pcitems:
+                stock_entry.append('items',pc)
 
     
 
