@@ -223,8 +223,8 @@ def update_selling_cost(doc,event):
 def update_project(doc,item_code,qty,rate):
 
     own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
-    `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name where l.is_billing_updated<>'1' 
-    and o.item_processed=1 and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
+    `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where l.is_billing_updated<>'1' 
+    and o.item_processed=1 and p.status='Open' and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
     
     if own_pack:
         remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
