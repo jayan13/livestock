@@ -18,10 +18,11 @@ def stock_entry(own_packing):
     udoc = frappe.get_doc('Chicken Own Packing', own_packing)
     sett = frappe.get_doc('Own Packing Settings')
     stock_entry = frappe.new_doc("Stock Entry")    
-    stock_entry.company = udoc.company
-    #stock_entry.posting_date = udoc.date
-    #stock_entry.posting_time = '00:00:00'    
-    #frappe.throw(str(udoc.modified))
+    stock_entry.company = udoc.company     
+    ownpacktime=format_time(str(udoc.creation))
+    stock_entry.posting_date = udoc.date
+    stock_entry.posting_time = ownpacktime
+    stock_entry.set_posting_time='1'
     stock_entry.purpose = "Manufacture"
     stock_entry.stock_entry_type = "Manufacture"
     stock_entry.manufacturing_type = "Chicken Slaughtering"
