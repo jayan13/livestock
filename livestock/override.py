@@ -52,10 +52,10 @@ class HatcheryProject(Document):
 
 
 	def calculate_packing_cost(self):
-		own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+		own_packing = frappe.db.get_list('Chicken Own Packing', {'Project':self.name}, ['name'], pluck='name')
 		pkcost=0
 		if own_packing:
-			stock=frappe.db.get_list("Stock Entry",filters={'chicken_own_packing': own_packing,'stock_entry_type':"Manufacture","docstatus":'1'},fields=['name'])
+			stock=frappe.db.get_list("Stock Entry",filters={'chicken_own_packing': ['in',own_packing],'stock_entry_type':"Manufacture","docstatus":'1'},fields=['name'])
 			
 			for stitm in stock:
 				itm=frappe.get_doc('Stock Entry',stitm.name)
@@ -171,15 +171,15 @@ class HatcheryProject(Document):
 			self.total_transfer_amount=amount
 
 		if self.project_type=='Broiler':
-			own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+			own_packing = frappe.db.get_list('Chicken Own Packing', {'Project':self.name}, ['name'], pluck='name')
 			pkcost=0
-			if own_packing==doc.chicken_own_packing:
+			if doc.chicken_own_packing in own_packing:
 				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
 				for pacitem in doc.items:
 					if pacitem.item_code in usedpacitem:
 						pkcost+=pacitem.amount
 
-			self.packing_cost=pkcost
+			self.packing_cost=self.packing_cost+pkcost
 
 		self.calculate_gross_margin()
 
@@ -229,9 +229,9 @@ class HatcheryProject(Document):
 			self.total_transfer_amount=self.total_transfer_amount-amount
 
 		if self.project_type=='Broiler':
-			own_packing = frappe.db.get_value('Chicken Own Packing', {'Project':self.name}, ['name'])
+			own_packing = frappe.db.get_list('Chicken Own Packing', {'Project':self.name}, ['name'], pluck='name')
 			pkcost=0
-			if own_packing==doc.chicken_own_packing:
+			if doc.chicken_own_packing in own_packing:
 				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
 				for pacitem in doc.items:
 					if pacitem.item_code in usedpacitem:
