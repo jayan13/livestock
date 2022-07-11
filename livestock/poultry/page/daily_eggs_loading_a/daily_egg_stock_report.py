@@ -14,10 +14,9 @@ def get_egg_report(company=None,posted_on=None):
         
     data['company']=company
     data['posted_on']=posted_on
-    projects= frappe.db.sql("""select  project_name from tabProject p left join  `tabStock Ledger Entry`  s  on s.project=p.project_name  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}'  and p.project_name LIKE 'LH%'  group by s.project having sum(s.actual_qty) >0 order by p.project_name """.format(posted_on),as_dict=1)
+   
     data['items']=items= frappe.db.sql("""select  item_code,item_name from tabItem where item_group='EGGS' """,as_dict=1)
     warehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and warehouse_type='Store' """.format(company),as_dict=1)
-    retwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and warehouse_type='RETURN STORE' """.format(company),as_dict=1)
     oppeingstockqr=frappe.db.sql("""select  name from tabWarehouse where company='{0}' and warehouse_type='Layer' """.format(company),as_dict=1)
     
 
@@ -79,7 +78,7 @@ def get_egg_report(company=None,posted_on=None):
     if oppeingstockwh:
         warehouse_conditions_sql = """ and warehouse in ('{}')""".format( "' ,'".join([str(elem) for elem in oppeingstockwh]))
 
-    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and name not like '%AL AIN%' and warehouse_type='Store' """.format(company),as_dict=1)
+    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and name not like '%AL AIN%' and warehouse_type='Store' """.format(company),as_dict=0)
     
     for item in items:
         i=0
@@ -94,12 +93,12 @@ def get_egg_report(company=None,posted_on=None):
                 WHERE
                     company = '{0}' 
                     AND is_cancelled = 0 
-                    AND posting_date = '{1}'
+                    AND posting_date <= '{1}'
                     AND item_code='{2}'
                     {3}
                 GROUP BY
                     item_code
-                """.format(company,posted_on,item.item_code,warehouse_conditions_sql),as_dict=1,debug=0)
+                """.format(company,posted_on,item.item_code,warehouse_conditions_sql),as_dict=1,debug=1)
         itmqty=0         
         for sl_entry in sl_entrys:
             itmqty=get_item_ctn_qty(item.item_code,sl_entry.qty)
@@ -119,7 +118,7 @@ def get_egg_report(company=None,posted_on=None):
                 WHERE
                     company = '{0}' 
                     AND is_cancelled = 0 
-                    AND posting_date = '{1}'
+                    AND posting_date <= '{1}'
                     AND item_code='{2}'
                     AND warehouse='{3}'
                 GROUP BY
