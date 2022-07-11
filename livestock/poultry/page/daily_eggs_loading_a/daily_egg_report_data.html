@@ -88,12 +88,12 @@ padding:4px;
 	<tr><td>Area</td>
 		<td>FARM</td> 
 		{% for wer in stwarehouses %}
-        <td style="width:20%">{{wer.name}}</td>
+        <td style="width:16%">{{wer.name}}</td>
 		{% endfor %}
 	</tr>
 	<tr><td>Total</td>
 		{% for wert in daily_stock_tot %}
-        <td style="width:20%">{{wert}} Ctn</td>
+        <td style="width:16%">{{wert}} Ctn</td>
 		{% endfor %}
 	</tr>
 	
@@ -104,13 +104,13 @@ padding:4px;
 	<tr><td>Categories</td> 
 		<td>FARM</td>
 		{% for wer in stwarehouses %}
-        <td style="width:20%">{{wer.name}}</td>
+        <td style="width:16%">{{wer.name}}</td>
 		{% endfor %}
 	</tr>
 	{% for wert in daily_stock %}
 	<tr>
 		{% for wei in wert %}
-        <td style="width:20%">{{wei}} </td>
+        <td style="width:16%">{{wei}} </td>
 		{% endfor %}
 	</tr>
 	{% endfor %}

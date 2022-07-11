@@ -69,7 +69,7 @@ def get_egg_report(company=None,posted_on=None):
     #frappe.throw(str(daily_load_tot))
 #===========================================================
     oppeingstockwh=[]
-    daily_stock_tot=[0,0,0,0]
+    daily_stock_tot=[0,0,0,0,0]
     stritems=[]    
     for oppeingstoc in oppeingstockqr:
         oppeingstockwh.append(oppeingstoc.name)
@@ -78,7 +78,7 @@ def get_egg_report(company=None,posted_on=None):
     if oppeingstockwh:
         warehouse_conditions_sql = """ and warehouse in ('{}')""".format( "' ,'".join([str(elem) for elem in oppeingstockwh]))
 
-    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and name not like '%AL AIN%' and warehouse_type='Store' """.format(company),as_dict=1)
+    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and warehouse_type='Store' """.format(company),as_dict=1,debug=0)
     
     for item in items:
         i=0
