@@ -2,7 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "field:item",
- "creation": "2022-06-08 16:48:25.409886",
+ "creation": "2022-07-08 12:27:43.722965",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -45,10 +45,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-08 10:58:09.507535",
+ "modified": "2022-07-08 12:27:43.722965",
  "modified_by": "Administrator",
  "module": "Slaughtering",
- "name": "Own Packing Report Setting",
+ "name": "Co Packing Report Setting",
  "owner": "Administrator",
  "permissions": [
   {
