@@ -78,7 +78,7 @@ def get_egg_report(company=None,posted_on=None):
     if oppeingstockwh:
         warehouse_conditions_sql = """ and warehouse in ('{}')""".format( "' ,'".join([str(elem) for elem in oppeingstockwh]))
 
-    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and name not like '%AL AIN%' and warehouse_type='Store' """.format(company),as_dict=0)
+    stwarehouses= frappe.db.sql("""select  name from tabWarehouse where company='{0}' and name not like '%AL AIN%' and warehouse_type='Store' """.format(company),as_dict=1)
     
     for item in items:
         i=0
@@ -98,7 +98,7 @@ def get_egg_report(company=None,posted_on=None):
                     {3}
                 GROUP BY
                     item_code
-                """.format(company,posted_on,item.item_code,warehouse_conditions_sql),as_dict=1,debug=1)
+                """.format(company,posted_on,item.item_code,warehouse_conditions_sql),as_dict=1,debug=0)
         itmqty=0         
         for sl_entry in sl_entrys:
             itmqty=get_item_ctn_qty(item.item_code,sl_entry.qty)
