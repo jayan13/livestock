@@ -216,21 +216,64 @@ def update_selling_cost(doc,event):
     
     for i in doc.items:
         if i.item_code in itemary:
-            update_project(doc,i.item_code,i.qty,i.rate)
+            update_project(doc,i.item_code,i.qty,i.rate,i.production_date)
             
 
 
-def update_project(doc,item_code,qty,rate):
+def update_project(doc,item_code,qty,rate,production_date):
 
     if doc.is_return:
-        own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
+        own_pack=''
+        if production_date:
+            own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where  
-         l.updated_qty > 0 and o.item_processed=1 and p.status='Open' and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
-
+         o.date='{0}' and l.updated_qty > 0 and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(production_date, item_code),as_dict=1,debug=0)
+        if not own_pack:
+            own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
+        `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where  
+         (o.date between DATE_SUB('{0}', INTERVAL 3 DAY) and '{1}') and l.updated_qty > 0 and o.item_processed=1 and p.status='Open' and l.item='{2}' order by o.`date` limit 0,1 """.format(doc.posting_date, doc.posting_date, item_code),as_dict=1,debug=0)
+        
+        if own_pack:            
+            if own_pack[0]['updated_qty'] >= abs(qty):
+                selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+                selling_cost=selling_cost+(qty*rate)
+                updated_qty=own_pack[0]['updated_qty']-abs(qty)
+                frappe.db.set_value('Own Packing List', own_pack[0]['name'], {'updated_qty':updated_qty,'is_billing_updated':'0'})
+                frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+                project=frappe.get_doc('Project', own_pack[0]['project'])
+                project.update_costing()
+                project.save()
+                sales_cost=frappe.new_doc("Own Pack Sales Cost") #used when sales invoice canceled - removing sales cost from projects
+                sales_cost.sales_invoice=doc.name
+                sales_cost.project=own_pack[0]['project']
+                sales_cost.item=item_code
+                sales_cost.amount=qty*rate
+                sales_cost.qty=qty
+                sales_cost.own_pack_list=own_pack[0]['name']
+                sales_cost.insert(ignore_permissions=True)
+            else:
+                remqty=own_pack[0]['updated_qty']+qty
+                reqty=own_pack[0]['updated_qty']*-1
+                selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
+                selling_cost=selling_cost+(reqty*rate)
+                frappe.db.set_value('Own Packing List', own_pack[0]['name'], {'updated_qty':'0','is_billing_updated':'0'})
+                frappe.db.set_value('Project', own_pack[0]['project'], 'own_packing_selling_cost', selling_cost)
+                project=frappe.get_doc('Project', own_pack[0]['project'])
+                project.update_costing()
+                project.save()
+                sales_cost=frappe.new_doc("Own Pack Sales Cost") #used when sales invoice canceled - removing sales cost from projects
+                sales_cost.sales_invoice=doc.name
+                sales_cost.project=own_pack[0]['project']
+                sales_cost.item=item_code
+                sales_cost.amount=reqty*rate
+                sales_cost.qty=reqty
+                sales_cost.own_pack_list=own_pack[0]['name']
+                sales_cost.insert(ignore_permissions=True)
+                update_project(doc,item_code,remqty,rate,production_date)
     else:
         own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where l.is_billing_updated<>'1' 
-        and o.item_processed=1 and p.status='Open' and l.item=%s order by o.`date` limit 0,1 """, item_code,as_dict=1)
+        and o.date < '{0}' and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(doc.posting_date,item_code), as_dict=1)
         
         if own_pack:
             remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
@@ -253,7 +296,7 @@ def update_project(doc,item_code,qty,rate):
                 sales_cost.own_pack_list=own_pack[0]['name']
                 sales_cost.insert(ignore_permissions=True)
 
-                update_project(doc,item_code,ownqty,rate)
+                update_project(doc,item_code,ownqty,rate,production_date)
             else:
                 cqty=remqty-qty
                 selling_cost=frappe.db.get_value('Project', own_pack[0]['project'], ['own_packing_selling_cost']) or 0
