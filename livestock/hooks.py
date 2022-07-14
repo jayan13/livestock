@@ -122,7 +122,10 @@ doc_events = {
 			"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat",
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_selling_cost"
 		],
-		"on_cancel":"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.cancel_selling_cost"
+		"on_cancel":[
+			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.cancel_selling_cost",
+			"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.cancel_item",
+		]
 	}
 }
 # Scheduled Tasks

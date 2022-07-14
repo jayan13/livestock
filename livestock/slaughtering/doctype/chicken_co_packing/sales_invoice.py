@@ -90,3 +90,10 @@ def update_item_stat(doc,event):
         udoc = frappe.get_doc('Chicken Co Packing', doc.chicken_co_packing)
         udoc.item_processed = 1
         udoc.save()
+
+@frappe.whitelist()
+def cancel_item(doc,event):
+    if doc.chicken_co_packing:
+        udoc = frappe.get_doc('Chicken Co Packing', doc.chicken_co_packing)
+        udoc.item_processed = 0
+        udoc.save()
