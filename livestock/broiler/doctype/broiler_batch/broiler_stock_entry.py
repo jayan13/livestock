@@ -52,7 +52,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
     base_row_rate=0
     total_add_cost=0
     tot_scrap=sum(c.total for c in udoc.daily_mortality)+udoc.mortality-pv_scrap or 0
-    
+    if tot_scrap < 0:
+        tot_scrap=0
+
     if sett.base_row_material:
         #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')
         pv_item_qty=pv_qty.get(sett.base_row_material) or 0
