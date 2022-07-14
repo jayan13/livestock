@@ -496,3 +496,13 @@ def cancel_item(doc,event):
 
         frappe.db.set_value('Broiler Item Transfer', doc.item_transfer, 'processed', '0')
         frappe.db.sql("""update `tabBroiler Transfer Consumable` set processed='0' where parent=%s""",doc.item_transfer)
+
+@frappe.whitelist()
+def get_added_mortality(batch):
+    broiler_item_transfer=frappe.db.get_list('Broiler Item Transfer',filters={'processed': '1','broiler_bach':batch},
+    fields=['sum(scrap) as scrap'],group_by='broiler_bach')
+    pv_scrap = 0
+    for trn in broiler_item_transfer:
+        pv_scrap = trn.scrap
+        
+    return pv_scrap

@@ -23,7 +23,44 @@ frappe.ui.form.on('Broiler Batch', {
 		}
 			};
 		});
+        if(frm.doc.chick_transferred > 0)
+        {
+            frm.set_df_property("mortality", "read_only",1);
+        }
+
+        const fieldname_arr = ['evening','morning','date','age'];
         
+        frappe.call(
+            { 
+                method: "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.get_added_mortality",
+                args: {
+                    batch:frm.doc.name,                    
+                },
+                callback: function(r) 
+                    { 
+                        if(r.message) 
+                            { 
+                                if(r.message > 0)
+                                {
+                                    var tot=r.message;
+                                    var ctot=0
+                                    cur_frm.fields_dict['daily_mortality'].grid.grid_rows.forEach((grid_row)=> {
+                                        ctot+=grid_row.doc.total;
+                                        grid_row.docfields.forEach((df)=>{
+                                                if(tot > ctot)
+                                                {
+                                                    if (fieldname_arr.includes(df.fieldname)) {
+                                                    df.read_only=1;
+                                                    }
+                                                }
+                                            });
+                                    });
+
+                                }
+                            } 
+                    }
+            });
+
         if (frm.doc.item_processed!=1)
 			{       
 				frm.add_custom_button(__('Broiler Production Entry'), function(){
