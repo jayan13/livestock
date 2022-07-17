@@ -172,7 +172,8 @@ fixtures = [
 					"Project-broiler_batch",
 					"Stock Entry-item_transfer",
 					"Project-packing_cost",
-					"Project-own_packing_selling_cost"
+					"Project-own_packing_selling_cost",
+					"Stock Entry-own_repack"
                     
                 ),
             ]

@@ -178,6 +178,170 @@ def stock_entry(own_packing):
 
     return stock_entry.as_dict()
 
+@frappe.whitelist()
+def re_packing(own_packing):
+    udoc = frappe.get_doc('Chicken Own Packing', own_packing)
+    sett = frappe.get_doc('Own Packing Settings')
+    own_repk = frappe.new_doc("Own Re Packing")
+    own_repk.own_packing=udoc.name
+    own_repk.own_paking_date=udoc.date
+    own_repk.source_warehouse=sett.warehouse
+    own_repk.traget_warehouse=sett.warehouse
+    own_repk.packing_item_warehouse=sett.packing_item_warehouse
+    stock=frappe.db.get_value('Stock Entry', {'chicken_own_packing': own_packing}, 'name')
+    for fitem in udoc.finished_items:
+        if fitem.qty > fitem.updated_qty:
+            own_repk.append('re_packing_items', {
+                    'item_code': fitem.item_code,
+                    'item_name':fitem.item_name,
+					'old_item_qty': fitem.qty,
+                    'old_item_avail_qty': fitem.qty-fitem.updated_qty,
+                    'old_uom':fitem.uom,
+                    'old_item_rate': get_old_valuerate(fitem.item_code,stock),					
+			        })
+
+    return own_repk.as_dict()
+
+@frappe.whitelist()
+def re_stock_entry(own_re_packing):
+    from erpnext.stock.doctype.item.item import get_item_defaults
+    udoc = frappe.get_doc('Own Re Packing', own_re_packing)
+    sett = frappe.get_doc('Own Packing Settings')    
+    company=frappe.db.get_value('Chicken Own Packing',udoc.own_packing,'company')
+    stock_entry = frappe.new_doc("Stock Entry")    
+    stock_entry.company = company     
+    ownpacktime=format_time(str(udoc.creation))
+    stock_entry.posting_date = udoc.own_paking_date
+    stock_entry.posting_time = ownpacktime
+    stock_entry.set_posting_time='1'
+    stock_entry.purpose = "Manufacture"
+    stock_entry.stock_entry_type = "Manufacture"
+    stock_entry.manufacturing_type = "Chicken Slaughtering Repack"
+    stock_entry.own_repack=own_re_packing
+    stock_entry.chicken_own_packing=udoc.own_packing
+    precision = cint(frappe.db.get_default("float_precision")) or 3
+
+    if udoc.re_packing_items:
+        pcitems=[]
+        for fitem in udoc.re_packing_items:
+            if not fitem.new_item or fitem.new_qty == 0:
+                continue
+
+            if fitem.new_qty > int(fitem.old_item_avail_qty):
+                frappe.throw(" Repack Item Qty must be less than or equal to Available Item")
+
+            old_item_details = get_item_defaults(fitem.item_code, company)
+            stock_uom = old_item_details.stock_uom
+            conversion_factor = get_conversion_factor(fitem.item_code, fitem.old_uom).get("conversion_factor")
+            cost_center=sett.cost_center or old_item_details.get("buying_cost_center")
+            expense_account=old_item_details.get("expense_account")                
+            item_name=old_item_details.get("item_name")
+            qty=fitem.new_qty
+            rate = fitem.old_item_rate
+            amount=qty*float(fitem.old_item_rate) 
+            stock_entry.append('items', {
+                    's_warehouse': udoc.source_warehouse,
+					'item_code': fitem.item_code,
+					'qty': qty,
+                    'actual_qty':qty,
+					'uom': fitem.old_uom,
+                    'cost_center':cost_center,					
+					'ste_detail': item_name,
+					'stock_uom': stock_uom,
+                    'expense_account':expense_account,
+                    'valuation_rate': rate,
+                    "basic_rate":rate, 	
+                    "basic_amount":amount,  
+                    "amount":amount,  
+                    "transfer_qty":qty,
+					'conversion_factor': flt(conversion_factor),
+			        })
+
+            itemscost=0
+            item_account_details = get_item_defaults(fitem.new_item, company)
+            pcmaterials=frappe.get_doc('Packing Materials',fitem.new_item)           
+            
+            for pcitem in pcmaterials.packing_item:
+                pack_item_details = get_item_defaults(pcitem.item, company)
+                stock_uom = pack_item_details.stock_uom
+                conversion_factor = get_conversion_factor(pcitem.item, pcitem.uom).get("conversion_factor")
+                cost_center=sett.cost_center or pack_item_details.get("buying_cost_center")
+                expense_account=pack_item_details.get("expense_account")                
+                item_name=pack_item_details.get("item_name")
+                packed_qty=float(pcitem.qty)*float(fitem.new_qty)
+                pck_rate = get_incoming_rate({
+						"item_code": pcitem.item,
+						"warehouse": udoc.packing_item_warehouse,
+						"posting_date": stock_entry.posting_date,
+						"posting_time": stock_entry.posting_time,
+						"qty": -1 * packed_qty,
+                        'company':company
+					})
+                                
+                transfer_qty=flt(flt(packed_qty) * flt(conversion_factor),2)
+                amount=flt(flt(transfer_qty) * flt(pck_rate), precision)
+                itemscost+=transfer_qty * pck_rate
+                stock_entry.append('items', {
+                    's_warehouse': udoc.packing_item_warehouse,
+					'item_code': pcitem.item,
+					'qty': packed_qty,
+                    'actual_qty':packed_qty,
+					'uom': pcitem.uom,
+                    'cost_center':cost_center,					
+					'ste_detail': item_name,
+					'stock_uom': stock_uom,
+                    'expense_account':expense_account,
+                    'valuation_rate': pck_rate,
+                    "basic_rate":pck_rate, 	
+                    "basic_amount":amount,  
+                    "amount":amount,  
+                    "transfer_qty":transfer_qty,
+					'conversion_factor': flt(conversion_factor),
+			        })    
+                
+
+
+            #base_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Selling','item_code':fitem.item}, 'price_list_rate') 
+            stock_uom = item_account_details.stock_uom
+            conversion_factor = get_conversion_factor(fitem.new_item, fitem.old_uom).get("conversion_factor")
+            cost_center=sett.cost_center or item_account_details.get("buying_cost_center")
+            expense_account=item_account_details.get("expense_account")                
+            item_name=item_account_details.get("item_name")
+            #weight_per_unit=item_account_details.get("weight_per_unit")
+            packing_rate_of_item=itemscost/float(fitem.new_qty)
+            base_rate=packing_rate_of_item+float(fitem.old_item_rate)
+            amount=flt(fitem.new_qty) * base_rate
+            pcitems.append({            
+                    't_warehouse': udoc.traget_warehouse,
+					'item_code': fitem.new_item,
+					'qty': fitem.new_qty,
+                    'actual_qty':fitem.new_qty,
+					'uom': fitem.old_uom,
+                    'cost_center':cost_center,					
+					'ste_detail': item_name,
+					'stock_uom': stock_uom,
+                    'expense_account':expense_account,
+                    'valuation_rate': base_rate,
+                    "basic_rate":base_rate, 	
+                    "basic_amount":amount,  
+                    "amount":amount,  
+                    "transfer_qty":fitem.new_qty,
+					'conversion_factor': flt(conversion_factor),
+                    'is_finished_item':1,
+                    'set_basic_rate_manually':1                  
+			})
+
+        for pc in pcitems:
+            stock_entry.append('items',pc)
+        
+    return stock_entry.as_dict()    
+
+def get_old_valuerate(item,stock=None):
+    vrate=0
+    if stock:    
+        vrate=frappe.db.get_value('Stock Entry Detail', {'item_code': item,'parent':stock}, 'valuation_rate')
+    return vrate
+
 def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
     if uom != stock_uom:
         conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor") or 1
@@ -198,6 +362,25 @@ def update_item_stat(doc,event):
         if doc.manufacturing_type == "Chicken Slaughtering":
             udoc.item_processed = 1
             udoc.save()
+    if doc.own_repack:
+        pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'],debug=0)
+        for pklst in pklist:
+            plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code},['parent','parenttype','name', 'qty','uom','grade'], as_dict=1,debug=0)
+            item_name=frappe.db.get_value('Item',pklst.new_item,'item_name')
+            newqty=int(plist.qty)-int(pklst.new_qty)
+            frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)
+            newplist=frappe.new_doc("Own Packing List")
+            newplist.qty=pklst.new_qty
+            newplist.item_code=pklst.new_item
+            newplist.item=pklst.new_item
+            newplist.uom=plist.uom
+            newplist.item_name=item_name
+            newplist.grade=plist.grade
+            newplist.re_packing=doc.own_repack
+            newplist.parent=plist.parent
+            newplist.parenttype=plist.parenttype
+            newplist.insert(ignore_permissions=True)
+
 
 @frappe.whitelist()
 def cancel_item(doc,event):
@@ -206,6 +389,17 @@ def cancel_item(doc,event):
         if doc.manufacturing_type == "Chicken Slaughtering":
             udoc.item_processed = 0
             udoc.save()
+
+    if doc.own_repack:
+        pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'])
+        for pklst in pklist:
+            plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code},['name', 'qty','uom','grade'], as_dict=1)
+            newqty=int(plist.qty)+int(pklst.new_qty)
+            frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)
+            frappe.db.delete("Own Packing List", {'re_packing':doc.own_repack,'item_code':pklst.new_item})
+            
+        
+        
 
 def update_selling_cost(doc,event):
     itemary=[]

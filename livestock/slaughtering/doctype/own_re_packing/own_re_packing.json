@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{own_packing}-{own_paking_date}",
+ "creation": "2022-07-16 14:22:34.575193",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "own_packing",
+  "own_paking_date",
+  "source_warehouse",
+  "traget_warehouse",
+  "packing_item_warehouse",
+  "re_packing_items"
+ ],
+ "fields": [
+  {
+   "fieldname": "own_packing",
+   "fieldtype": "Link",
+   "label": "Own Packing",
+   "options": "Chicken Own Packing"
+  },
+  {
+   "fieldname": "source_warehouse",
+   "fieldtype": "Link",
+   "label": "Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "traget_warehouse",
+   "fieldtype": "Link",
+   "label": "Traget Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "packing_item_warehouse",
+   "fieldtype": "Link",
+   "label": "Packing Item Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fetch_from": "own_packing.date",
+   "fieldname": "own_paking_date",
+   "fieldtype": "Data",
+   "label": "Own Paking Date"
+  },
+  {
+   "fieldname": "re_packing_items",
+   "fieldtype": "Table",
+   "label": "Re Packing Items",
+   "options": "Own Repacking Item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-17 13:13:35.938401",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Own Re Packing",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

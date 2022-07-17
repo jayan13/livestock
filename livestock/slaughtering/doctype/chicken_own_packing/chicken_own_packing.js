@@ -66,6 +66,33 @@ frappe.ui.form.on('Chicken Own Packing', {
            
             }).removeClass("btn-default").addClass("btn-success");
         }
+        if (frm.doc.item_processed==1)
+        {       
+            frm.add_custom_button(__('Re Packing'), function(){
+        
+                
+					
+					
+			//console.log(frm.doc);  
+				frappe.call(
+                    { 
+                        method: "livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.re_packing",
+                        args: { 
+                            //doc: d,
+                            own_packing:frm.doc.name
+                        },
+                        callback: function(r) 
+                            { 
+                                if(r.message) 
+                                    { 
+				                    	var doclist = frappe.model.sync(r.message);
+				                        frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                    } 
+                            }
+                    });
+           
+            }).removeClass("btn-default").addClass("btn-success");
+        }
         frm.doc.chicken_net_of_mortality=frm.doc.number_of_chicken-frm.doc.mortality_while_receving-frm.doc.number_of_culls;
         if(frm.doc.total_live_weight_in_kg && frm.doc.chicken_net_of_mortality )
             {        

@@ -1,0 +1,85 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-16 14:20:54.198655",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "old_item_qty",
+  "old_item_avail_qty",
+  "old_uom",
+  "old_item_rate",
+  "new_item",
+  "new_qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "old_item_qty",
+   "fieldtype": "Data",
+   "label": "Old Item Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "old_item_avail_qty",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Old Item Avail Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "old_item_rate",
+   "fieldtype": "Data",
+   "label": "Old Item Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "new_item",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "New item",
+   "options": "Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "new_qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "New Qty",
+   "precision": "2"
+  },
+  {
+   "fieldname": "old_uom",
+   "fieldtype": "Link",
+   "label": "Old Uom",
+   "options": "UOM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Old Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item name"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-07-17 12:05:39.165387",
+ "modified_by": "Administrator",
+ "module": "Slaughtering",
+ "name": "Own Repacking Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
