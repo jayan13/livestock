@@ -396,10 +396,11 @@ def cancel_item(doc,event):
     if doc.own_repack:
         pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'])
         for pklst in pklist:
-            plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code,'parent':doc.chicken_own_packing},['name', 'qty','uom','grade'], as_dict=1)
-            newqty=int(plist.qty)+int(pklst.new_qty)
-            frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)
-            frappe.db.delete("Own Packing List", {'re_packing':doc.own_repack,'item_code':pklst.new_item})
+            if pklst.new_qty and pklst.new_item:
+                plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code,'parent':doc.chicken_own_packing},['name', 'qty','uom','grade'], as_dict=1)
+                newqty=int(plist.qty)+int(pklst.new_qty)
+                frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)
+                frappe.db.delete("Own Packing List", {'re_packing':doc.own_repack,'item_code':pklst.new_item})
             
         
         
