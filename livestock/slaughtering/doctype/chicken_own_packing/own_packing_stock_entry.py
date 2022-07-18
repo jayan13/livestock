@@ -188,16 +188,17 @@ def re_packing(own_packing):
     own_repk.source_warehouse=sett.warehouse
     own_repk.traget_warehouse=sett.warehouse
     own_repk.packing_item_warehouse=sett.packing_item_warehouse
-    stock=frappe.db.get_value('Stock Entry', {'chicken_own_packing': own_packing,'manufacturing_type':'Chicken Slaughtering'}, 'name',order_by='')
+    
     for fitem in udoc.finished_items:
         if fitem.qty > fitem.updated_qty:
+            vrate=frappe.db.sql("""select d.valuation_rate from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where d.item_code ='{0}' and s.chicken_own_packing='{1}' and s.docstatus=1 order by s.creation  """.format(fitem.item_code,own_packing),as_dict=1)[0]
             own_repk.append('re_packing_items', {
                     'item_code': fitem.item_code,
                     'item_name':fitem.item_name,
 					'old_item_qty': fitem.qty,
                     'old_item_avail_qty': fitem.qty-fitem.updated_qty,
                     'old_uom':fitem.uom,
-                    'old_item_rate': get_old_valuerate(fitem.item_code,stock),					
+                    'old_item_rate': vrate.valuation_rate,					
 			        })
 
     return own_repk.as_dict()
