@@ -364,18 +364,22 @@ def update_item_stat(doc,event):
             udoc.item_processed = 1
             udoc.save()
     if doc.own_repack:
-        udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)
-        pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'],debug=0)
         
+        pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'],debug=0)
+        idxmax=frappe.db.sql("""select max(idx) as idx from `tabOwn Packing List`  where parent='{0}'   """.format(doc.chicken_own_packing),as_dict=1)[0]
+        idx=idxmax.idx or 0
         for pklst in pklist:
             if pklst.new_qty and pklst.new_item:
                 plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code,'parent':doc.chicken_own_packing},['parent','parenttype','name', 'qty','uom','grade'], as_dict=1,debug=0)
-                
+                if idx:
+                    idx=idx+1
                 item_name=frappe.db.get_value('Item',pklst.new_item,'item_name')
                 newqty=int(plist.qty)-int(pklst.new_qty)
-                frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)                
+                frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)  
+                udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)                                
                 udoc.append('finished_items', {
                     'qty': pklst.new_qty,
+                    'idx':idx,
 					'item_code': pklst.new_item,
 					'item': pklst.new_item,
                     'item_name':item_name,
@@ -385,7 +389,8 @@ def update_item_stat(doc,event):
                     'grade':plist.grade,					
 					're_packing': doc.own_repack,					
 			        })
-        udoc.save()             
+                udoc.save()
+                           
         
 
 @frappe.whitelist()
