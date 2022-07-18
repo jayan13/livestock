@@ -366,6 +366,7 @@ def update_item_stat(doc,event):
     if doc.own_repack:
         udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)
         pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'],debug=0)
+        
         for pklst in pklist:
             if pklst.new_qty and pklst.new_item:
                 plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code,'parent':doc.chicken_own_packing},['parent','parenttype','name', 'qty','uom','grade'], as_dict=1,debug=0)
@@ -378,6 +379,8 @@ def update_item_stat(doc,event):
 					'item_code': pklst.new_item,
 					'item': pklst.new_item,
                     'item_name':item_name,
+                    'is_billing_updated':'0',
+                    'parentfield':'finished_items',
 					'uom': plist.uom,
                     'grade':plist.grade,					
 					're_packing': doc.own_repack,					
