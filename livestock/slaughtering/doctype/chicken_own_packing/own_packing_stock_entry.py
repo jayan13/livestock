@@ -188,7 +188,7 @@ def re_packing(own_packing):
     own_repk.source_warehouse=sett.warehouse
     own_repk.traget_warehouse=sett.warehouse
     own_repk.packing_item_warehouse=sett.packing_item_warehouse
-    stock=frappe.db.get_value('Stock Entry', {'chicken_own_packing': own_packing}, 'name')
+    stock=frappe.db.get_value('Stock Entry', {'chicken_own_packing': own_packing,'manufacturing_type':'Chicken Slaughtering'}, 'name',order_by='')
     for fitem in udoc.finished_items:
         if fitem.qty > fitem.updated_qty:
             own_repk.append('re_packing_items', {
@@ -238,7 +238,7 @@ def re_stock_entry(own_re_packing):
             item_name=old_item_details.get("item_name")
             qty=fitem.new_qty
             rate = fitem.old_item_rate
-            amount=qty*float(fitem.old_item_rate) 
+            amount=int(qty)*float(fitem.old_item_rate) 
             stock_entry.append('items', {
                     's_warehouse': udoc.source_warehouse,
 					'item_code': fitem.item_code,
