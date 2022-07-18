@@ -364,24 +364,26 @@ def update_item_stat(doc,event):
             udoc.item_processed = 1
             udoc.save()
     if doc.own_repack:
+        udoc = frappe.get_doc('Chicken Own Packing', doc.chicken_own_packing)
         pklist=frappe.db.get_all('Own Repacking Item',filters={'parent': doc.own_repack},fields=['new_qty', 'new_item','item_code'],debug=0)
         for pklst in pklist:
-            plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code},['parent','parenttype','name', 'qty','uom','grade'], as_dict=1,debug=0)
-            item_name=frappe.db.get_value('Item',pklst.new_item,'item_name')
-            newqty=int(plist.qty)-int(pklst.new_qty)
-            frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)
-            newplist=frappe.new_doc("Own Packing List")
-            newplist.qty=pklst.new_qty
-            newplist.item_code=pklst.new_item
-            newplist.item=pklst.new_item
-            newplist.uom=plist.uom
-            newplist.item_name=item_name
-            newplist.grade=plist.grade
-            newplist.re_packing=doc.own_repack
-            newplist.parent=plist.parent
-            newplist.parenttype=plist.parenttype
-            newplist.insert(ignore_permissions=True)
-
+            if pklst.new_qty and pklst.new_item:
+                plist=frappe.db.get_value('Own Packing List', {'item_code': pklst.item_code,'parent':doc.chicken_own_packing},['parent','parenttype','name', 'qty','uom','grade'], as_dict=1,debug=0)
+                
+                item_name=frappe.db.get_value('Item',pklst.new_item,'item_name')
+                newqty=int(plist.qty)-int(pklst.new_qty)
+                frappe.db.set_value('Own Packing List', plist.name, 'qty', newqty)                
+                udoc.append('finished_items', {
+                    'qty': pklst.new_qty,
+					'item_code': pklst.new_item,
+					'item': pklst.new_item,
+                    'item_name':item_name,
+					'uom': plist.uom,
+                    'grade':plist.grade,					
+					're_packing': doc.own_repack,					
+			        })
+        udoc.save()             
+        
 
 @frappe.whitelist()
 def cancel_item(doc,event):
