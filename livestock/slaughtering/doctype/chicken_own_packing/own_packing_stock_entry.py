@@ -238,8 +238,16 @@ def re_stock_entry(own_re_packing):
             expense_account=old_item_details.get("expense_account")                
             item_name=old_item_details.get("item_name")
             qty=fitem.new_qty
-            rate = fitem.old_item_rate
-            amount=int(qty)*float(fitem.old_item_rate) 
+            #rate = fitem.old_item_rate
+            rate = get_incoming_rate({
+						"item_code": fitem.item_code,
+						"warehouse": udoc.source_warehouse,
+						"posting_date": stock_entry.posting_date,
+						"posting_time": stock_entry.posting_time,
+						"qty": -1 * qty,
+                        'company':company
+					})
+            amount=int(qty)*float(rate) 
             stock_entry.append('items', {
                     's_warehouse': udoc.source_warehouse,
 					'item_code': fitem.item_code,
@@ -259,6 +267,7 @@ def re_stock_entry(own_re_packing):
 			        })
 
             itemscost=0
+            
             item_account_details = get_item_defaults(fitem.new_item, company)
             pcmaterials=frappe.get_doc('Packing Materials',fitem.new_item)           
             
@@ -310,7 +319,7 @@ def re_stock_entry(own_re_packing):
             item_name=item_account_details.get("item_name")
             #weight_per_unit=item_account_details.get("weight_per_unit")
             packing_rate_of_item=itemscost/float(fitem.new_qty)
-            base_rate=packing_rate_of_item+float(fitem.old_item_rate)
+            base_rate=packing_rate_of_item+float(rate)
             amount=flt(fitem.new_qty) * base_rate
             pcitems.append({            
                     't_warehouse': udoc.traget_warehouse,
