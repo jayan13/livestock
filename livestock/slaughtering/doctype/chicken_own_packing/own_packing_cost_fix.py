@@ -1,5 +1,5 @@
 import frappe
-
+from frappe.utils import flt
 def fix_cost():
     frappe.db.sql("""SET SQL_SAFE_UPDATES = 0""")
     frappe.db.sql(""" update `tabOwn Packing List` set updated_qty='0',is_billing_updated='0' """)
@@ -12,12 +12,17 @@ def fix_cost():
         #print(str(inv.name)+"-"+str(inv.is_return)+'-'+str(inv.posting_date))
         sinv=frappe.get_doc('Sales Invoice', inv.name)
         for i in sinv.items:
-            group=frappe.db.get_value('Item', i.item_code, ['item_group'])
+            group,weight=frappe.db.get_value('Item', i.item_code, ['item_group','weight_per_unit'])
             if group in itemgp:
+                qty=i.qty
+                rate=i.rate
+                if i.uom=='Kg':
+                    qty=flt(i.qty/weight,4)
+                    rate=flt(i.rate*weight,4)
                 #print(str(i.item_code)+" - "+str(i.qty)) amount
                 #if i.item_code=='CCPR0007':
                     #print(str(inv.posting_date)+"-"+str(i.item_code)+" - "+str(i.qty))
-                update_project(sinv,i.item_code,i.qty,i.rate,i.production_date) 
+                update_project(sinv,i.item_code,qty,rate,i.production_date) 
 
     print("db updated")    
     #frappe.db.commit()
