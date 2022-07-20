@@ -423,14 +423,10 @@ def cancel_item(doc,event):
         
 
 def update_selling_cost(doc,event):
-    itemary=[]
-    ownpacking_items=frappe.db.sql("select d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s  on d.parent=s.name where s.manufacturing_type='Chicken Slaughtering' and d.is_finished_item=1 group by d.item_code",as_dict=1)
-    
-    for it in ownpacking_items:
-        itemary.append(str(it.item_code))
-    
+    itemgp=['CHICKEN PRODUCTS - ACACIA','CHICKEN PRODUCTS - AL FAKHER','CHICKEN PRODUCTS - AUH']
     for i in doc.items:
-        if i.item_code in itemary:
+        group=frappe.db.get_value('Item', i.item_code, ['item_group'])
+        if group in itemgp:
             update_project(doc,i.item_code,i.qty,i.rate,i.production_date)
             
 
@@ -488,7 +484,7 @@ def update_project(doc,item_code,qty,rate,production_date):
     else:
         own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where l.is_billing_updated<>'1' 
-        and o.date < '{0}' and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(doc.posting_date,item_code), as_dict=1)
+        and o.date <= '{0}' and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(doc.posting_date,item_code), as_dict=1)
         
         if own_pack:
             remqty=own_pack[0]['qty']-own_pack[0]['updated_qty']
