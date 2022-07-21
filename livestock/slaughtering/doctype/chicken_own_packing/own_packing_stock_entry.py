@@ -427,14 +427,15 @@ def update_selling_cost(doc,event):
     for i in doc.items:
         group,weight=frappe.db.get_value('Item', i.item_code, ['item_group','weight_per_unit'])
         if group in itemgp:
-            qty=i.qty
-            rate=i.rate
-            if i.uom=='Kg':
-                qty=flt(i.qty/weight,4)
-                rate=flt(i.rate*weight,4)
-            if i.uom=='ctn':
-                qty=flt(i.qty/10,4)
-                rate=flt(i.rate/10,4)
+            qty=i.stock_qty or i.qty
+            rate=i.stock_uom_rate or i.rate
+            #if i.uom=='Kg':
+             #   qty=flt(i.qty/weight,4)
+              #  rate=flt(i.rate*weight,4)
+            #if i.uom=='ctn':
+             #   qty=flt(i.qty/10,4)
+              #  rate=flt(i.rate/10,4)
+                
             update_project(doc,i.item_code,qty,rate,i.production_date)
             
 
