@@ -432,6 +432,9 @@ def update_selling_cost(doc,event):
             if i.uom=='Kg':
                 qty=flt(i.qty/weight,4)
                 rate=flt(i.rate*weight,4)
+            if i.uom=='ctn':
+                qty=flt(i.qty/10,4)
+                rate=flt(i.rate/10,4)
             update_project(doc,i.item_code,qty,rate,i.production_date)
             
 

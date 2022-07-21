@@ -19,10 +19,13 @@ def fix_cost():
                 if i.uom=='Kg':
                     qty=flt(i.qty/weight,4)
                     rate=flt(i.rate*weight,4)
+                if i.uom=='ctn':
+                    qty=flt(i.qty/10,4)
+                    rate=flt(i.rate/10,4)
                 #print(str(i.item_code)+" - "+str(i.qty)) amount
                 #if i.item_code=='CCPR0007':
-                    #print(str(inv.posting_date)+"-"+str(i.item_code)+" - "+str(i.qty))
-                update_project(sinv,i.item_code,qty,rate,i.production_date) 
+                print(str(inv.posting_date)+"-"+str(i.item_code)+" - "+str(i.qty)+"-"+i.uom)
+                #update_project(sinv,i.item_code,qty,rate,i.production_date) 
 
     print("db updated")    
     #frappe.db.commit()
