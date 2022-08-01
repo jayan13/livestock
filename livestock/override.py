@@ -174,10 +174,11 @@ class HatcheryProject(Document):
 			own_packing = frappe.db.get_list('Chicken Own Packing', {'Project':self.name}, ['name'], pluck='name')
 			pkcost=0
 			if doc.chicken_own_packing in own_packing:
-				usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
-				for pacitem in doc.items:
-					if pacitem.item_code in usedpacitem:
-						pkcost+=pacitem.amount
+				if doc.stock_entry_type=='Manufacture':
+					usedpacitem=frappe.db.get_list('Packing Items',fields=['item'], pluck='item')
+					for pacitem in doc.items:
+						if pacitem.item_code in usedpacitem:
+							pkcost+=pacitem.amount
 
 			self.packing_cost=self.packing_cost+pkcost
 
