@@ -34,14 +34,14 @@ def stock_entry(batch):
 	#stock_entry.set_stock_entry_type()
     base_row_rate=0
     total_add_cost=0
-
+    
     if sett.base_row_material:
         #base_row_rate = frappe.db.get_value('Item Price', {'price_list': 'Standard Buying','item_code':sett.base_row_material}, 'price_list_rate')        
         item_account_details = get_item_defaults(sett.base_row_material, sett.company)
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")
+        expense_account=sett.expense_account or item_account_details.get("expense_account")
         base_row_rate = get_incoming_rate({
 						"item_code": sett.base_row_material,
 						"warehouse": sett.row_material_target_warehouse,
@@ -86,7 +86,7 @@ def stock_entry(batch):
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")                
+                expense_account=sett.expense_account or item_account_details.get("expense_account")                
                 
                 if wareh:
                     validate_stock_qty(item.item_code,item.qty,wareh,item.uom,stock_uom)                
@@ -123,7 +123,7 @@ def stock_entry(batch):
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.scrap, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
+        expense_account=sett.expense_account or item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3    
         amount=flt(flt(tot_scrap) * flt(base_row_rate), precision)
         stock_entry.append('items', {
@@ -151,7 +151,7 @@ def stock_entry(batch):
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.product, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
+        expense_account=sett.expense_account or item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3
         cost=((udoc.chicks_transferred*base_row_rate) + total_add_cost) / udoc.chicks_transferred
         amount=flt(flt(udoc.chicks_transferred) * flt(cost), precision)
