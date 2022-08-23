@@ -123,8 +123,9 @@ class HatcheryProject(Document):
 		total_billed_amount = frappe.db.sql("""select sum(base_net_total)
                         from `tabSales Invoice` where project = %s and docstatus=1""", self.name)
 
-		self.total_billed_amount = total_billed_amount and total_billed_amount[0][0] or 0 + self.own_packing_selling_cost or 0
+		self.total_billed_amount = (total_billed_amount and total_billed_amount[0][0] or 0) + (self.own_packing_selling_cost or 0)
 		
+
 	def update_costing_from_trn(self,doc):
 		
 		from_time_sheet = frappe.db.sql("""select
