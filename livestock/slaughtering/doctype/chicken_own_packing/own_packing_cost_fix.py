@@ -25,7 +25,7 @@ def fix_cost():
                 #print(str(i.item_code)+" - "+str(i.qty)) amount
                 #if i.item_code=='CCPR0007':
                 print(str(inv.posting_date)+"-"+str(i.item_code)+" - "+str(i.qty)+"-"+i.uom)
-                #update_project(sinv,i.item_code,qty,rate,i.production_date) 
+                update_project(sinv,i.item_code,qty,rate,i.production_date) 
 
     print("db updated")    
     #frappe.db.commit()
@@ -37,11 +37,11 @@ def update_project(doc,item_code,qty,rate,production_date):
         if production_date:
             own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where  
-         o.date='{0}' and l.updated_qty > 0 and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(production_date, item_code),as_dict=1,debug=0)
+         o.date='{0}' and l.updated_qty > 0 and o.item_processed=1 and p.status<>'Cancelled' and l.item='{1}' order by o.`date` limit 0,1 """.format(production_date, item_code),as_dict=1,debug=0)
         if not own_pack:
             own_pack=frappe.db.sql("""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where  
-         (o.date between DATE_SUB('{0}', INTERVAL 3 DAY) and '{1}') and l.updated_qty > 0 and o.item_processed=1 and p.status='Open' and l.item='{2}' order by o.`date` limit 0,1 """.format(doc.posting_date, doc.posting_date, item_code),as_dict=1,debug=0)
+         (o.date between DATE_SUB('{0}', INTERVAL 3 DAY) and '{1}') and l.updated_qty > 0 and o.item_processed=1 and p.status<>'Cancelled' and l.item='{2}' order by o.`date` limit 0,1 """.format(doc.posting_date, doc.posting_date, item_code),as_dict=1,debug=0)
         
         if own_pack:            
             if own_pack[0]['updated_qty'] >= abs(qty):
@@ -83,7 +83,7 @@ def update_project(doc,item_code,qty,rate,production_date):
     else:
         sql="""select l.item,o.project,l.name,l.updated_qty,l.qty from 
         `tabOwn Packing List` l left join `tabChicken Own Packing` o  on l.parent=o.name left join `tabProject` p on p.name=o.project where l.is_billing_updated<>'1' 
-        and o.date <= '{0}' and o.item_processed=1 and p.status='Open' and l.item='{1}' order by o.`date` limit 0,1 """.format(doc.posting_date,item_code)
+        and o.date <= '{0}' and o.item_processed=1 and p.status<>'Cancelled' and l.item='{1}' order by o.`date` limit 0,1 """.format(doc.posting_date,item_code)
         #print(sql)
         own_pack=frappe.db.sql(sql, as_dict=1,debug=0)
         

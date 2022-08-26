@@ -120,7 +120,10 @@ class HatcheryProject(Document):
 		self.total_sales_amount = total_sales_amount and total_sales_amount[0][0] or 0
 
 	def update_billed_amount(self):
-		total_billed_amount = frappe.db.sql("""select sum(base_net_total)
+		if self.company=='ABU DHABI MODERNE POULTRY FARM L.L.C.' and self.project_type=='Broiler':
+			total_billed_amount = ''
+		else:
+			total_billed_amount = frappe.db.sql("""select sum(base_net_total)
                         from `tabSales Invoice` where project = %s and docstatus=1""", self.name)
 
 		self.total_billed_amount = (total_billed_amount and total_billed_amount[0][0] or 0) + (self.own_packing_selling_cost or 0)
