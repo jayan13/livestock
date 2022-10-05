@@ -6,7 +6,7 @@ from frappe.utils import add_days, flt, get_datetime, get_time, get_url, nowtime
 from erpnext.projects.doctype.project.project import Project
 from frappe.model.document import Document
 
-class HatcheryProject(Document):
+class HatcheryProject(Project):
 	def onload(self):
 		self.set_onload('activity_summary', frappe.db.sql('''select activity_type,
 			sum(hours) as total_hours
