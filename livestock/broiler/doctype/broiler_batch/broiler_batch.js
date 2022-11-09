@@ -204,7 +204,7 @@ frappe.ui.form.on("Mortality",
                 totom+=dt.total;
                 
             });
-
+            console.log('mor');
             frm.doc.total_mortaliy=totom
             frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred
             frm.refresh_fields() 
