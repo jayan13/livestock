@@ -40,13 +40,13 @@ def get_report(company=None,from_date=None,to_date=None):
 
     for dts in dates:
         datesection=[dts]
-        grandtot=['Birds Total',0,'',0,0,0,'',0,'',0,'']
+        grandtot=['Birds Total',0,'',0,0,0,'',0,0,'',0,'']
         sections=[]
         for shdg in shedgps:            
-            sectiontot=['Total',0,'',0,0,0,'',0,'',0,'']       
+            sectiontot=['Total',0,'',0,0,0,'',0,0,'',0,'']       
             for shd in shdg:
                 batches=frappe.db.sql("""select * from `tabBroiler Batch` where broiler_shed='{0}' and ('{1}' between start_date and end_date) """.format(shd,dts),as_dict=1,debug=0)
-                row=[shd,0,0,0,0,0,0,0,0,0,0]                
+                row=[shd,0,0,0,0,0,0,0,0,0,0,0]                
                 if batches:
                     batch=batches[0].name                    
                     row[1]=batches[0].doc_placed
@@ -56,6 +56,7 @@ def get_report(company=None,from_date=None,to_date=None):
                     today_mortality=0
                     prev_mor=0
                     tran_cnt=0
+                    tran_cnt_today=0
                     tmor=frappe.db.sql("""select total from `tabMortality` where  parent='{0}' and `date` ='{1}' """.format(batch,dts),as_dict=1,debug=0)
                     if tmor:
                         today_mortality=tmor[0].total
@@ -63,6 +64,10 @@ def get_report(company=None,from_date=None,to_date=None):
                     if pmor:
                         prev_mor=pmor[0].prevmor
                     totmor=prev_mor+today_mortality
+
+                    totrantoday=frappe.db.sql("""select sum(transfer_qty) as tottrn from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date ='{1}' group by broiler_bach """.format(batch,dts),as_dict=1,debug=0)
+                    if totrantoday:
+                        tran_cnt_today=totrantoday[0].tottrn
 
                     totran=frappe.db.sql("""select sum(transfer_qty) as tottrn from `tabBroiler Item Transfer` where  broiler_bach='{0}' and transfer_date <='{1}' group by broiler_bach """.format(batch,dts),as_dict=1,debug=0)
                     if totran:
@@ -78,28 +83,31 @@ def get_report(company=None,from_date=None,to_date=None):
                     
                     row[3]=batches[0].doc_placed-prev_mor
                     row[4]=today_mortality
-                    row[5]=tran_cnt
+                    row[5]=tran_cnt_today
                     if today_mortality:
                         row[6]=round(((100*today_mortality)/row[3]),2)
                     row[7]=totmor
+                    row[8]=tran_cnt
                     if totmor:
-                        row[8]=round(((100*totmor)/batches[0].doc_placed),2)
-                    row[9]=batches[0].doc_placed-totmor
-                    row[10]=vc_med
+                        row[9]=round(((100*totmor)/batches[0].doc_placed),2)
+                    row[10]=batches[0].doc_placed-totmor
+                    row[11]=vc_med
 
                     sectiontot[1]=sectiontot[1]+row[1]                    
                     sectiontot[3]=sectiontot[3]+row[3]
                     sectiontot[4]=sectiontot[4]+row[4]
                     sectiontot[5]=sectiontot[5]+row[5]                    
-                    sectiontot[7]=sectiontot[7]+row[7]                    
-                    sectiontot[9]=sectiontot[9]+row[9]
+                    sectiontot[7]=sectiontot[7]+row[7]
+                    sectiontot[8]=sectiontot[8]+row[8]                    
+                    sectiontot[10]=sectiontot[10]+row[10]
 
                     grandtot[1]=grandtot[1]+row[1]                    
                     grandtot[3]=grandtot[3]+row[3]
                     grandtot[4]=grandtot[4]+row[4]
                     grandtot[5]=grandtot[5]+row[5]                    
-                    grandtot[7]=grandtot[7]+row[7]                    
-                    grandtot[9]=grandtot[9]+row[9]
+                    grandtot[7]=grandtot[7]+row[7]
+                    grandtot[8]=grandtot[8]+row[8]                    
+                    grandtot[10]=grandtot[10]+row[10]
                     
 
                 sections.append(row)
@@ -112,9 +120,9 @@ def get_report(company=None,from_date=None,to_date=None):
     #........................ html data creation ........................................
     datahtml=''
     for rep in report:
-        datahtml+='<table>	<tr><th colspan="9">'+company+'</th><th colspan="2">'+str(rep[0])+'</th></tr>'        
-        datahtml+='<tr><td colspan="4"><td colspan="3">Daily Depletion</td><td colspan="2">Cumulative Depletion</td><td colspan="2"></td></tr>'
-        datahtml+='<tr><td>Fram Shed</td>	<td>Placed Chick</td><td>Age</td><td>Open Balance</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Mortality</td><td>%</td><td>Closing Balance</td><td>Med/Vacc Details</td></tr>'
+        datahtml+='<table>	<tr><th colspan="10">'+company+'</th><th colspan="2">'+str(rep[0])+'</th></tr>'        
+        datahtml+='<tr><td colspan="4"><td colspan="3">Daily Depletion</td><td colspan="3">Cumulative Depletion</td><td colspan="2"></td></tr>'
+        datahtml+='<tr><td>Fram Shed</td>	<td>Placed Chick</td><td>Age</td><td>Open Balance</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Mortality</td><td>Transfer</td><td>%</td><td>Closing Balance</td><td>Med/Vacc Details</td></tr>'
         
         for re in rep[1]:
             datahtml+='<tr>'
