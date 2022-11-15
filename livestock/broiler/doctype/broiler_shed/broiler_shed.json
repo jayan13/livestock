@@ -13,6 +13,7 @@
   "cost_center",
   "base_row_material",
   "row_material_target_warehouse",
+  "difference_account",
   "column_break_6",
   "product",
   "product_target_warehouse",
@@ -84,11 +85,17 @@
   {
    "fieldname": "column_break_6",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "difference_account",
+   "fieldtype": "Link",
+   "label": "Material Receipt Difference Accounts",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-28 10:24:34.848146",
+ "modified": "2022-11-10 17:03:21.222966",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Shed",
