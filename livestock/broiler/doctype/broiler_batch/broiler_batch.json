@@ -24,6 +24,8 @@
   "chick_transferred",
   "project",
   "status",
+  "create_doc_material_receipt",
+  "excess_production",
   "section_break_16",
   "feed",
   "section_break_18",
@@ -227,6 +229,17 @@
    "fieldtype": "Int",
    "label": "Live Broiler Produced - Via Broiler Production Entry",
    "read_only": 1
+  },
+  {
+   "fieldname": "excess_production",
+   "fieldtype": "Int",
+   "label": "Extra DOC(chicks)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "create_doc_material_receipt",
+   "fieldtype": "Button",
+   "label": "Add Extra DOC"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -244,7 +257,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2022-06-16 10:23:34.303835",
+ "modified": "2022-11-15 19:03:28.951129",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",

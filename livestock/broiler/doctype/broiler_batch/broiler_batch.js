@@ -137,7 +137,7 @@ frappe.ui.form.on('Broiler Batch', {
                 totom+=dt.total;
                 
             });
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom-frm.doc.chick_transferred
+        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom-frm.doc.chick_transferred+frm.doc.excess_production
         frm.refresh_fields()
     },
     number_received:function(frm, cdt, cdn) 
@@ -150,7 +150,7 @@ frappe.ui.form.on('Broiler Batch', {
                 totom+=dt.total;
                 
             });
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom-frm.doc.chick_transferred
+        frm.doc.current_alive_chicks=frm.doc.doc_placed-totom-frm.doc.chick_transferred+frm.doc.excess_production
         frm.refresh_fields()
     },
 	create_stock_entry: function(frm, cdt, cdn) 
@@ -189,7 +189,49 @@ frappe.ui.form.on('Broiler Batch', {
                                     } 
                             }
                     });
-			}
+			},
+            create_doc_material_receipt:function(frm)
+            {
+                let d = new frappe.ui.Dialog({
+                    title: 'Add Extra DOC',
+                    fields: [                        
+                        {
+                            label: 'No of Extra Doc',
+                            fieldname: 'doc_number',
+                            fieldtype: 'Int',
+                            reqd:'1'
+
+                        }
+                    ],
+                    primary_action_label: 'Add',
+                    primary_action(values) {                        
+                        
+                        frappe.call(
+                            { 
+                                method: "livestock.broiler.doctype.broiler_batch.broiler_stock_entry.stock_entry_rec",
+                                args: {
+                                    batch:frm.doc.name,
+                                    transfer_qty:values.doc_number
+                                },
+                                callback: function(r) 
+                                    { 
+                                        if(r.message) 
+                                            { 
+                                                frm.doc.excess_production=frm.doc.excess_production+values.doc_number;
+                                                frm.doc.current_alive_chicks=frm.doc.current_alive_chicks+values.doc_number;
+                                                frm.refresh_fields('excess_production');
+                                                frm.refresh_fields('current_alive_chicks');
+                                                d.hide();
+                                                frm.reload_doc();
+                                            } 
+                                    }
+                            });
+                        
+                    }
+                });
+                
+                d.show();
+            }
 });
 
 frappe.ui.form.on("Mortality", 
@@ -204,9 +246,9 @@ frappe.ui.form.on("Mortality",
                 totom+=dt.total;
                 
             });
-            console.log('mor');
+
             frm.doc.total_mortaliy=totom
-            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred+frm.doc.excess_production
             frm.refresh_fields() 
         },
         morning:function(frm, cdt, cdn) 
@@ -222,7 +264,7 @@ frappe.ui.form.on("Mortality",
             });
 
             frm.doc.total_mortaliy=totom
-            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred
+            frm.doc.current_alive_chicks=frm.doc.number_received-totom-frm.doc.mortality-frm.doc.chick_transferred+frm.doc.excess_production
             frm.refresh_fields()
         }
     });

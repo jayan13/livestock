@@ -13,10 +13,73 @@ from erpnext.stock.doctype.item.item import get_item_defaults
 #from erpnext.stock.doctype.stock_entry.stock_entry import get_uom_details
 
 @frappe.whitelist()
+def stock_entry_rec(batch,transfer_qty):
+    udoc = frappe.get_doc('Broiler Batch', batch)
+    sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)
+    #----------------  exess production material recipt entry-------------
+    exess=int(transfer_qty)
+    stock_entry_recp = frappe.new_doc("Stock Entry")    
+    stock_entry_recp.company = sett.company
+    stock_entry_recp.purpose = "Manufacture"
+    stock_entry_recp.stock_entry_type = "Material Receipt"
+    stock_entry_recp.manufacturing_type = "Broiler Chicken"
+    stock_entry_recp.project = udoc.project
+    stock_entry_recp.posting_date=nowdate()        
+    item_account_details = get_item_defaults(sett.base_row_material, sett.company)
+    stock_uom = item_account_details.stock_uom
+    conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
+    cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
+    expense_account=sett.difference_account or item_account_details.get("expense_account")
+    base_row_rate = get_incoming_rate({
+						"item_code": sett.base_row_material,
+						"warehouse": sett.row_material_target_warehouse,
+						"posting_date": stock_entry_recp.posting_date,
+						"posting_time": stock_entry_recp.posting_time,
+						"qty": -1 * exess,
+                        'company':sett.company
+					})
+
+    precision = cint(frappe.db.get_default("float_precision")) or 3    
+    amount=flt(exess * flt(base_row_rate), precision)
+    stock_entry_recp.append('items', {
+                        't_warehouse': sett.row_material_target_warehouse,
+                        'item_code': sett.base_row_material,
+                        'qty': exess,
+                        'actual_qty':exess,
+                        'uom': stock_uom,
+                        'cost_center':cost_center,					
+                        'ste_detail': item_account_details.name,
+                        'stock_uom': stock_uom,
+                        'expense_account':expense_account,
+                        'valuation_rate': base_row_rate,
+                        "basic_rate":base_row_rate, 	
+                        "basic_amount":amount,  
+                        "amount":amount,  
+                        "transfer_qty":exess,
+                        'conversion_factor': flt(conversion_factor),
+                                  
+        })
+    stock_entry_recp.insert(ignore_permissions=True)
+    stock_entry_recp.submit()
+
+    #udoc.excess_production = udoc.excess_production+int(exess)
+    #udoc.save()
+    excess_production,current_alive_chicks=frappe.db.get_value('Broiler Batch', batch, ['excess_production','current_alive_chicks'])
+    current_alive_chicks=current_alive_chicks+exess
+    excess_production=excess_production+exess
+    frappe.db.set_value('Broiler Batch', batch, 'excess_production', excess_production)
+    frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', current_alive_chicks)
+
+    frappe.msgprint(" Material receipt created "+str(stock_entry_recp.name))
+    return exess
+    #----------------  exess production  material recipt entry-------------
+
+@frappe.whitelist()
 def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
     
     udoc = frappe.get_doc('Broiler Batch', batch)
-    sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)    
+    sett = frappe.get_doc('Broiler Shed',udoc.broiler_shed)
+    
     broiler_item_transfer=frappe.db.get_list('Broiler Item Transfer',filters={'processed': '1','broiler_bach':batch},
     fields=['sum(transfer_qty) as transfer_qty,sum(scrap) as scrap'],group_by='broiler_bach')
     pv_qty={}
@@ -433,7 +496,7 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
         })
     
     stock_entry.item_transfer=broiler_item.name
-
+    
     return stock_entry.as_dict()
 
 def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
@@ -462,7 +525,8 @@ def update_item_stat(doc,event):
         if udoc:            
             if (int(udoc.current_alive_chicks)-int(transfer_qty)) < 1:
                 udoc.item_processed = 1
-            udoc.current_alive_chicks =udoc.current_alive_chicks-int(transfer_qty)
+            
+            udoc.current_alive_chicks =udoc.current_alive_chicks-int(transfer_qty)            
             udoc.chick_transferred = int(transfer_qty)+udoc.chick_transferred
             udoc.save()
 
@@ -472,7 +536,7 @@ def delete_item(doc,event):
         
         trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty']) or 0
         if trn:
-            batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
+            batch,chick_transferred,current_alive_chicks,excess_production=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks','excess_production'])
             trns=int(chick_transferred)-int(trn)
             trns2=int(current_alive_chicks)+int(trn)
             frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
@@ -483,19 +547,28 @@ def delete_item(doc,event):
 
 @frappe.whitelist()
 def cancel_item(doc,event):
+
     if doc.item_transfer:
         
         trn=frappe.db.get_value("Broiler Item Transfer", {'name': doc.item_transfer,'processed':'1'}, ['transfer_qty']) or 0
         if trn:
-            batch,chick_transferred,current_alive_chicks=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks'])
+            batch,chick_transferred,current_alive_chicks,excess_production=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','chick_transferred','current_alive_chicks','excess_production'])
             trns=int(chick_transferred)-int(trn)
             trns2=int(current_alive_chicks)+int(trn)
             frappe.db.set_value('Broiler Batch', batch, 'chick_transferred', trns)
             frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', trns2)
             frappe.db.set_value('Broiler Batch', batch, 'item_processed', '0')
 
+
         frappe.db.set_value('Broiler Item Transfer', doc.item_transfer, 'processed', '0')
         frappe.db.sql("""update `tabBroiler Transfer Consumable` set processed='0' where parent=%s""",doc.item_transfer)
+    elif doc.manufacturing_type == "Broiler Chicken" and doc.stock_entry_type == "Material Receipt":
+        batch,current_alive_chicks,excess_production=frappe.db.get_value('Broiler Batch', {'project': doc.project}, ['name','current_alive_chicks','excess_production'])
+        qty=frappe.db.get_value('Stock Entry Detail', {'parent': doc.name}, ['qty'])
+        livechk=float(current_alive_chicks)-float(qty)
+        exes=float(excess_production)-float(qty)
+        frappe.db.set_value('Broiler Batch', batch, 'current_alive_chicks', livechk)
+        frappe.db.set_value('Broiler Batch', batch, 'excess_production', exes)
 
 @frappe.whitelist()
 def get_added_mortality(batch):
