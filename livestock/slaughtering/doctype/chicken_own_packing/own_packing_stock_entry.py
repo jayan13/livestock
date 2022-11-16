@@ -425,18 +425,19 @@ def cancel_item(doc,event):
 def update_selling_cost(doc,event):
     itemgp=['CHICKEN PRODUCTS - ACACIA','CHICKEN PRODUCTS - AL FAKHER','CHICKEN PRODUCTS - AUH']
     for i in doc.items:
-        group,weight=frappe.db.get_value('Item', i.item_code, ['item_group','weight_per_unit'])
-        if group in itemgp:
-            qty=i.stock_qty or i.qty
-            rate=i.stock_uom_rate or i.rate
-            #if i.uom=='Kg':
-             #   qty=flt(i.qty/weight,4)
-              #  rate=flt(i.rate*weight,4)
-            #if i.uom=='ctn':
-             #   qty=flt(i.qty/10,4)
-              #  rate=flt(i.rate/10,4)
-                
-            update_project(doc,i.item_code,qty,rate,i.production_date)
+        if i.item_code:
+            group,weight=frappe.db.get_value('Item', i.item_code, ['item_group','weight_per_unit'])
+            if group in itemgp:
+                qty=i.stock_qty or i.qty
+                rate=i.stock_uom_rate or i.rate
+                #if i.uom=='Kg':
+                #   qty=flt(i.qty/weight,4)
+                #  rate=flt(i.rate*weight,4)
+                #if i.uom=='ctn':
+                #   qty=flt(i.qty/10,4)
+                #  rate=flt(i.rate/10,4)
+                    
+                update_project(doc,i.item_code,qty,rate,i.production_date)
             
 
 
