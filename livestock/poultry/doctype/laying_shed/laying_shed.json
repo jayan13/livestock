@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "field:laying_shed",
+ "creation": "2023-03-12 18:55:31.056130",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "laying_shed",
+  "company",
+  "cost_center",
+  "base_row_material",
+  "row_material_target_warehouse",
+  "vaccine_expense_account",
+  "medicine_expense_account",
+  "other_items_expense_account",
+  "column_break_6",
+  "finished_product",
+  "product_target_warehouse",
+  "cull",
+  "cull_target_warehouse",
+  "mortality_expense_account",
+  "feed_warehouse",
+  "feed_expense_account"
+ ],
+ "fields": [
+  {
+   "fieldname": "laying_shed",
+   "fieldtype": "Data",
+   "label": "Laying Shed Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "row_material_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Base Row Material Source Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "product_target_warehouse",
+   "fieldtype": "Link",
+   "label": "Finished Product Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "cull",
+   "fieldtype": "Link",
+   "label": "Cull Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "cull_target_warehouse",
+   "fieldtype": "Link",
+   "label": "CUll Item Target Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "feed_warehouse",
+   "fieldtype": "Link",
+   "label": "Feed Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "base_row_material",
+   "fieldtype": "Link",
+   "label": "Base Row Material",
+   "options": "Item"
+  },
+  {
+   "fieldname": "finished_product",
+   "fieldtype": "Link",
+   "label": "Finished Product",
+   "options": "Item"
+  },
+  {
+   "fieldname": "vaccine_expense_account",
+   "fieldtype": "Link",
+   "label": "Vaccine Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "medicine_expense_account",
+   "fieldtype": "Link",
+   "label": "Medicine Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "other_items_expense_account",
+   "fieldtype": "Link",
+   "label": "Other Items Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "mortality_expense_account",
+   "fieldtype": "Link",
+   "label": "Mortality Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "feed_expense_account",
+   "fieldtype": "Link",
+   "label": "Feed Expense Account",
+   "options": "Account"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-03-26 14:03:37.736422",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Laying Shed",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

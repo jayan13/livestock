@@ -1,0 +1,92 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-10 20:47:21.780622",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "age",
+  "evening",
+  "morning",
+  "total",
+  "remark",
+  "rate",
+  "conversion_factor",
+  "stock_entry"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Age In Days"
+  },
+  {
+   "default": "0",
+   "fieldname": "evening",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Evening"
+  },
+  {
+   "default": "0",
+   "fieldname": "morning",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Morning"
+  },
+  {
+   "default": "0",
+   "fieldname": "total",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Remark"
+  },
+  {
+   "default": "0",
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "label": "Rate",
+   "precision": "4"
+  },
+  {
+   "default": "0",
+   "fieldname": "conversion_factor",
+   "fieldtype": "Float",
+   "label": "Conversion Factor",
+   "precision": "6"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Stock Entry",
+   "options": "Stock Entry"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-26 16:11:18.277609",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Layer Mortality",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

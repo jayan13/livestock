@@ -1,0 +1,43 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-10 20:44:38.222480",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "evening",
+  "morning"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "evening",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Evening"
+  },
+  {
+   "fieldname": "morning",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Morning"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-19 20:32:10.438537",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Layer Temperature",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

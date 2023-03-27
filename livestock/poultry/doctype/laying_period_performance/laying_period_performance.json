@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-09 12:57:17.624704",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "age",
+  "hen_day",
+  "hen_day_eggs",
+  "hen_housed_eggs",
+  "mortality",
+  "body_weight",
+  "feed_intake",
+  "water_consumption",
+  "hen_housed_egg_mass",
+  "avgegg_weight"
+ ],
+ "fields": [
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "AGE (weeks)"
+  },
+  {
+   "fieldname": "hen_day",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "% HEN DAY Current"
+  },
+  {
+   "fieldname": "hen_day_eggs",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "HEN DAY EGGS Cumulative"
+  },
+  {
+   "fieldname": "hen_housed_eggs",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "HEN HOUSED EGGS Cumulative"
+  },
+  {
+   "fieldname": "mortality",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "MORTALITY Cumulative (%)"
+  },
+  {
+   "fieldname": "body_weight",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "BODY WEIGHT (kg)"
+  },
+  {
+   "fieldname": "feed_intake",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "FEED INTAKE (g / bird / day)"
+  },
+  {
+   "fieldname": "water_consumption",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "WATER CONSUMPTION (ml / bird/ day) "
+  },
+  {
+   "fieldname": "hen_housed_egg_mass",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "HEN HOUSED EGG MASS Cumulative (kg)"
+  },
+  {
+   "fieldname": "avgegg_weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "AVG.EGG WEIGHT (g / egg)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-10 15:32:17.002631",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Laying Period Performance",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

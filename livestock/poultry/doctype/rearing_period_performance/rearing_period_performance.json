@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-09 11:47:36.495019",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "age",
+  "mortality",
+  "body_weight",
+  "feed_intake",
+  "cumulative_feed_intake",
+  "water_consumption",
+  "uniformity"
+ ],
+ "fields": [
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "AGE (weeks)"
+  },
+  {
+   "fieldname": "mortality",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "MORTALITY Cumulative (%)"
+  },
+  {
+   "fieldname": "body_weight",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "BODY WEIGHT (kg)"
+  },
+  {
+   "fieldname": "feed_intake",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "FEED INTAKE (g / bird / day)"
+  },
+  {
+   "fieldname": "cumulative_feed_intake",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "CUMULATIVE FEED INTAKE (g to date) "
+  },
+  {
+   "fieldname": "water_consumption",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "WATER CONSUMPTION (ml / bird/ day) "
+  },
+  {
+   "fieldname": "uniformity",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "UNIFORMITY (Cage)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-09 11:55:41.533749",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Rearing Period Performance",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
