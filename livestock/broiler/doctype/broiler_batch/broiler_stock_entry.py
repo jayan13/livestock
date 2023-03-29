@@ -29,7 +29,8 @@ def stock_entry_rec(batch,transfer_qty):
     stock_uom = item_account_details.stock_uom
     conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
     cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-    expense_account=sett.difference_account or item_account_details.get("expense_account")
+    stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+    expense_account=sett.difference_account or stock_adjustment_account or item_account_details.get("expense_account")
     base_row_rate = get_incoming_rate({
 						"item_code": sett.base_row_material,
 						"warehouse": sett.row_material_target_warehouse,
@@ -132,7 +133,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")
+        stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+        expense_account=stock_adjustment_account or item_account_details.get("expense_account")
         base_row_rate = get_incoming_rate({
 						"item_code": sett.base_row_material,
 						"warehouse": sett.row_material_target_warehouse,
@@ -186,7 +188,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")                
+                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+                expense_account=stock_adjustment_account or item_account_details.get("expense_account")                
                 rate = get_incoming_rate({
 						"item_code": item.item_code,
 						"warehouse": sett.row_material_target_warehouse,
@@ -241,7 +244,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")
+                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+                expense_account=stock_adjustment_account or item_account_details.get("expense_account")
                 rate = get_incoming_rate({
                                 "item_code": vc.item,
                                 "warehouse": sett.row_material_target_warehouse,
@@ -291,7 +295,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 stock_uom = item_account_details.stock_uom
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")
+                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+                expense_account=stock_adjustment_account or item_account_details.get("expense_account")
                 rate = get_incoming_rate({
                                 "item_code": vc.item,
                                 "warehouse": sett.row_material_target_warehouse,
@@ -342,7 +347,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
                 #frappe.msgprint("conf1"+str(conversion_factor))
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")
+                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+                expense_account=stock_adjustment_account or item_account_details.get("expense_account")
                 rate = get_incoming_rate({
                                 "item_code": vc.item,
                                 "warehouse": sett.feed_warehouse,
@@ -392,7 +398,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
                 #frappe.msgprint("conf2"+str(conversion_factor))
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                expense_account=item_account_details.get("expense_account")
+                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+                expense_account=stock_adjustment_account or item_account_details.get("expense_account")
                 rate = get_incoming_rate({
                                 "item_code": vc.item,
                                 "warehouse": sett.feed_warehouse,
@@ -432,7 +439,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.product, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
+        stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+        expense_account=stock_adjustment_account or item_account_details.get("expense_account")                                  
         precision = cint(frappe.db.get_default("float_precision")) or 3
         cost=((int(transfer_qty)*base_row_rate) + total_add_cost) / int(transfer_qty)
         amount=flt(int(transfer_qty) * flt(cost), precision)
@@ -465,7 +473,8 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
         stock_uom = item_account_details.stock_uom
         conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
         cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-        expense_account=item_account_details.get("expense_account")                                
+        stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
+        expense_account=stock_adjustment_account or item_account_details.get("expense_account")                                
         precision = cint(frappe.db.get_default("float_precision")) or 3
         base_row_rate = get_incoming_rate({
 						"item_code": sett.base_row_material,
