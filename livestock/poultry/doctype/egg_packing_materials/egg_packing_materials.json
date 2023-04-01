@@ -1,13 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:item",
+ "autoname": "format:{item}-{uom}",
  "creation": "2023-03-26 00:07:32.767942",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "item",
+  "uom",
   "description",
   "packing_item"
  ],
@@ -15,9 +16,9 @@
   {
    "fieldname": "item",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Parent Item",
-   "options": "Item",
-   "unique": 1
+   "options": "Item"
   },
   {
    "fetch_from": "item.item_name",
@@ -31,11 +32,19 @@
    "fieldtype": "Table",
    "label": "Packing Item",
    "options": "Egg Packing Items"
+  },
+  {
+   "default": "ctn",
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Uom",
+   "options": "UOM"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 00:07:32.767942",
+ "modified": "2023-03-30 18:31:05.829278",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Egg Packing Materials",

@@ -9,18 +9,19 @@
  "engine": "InnoDB",
  "field_order": [
   "laying_shed",
+  "egg_category",
   "company",
   "cost_center",
   "base_row_material",
   "row_material_target_warehouse",
   "vaccine_expense_account",
-  "medicine_expense_account",
-  "other_items_expense_account",
+  "vaccine_warehouse",
   "column_break_6",
-  "finished_product",
+  "medicine_expense_account",
+  "medicine_warehouse",
+  "other_items_expense_account",
+  "other_item_warehouse",
   "product_target_warehouse",
-  "cull",
-  "cull_target_warehouse",
   "mortality_expense_account",
   "feed_warehouse",
   "feed_expense_account"
@@ -61,18 +62,6 @@
    "options": "Warehouse"
   },
   {
-   "fieldname": "cull",
-   "fieldtype": "Link",
-   "label": "Cull Item",
-   "options": "Item"
-  },
-  {
-   "fieldname": "cull_target_warehouse",
-   "fieldtype": "Link",
-   "label": "CUll Item Target Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "feed_warehouse",
    "fieldtype": "Link",
    "label": "Feed Warehouse",
@@ -82,12 +71,6 @@
    "fieldname": "base_row_material",
    "fieldtype": "Link",
    "label": "Base Row Material",
-   "options": "Item"
-  },
-  {
-   "fieldname": "finished_product",
-   "fieldtype": "Link",
-   "label": "Finished Product",
    "options": "Item"
   },
   {
@@ -119,11 +102,36 @@
    "fieldtype": "Link",
    "label": "Feed Expense Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "vaccine_warehouse",
+   "fieldtype": "Link",
+   "label": "Vaccine Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "medicine_warehouse",
+   "fieldtype": "Link",
+   "label": "Medicine Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "other_item_warehouse",
+   "fieldtype": "Link",
+   "label": "Other Item Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "default": "Normal",
+   "fieldname": "egg_category",
+   "fieldtype": "Select",
+   "label": "Egg Category",
+   "options": "Normal\nOrganic\nBrooder"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 14:03:37.736422",
+ "modified": "2023-03-31 10:13:16.777701",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Laying Shed",

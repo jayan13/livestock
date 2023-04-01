@@ -13,8 +13,10 @@
   "cost_center",
   "base_row_material",
   "row_material_target_warehouse",
-  "difference_account",
+  "vaccine_warehouse",
+  "medicine_warehouse",
   "column_break_6",
+  "other_item_warehouse",
   "finished_product",
   "product_target_warehouse",
   "cull",
@@ -45,12 +47,6 @@
    "fieldtype": "Link",
    "label": "Base Row Material Source Warehouse",
    "options": "Warehouse"
-  },
-  {
-   "fieldname": "difference_account",
-   "fieldtype": "Link",
-   "label": "Material Receipt Difference Accounts",
-   "options": "Account"
   },
   {
    "fieldname": "column_break_6",
@@ -91,11 +87,29 @@
    "fieldtype": "Link",
    "label": "Base Row Material",
    "options": "Item"
+  },
+  {
+   "fieldname": "vaccine_warehouse",
+   "fieldtype": "Link",
+   "label": "Vaccine Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "medicine_warehouse",
+   "fieldtype": "Link",
+   "label": "Medicine Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "other_item_warehouse",
+   "fieldtype": "Link",
+   "label": "Other Item Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-23 17:04:03.087370",
+ "modified": "2023-03-31 12:55:38.579373",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Rearing Shed",

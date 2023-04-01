@@ -32,6 +32,7 @@ frappe.ui.form.on('Layer Batch', {
         frm.refresh_field('current_alive_chicks');
 
         //====================================================
+        //frm.doc.egg_category
         if (frm.doc.item_processed!=1)
         {       
             frm.add_custom_button(__('Transfer Flock To layer Shed'), function(){
@@ -1120,6 +1121,7 @@ frappe.ui.form.on('Layer Batch', {
             },
             add_laying_weight:function(frm)
             {
+                
                 let d = new frappe.ui.Dialog({
                     title: 'Add Weight',
                     fields: [                        
@@ -1182,78 +1184,102 @@ frappe.ui.form.on('Layer Batch', {
             },
             add_egg_production:function(frm)
             {
-                let d = new frappe.ui.Dialog({
-                    title: 'Add Egg',
-                    fields: [                        
-                        {
-                            label: 'Date',
-                            fieldname: 'date',
-                            fieldtype: 'Date',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Item',
-                            fieldname: 'item_code',
-                            fieldtype: 'Link',
-							options:'Item',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Qty',
-                            fieldname: 'qty',
-                            fieldtype: 'Int',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Uom',
-                            fieldname: 'uom',
-                            fieldtype: 'Link',
-							options:'UOM',
-                            reqd:'1'
-                        }
-                    ],
-                    primary_action_label: 'Add Egg',
-                    primary_action(values) {                        
 
-                        let rw=frm.add_child("egg_production");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						frm.refresh_field('egg_production');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
-                        
-						frappe.call(
-                            { 
-                                method: "livestock.poultry.doctype.layer_batch.layer_batch.add_egg_production",
-                                args: {
-                                    batch:frm.doc.name,
-                                    parentfield:'egg_production',
-                                    date:values.date,
-									item_code:values.item_code,
-									qty:values.qty,
-									uom:values.uom
-                                },
-                                callback: function(r) 
-                                    { 
-                                        if(r.message) 
-                                            { 
-                                                rw.rate=r.message.rate;
-                                                rw.conversion_factor=r.message.conversion_factor;
-                                                rw.item_name=r.message.item_name;
-                                                frm.refresh_field('egg_production');
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
-                                            } 
+            var prompt_fields=[{  fieldtype: "Date",
+            label: __("Date"),
+            fieldname: "date",
+            reqd:'1'                                
+            }
+            ];
+
+            frappe.call(
+                { 
+                    method: "livestock.poultry.doctype.layer_batch.layer_batch.get_egg_products",
+                    args: {
+                        cat:frm.doc.egg_category
+                    },
+                    callback: function(r) 
+                        { 
+                            if(r.message) 
+                                { 
+                                    
+                                   var res=r.message
+                                    for(var i=0;i< res.length;i++)
+                                    {
+                                        let itm=res[i];                                        
+                                        prompt_fields.push({  fieldtype: "Float",
+                                        label: itm.item_code+': '+itm.item_name+' Qty in '+itm.default_uom,
+                                        fieldname: "qty_"+itm.item_code+"_"+itm.default_uom,
+                                        default:'0',                                
+                                        });
+
                                     }
-                            });
 
-                    }
+                                    let d = new frappe.ui.Dialog({
+                                        title: 'Add Egg',
+                                        fields: prompt_fields,
+                                        primary_action_label: 'Add Egg',
+                                        primary_action(values) {
+                                            //console.log(values);                        
+                                            //console.log(JSON.stringify(values));
+                                            let item_post=[];
+                                            for (const [key, value] of Object.entries(values)) {
+                                                if(key!='date' && value > 0 )
+                                                {
+                                                    //console.log(key, value);
+                                                    const item_ar = key.split("_");                                                      
+                                                    let rw=frm.add_child("egg_production");
+                                                    rw.date=values.date;
+                                                    rw.item_code=item_ar[1];
+                                                    rw.qty=value;
+                                                    rw.uom=item_ar[2];
+                                                    frm.refresh_field('egg_production');
+                                                    d.hide();
+                                                    $(".grid-add-row").hide();
+                                                    frm.doc.__unsaved=0; 
+                                                    item_post.push({'date':values.date,'item_code':item_ar[1],'qty':value,'uom':item_ar[2]});
+                                                    
+                                                            
+                                                }
+                                                
+                                              }
+                                            
+                                             //---------------------------------------
+                                             let itemss=JSON.stringify(item_post);
+                                             frappe.call(
+                                                { 
+                                                    method: "livestock.poultry.doctype.layer_batch.layer_batch.add_eggs_production",
+                                                    args: {
+                                                        batch:frm.doc.name,
+                                                        parentfield:'egg_production',
+                                                        items:itemss,                                                                
+                                                    },
+                                                    callback: function(rs) 
+                                                        { 
+                                                            if(rs.message) 
+                                                                { 
+                                                                    //rw.rate=rs.message.rate;
+                                                                    //rw.conversion_factor=rs.message.conversion_factor;
+                                                                    //rw.item_name=rs.message.item_name;
+                                                                    //frm.refresh_field('egg_production');
+                                                                    //var doclist = frappe.model.sync(r.message);
+                                                                    //doclist[0].name
+                                                                    var doclist = frappe.model.sync(rs.message);
+                                                                    //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                                                } 
+                                                        }
+                                                });
+                                             //---------------------------------------   
+                                        }
+                                    });
+                                    
+                                    d.show();
+                                    
+                                } 
+                        }
                 });
+
                 
-                d.show();
                 
             }
 });
