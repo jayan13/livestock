@@ -627,7 +627,8 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 			transfer_qty=flt(float(packed_qty) * float(conversion_factor),2)
 			amount=flt(float(transfer_qty) * float(pck_rate), precision)
 			itemscost+=transfer_qty * pck_rate
-			pcitems.append({
+			#pcitems.append({
+			stock_entry.append('items', {
 						's_warehouse': sett.row_material_target_warehouse,
 						'item_code': pcitem.item,
 						'qty': packed_qty,
@@ -673,9 +674,11 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 				batch.insert()
 
 		if itemscost:
-			base_rate=itemscost/float(fitem.qty)		
+			base_rate=itemscost/float(fitem.qty)
+			stock_uom_rate=base_rate/conversion_factor		
 		amount=float(fitem.qty) * float(base_rate)
-		stock_entry.append('items', {            
+		#stock_entry.append('items', {
+		pcitems.append({            
 						't_warehouse': sett.product_target_warehouse,
 						'item_code': fitem.item_code,
 						'qty': fitem.qty,
@@ -685,8 +688,8 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 						'ste_detail': item_name,
 						'stock_uom': stock_uom,
 						'expense_account':expense_account,
-						'valuation_rate': base_rate,
-						"basic_rate":base_rate, 	
+						'valuation_rate': stock_uom_rate,
+						"basic_rate":stock_uom_rate, 	
 						"basic_amount":amount,  
 						"amount":amount,  
 						"transfer_qty":fitem.qty,
