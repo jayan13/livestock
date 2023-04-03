@@ -18,7 +18,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Normal\nOrganic\nBrooder"
+   "options": "Normal\nOrganic\nBreeder"
   },
   {
    "fieldname": "batch_prefix",
@@ -31,7 +31,7 @@
    "fieldname": "default_uom",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Default Uom",
+   "label": "Production Uom",
    "options": "UOM"
   },
   {
@@ -51,10 +51,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-01 08:40:08.750688",
+ "modified": "2023-04-02 10:55:25.099356",
  "modified_by": "Administrator",
  "module": "Poultry",
- "name": "Egg Product list",
+ "name": "Egg Finished Item Production Settings",
  "owner": "Administrator",
  "permissions": [
   {

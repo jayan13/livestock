@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestEggProductlist(unittest.TestCase):
+class TestEggFinishedItemProductionSettings(unittest.TestCase):
 	pass

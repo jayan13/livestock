@@ -1,7 +1,7 @@
 // Copyright (c) 2023, alantechnologies and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Egg Product list', {
+frappe.ui.form.on('Egg Finished Item Production Settings', {
 	refresh: function(frm) {
 		frm.set_query('item_code', function(doc, cdt, cdn) {
 		  
