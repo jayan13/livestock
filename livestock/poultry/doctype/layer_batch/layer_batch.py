@@ -672,7 +672,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 				batch.manufacturing_date=posting_date
 				batch.stock_uom=stock_uom
 				batch.insert()
-
+		stock_uom_rate=0
 		if itemscost:
 			base_rate=itemscost/float(fitem.qty)
 			stock_uom_rate=base_rate/conversion_factor		
