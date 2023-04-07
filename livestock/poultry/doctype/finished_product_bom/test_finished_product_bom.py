@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestEggPackingMaterials(unittest.TestCase):
+class TestFinishedProductBOM(unittest.TestCase):
 	pass

@@ -1,15 +1,20 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{item}-{uom}",
+ "autoname": "field:bom_name",
  "creation": "2023-03-26 00:07:32.767942",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "bom_name",
   "item",
   "uom",
+  "column_break_5",
   "description",
+  "is_default",
+  "is_active",
+  "section_break_8",
   "packing_item"
  ],
  "fields": [
@@ -40,14 +45,41 @@
    "in_list_view": 1,
    "label": "Uom",
    "options": "UOM"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_default",
+   "fieldtype": "Check",
+   "label": "Is Default"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  },
+  {
+   "fieldname": "bom_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-30 18:31:05.829278",
+ "modified": "2023-04-06 10:22:41.778017",
  "modified_by": "Administrator",
  "module": "Poultry",
- "name": "Egg Packing Materials",
+ "name": "Finished Product BOM",
  "owner": "Administrator",
  "permissions": [
   {

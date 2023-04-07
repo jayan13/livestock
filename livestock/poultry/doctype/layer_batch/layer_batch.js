@@ -1189,7 +1189,10 @@ frappe.ui.form.on('Layer Batch', {
             label: __("Date"),
             fieldname: "date",
             reqd:'1'                                
-            }
+            },
+            {'fieldname': 'sec_top', 'fieldtype': 'Section Break'},
+            //{'fieldname': 'ht', 'fieldtype': 'HTML'},Column Break Section Break
+            
             ];
 
             frappe.call(
@@ -1204,14 +1207,58 @@ frappe.ui.form.on('Layer Batch', {
                                 { 
                                     
                                    var res=r.message
-                                    for(var i=0;i< res.length;i++)
+                                    for(var i=0;i<res.length;i++)
                                     {
-                                        let itm=res[i];                                        
+                                        let itm=res[i];
+                                        
+                                        prompt_fields.push({  fieldtype: "HTML",
+                                        fieldname:itm.item_code+'_'+i,                                                         
+                                        });
+
+                                        prompt_fields.push({  fieldtype: "Section Break",
+                                        fieldname: "secbklbl_"+itm.item_code+"_"+i,                                                                     
+                                        });
+
                                         prompt_fields.push({  fieldtype: "Float",
-                                        label: itm.item_code+': '+itm.item_name+' Qty in '+itm.default_uom,
-                                        fieldname: "qty_"+itm.item_code+"_"+itm.default_uom,
+                                        label:'Qty',
+                                        fieldname: "qty_"+itm.item_code+"_"+i,
                                         default:'0',                                
                                         });
+                                        
+                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        fieldname: "colbk_"+itm.item_code+"_"+i,                                                               
+                                        });
+
+                                        prompt_fields.push({  fieldtype: "Link",
+                                        label: ' Uom',
+                                        fieldname: "uom_"+itm.item_code+"_"+i,
+                                        default:itm.default_uom,options:'UOM',                                
+                                        });
+
+                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        fieldname: "colbku_"+itm.item_code+"_"+i,                                                               
+                                        });
+
+                                        if(itm.default_bom){
+                                            prompt_fields.push({  fieldtype: "Link",
+                                            label: 'Finished Item BOM',
+                                            fieldname: "bom_"+itm.item_code+"_"+i,
+                                            default:itm.default_bom,
+                                            options:'Finished Product BOM',                                
+                                            });
+                                        }else{
+
+                                            prompt_fields.push({  fieldtype: "Link",
+                                            label: 'Finished Item BOM',
+                                            fieldname: "bom_"+itm.item_code+"_"+i,                                            
+                                            options:'Finished Product BOM',                                
+                                            });
+                                        }
+
+                                        prompt_fields.push({  fieldtype: "Section Break",
+                                        fieldname: "secbk_"+itm.item_code+"_"+i,                                                                     
+                                        });
+                                       
 
                                     }
 
@@ -1219,26 +1266,29 @@ frappe.ui.form.on('Layer Batch', {
                                         title: 'Add Egg',
                                         fields: prompt_fields,
                                         primary_action_label: 'Add Egg',
+                                        columns: 2, 
                                         primary_action(values) {
-                                            //console.log(values);                        
-                                            //console.log(JSON.stringify(values));
+                                            
                                             let item_post=[];
                                             for (const [key, value] of Object.entries(values)) {
-                                                if(key!='date' && value > 0 )
+                                                if(key!='date')
                                                 {
                                                     //console.log(key, value);
-                                                    const item_ar = key.split("_");                                                      
-                                                    let rw=frm.add_child("egg_production");
-                                                    rw.date=values.date;
-                                                    rw.item_code=item_ar[1];
-                                                    rw.qty=value;
-                                                    rw.uom=item_ar[2];
-                                                    frm.refresh_field('egg_production');
-                                                    d.hide();
-                                                    $(".grid-add-row").hide();
-                                                    frm.doc.__unsaved=0; 
-                                                    item_post.push({'date':values.date,'item_code':item_ar[1],'qty':value,'uom':item_ar[2]});
-                                                    
+                                                    const item_ar = key.split("_");
+                                                    if (item_ar[0]=='qty' && value > 0 )
+                                                    {                                                   
+                                                        let rw=frm.add_child("egg_production");
+                                                        rw.date=values.date;
+                                                        rw.item_code=item_ar[1];
+                                                        rw.qty=value;
+                                                        rw.uom=values['uom_'+item_ar[1]+'_'+item_ar[2]];
+                                                        rw.bom=values['bom_'+item_ar[1]+'_'+item_ar[2]];
+                                                        frm.refresh_field('egg_production');
+                                                        d.hide();
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0; 
+                                                        item_post.push({'date':values.date,'item_code':item_ar[1],'qty':value,'uom':rw.uom,'bom':rw.bom});
+                                                    }
                                                             
                                                 }
                                                 
@@ -1268,11 +1318,28 @@ frappe.ui.form.on('Layer Batch', {
                                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
                                                                 } 
                                                         }
-                                                });
+                                                }); 
                                              //---------------------------------------   
                                         }
                                     });
                                     
+                                    
+                                    for(var i=0;i< res.length;i++)
+                                    {
+                                        let itm=res[i];
+                                        let nm=itm.item_code+'_'+i;
+                                        d.fields_dict[nm].$wrapper.html('<b>'+itm.item_code+': '+itm.item_name+'</b>');
+
+                                        let bomfield="bom_"+itm.item_code+"_"+i
+                                        d.fields_dict[bomfield].get_query = function(){
+                                            return {
+                                                    filters:{
+                                                            "item": itm.item_code
+                                                    }
+                                            }
+                                        }
+                                    }
+                                   
                                     d.show();
                                     
                                 } 

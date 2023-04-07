@@ -122,16 +122,16 @@
    "options": "Warehouse"
   },
   {
-   "default": "Normal",
+   "default": "Layer Eggs",
    "fieldname": "egg_category",
    "fieldtype": "Select",
    "label": "Egg Category",
-   "options": "Normal\nOrganic\nBrooder"
+   "options": "Layer Eggs\nOrganic Eggs\nBreeder Eggs"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-31 10:13:16.777701",
+ "modified": "2023-04-03 18:42:02.186801",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Laying Shed",

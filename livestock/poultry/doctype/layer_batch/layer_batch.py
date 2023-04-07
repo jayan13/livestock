@@ -596,10 +596,15 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		time=time or get_datetime()
 		posting_time=time.strftime("%H:%M:%S")
 
-		
-		eggpack=frappe.db.get_value('Egg Packing Materials',{'item':fitem.item_code,'uom':fitem.uom},'name')
-		pcmaterials=frappe.get_doc('Egg Packing Materials',eggpack)
-	
+		if fitem.bom:
+			pcmaterials=frappe.get_doc('Finished Product BOM',fitem.bom)
+		else:
+			bom=frappe.db.get_value('Finished Product BOM',{'item':fitem.item_code,'uom':fitem.uom,'is_default':'1'},'name')
+			if not bom:
+				bom=frappe.db.get_value('Finished Product BOM',{'item':fitem.item_code,'uom':fitem.uom},'name')
+			if bom:
+				pcmaterials=frappe.get_doc('Finished Product BOM',bom)
+		#Finished Product BOM
 
 		#stock_entry.set_stock_entry_type()
 		precision = cint(frappe.db.get_default("float_precision")) or 3
@@ -1027,6 +1032,7 @@ def add_eggs_production(batch,parentfield,items):
 		item_code=lst.get('item_code')
 		qty=lst.get('qty')
 		uom=lst.get('uom')
+		bom=lst.get('bom')
 		date=lst.get('date')
 		item_name=frappe.db.get_value('Item',item_code,'item_name')
 		itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
@@ -1038,7 +1044,7 @@ def add_eggs_production(batch,parentfield,items):
 		if midx and midx[0][0] is not None:
 			curidx = cint(midx[0][0])+1
 		childtbl = frappe.new_doc("Egg Production")
-		childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
+		childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'bom':bom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 		childtbl.save()
 		item_data.append(childtbl)
 
@@ -1098,4 +1104,14 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 
 @frappe.whitelist()
 def get_egg_products(cat):
-	return frappe.db.get_all('Egg Finished Item Production Settings', filters={"category": cat },fields=['item_code','item_name','default_uom'])
+	finitem=frappe.db.get_all('Egg Finished Item Production Settings', filters={"category": cat },fields=['item_code','item_name','default_uom'])
+	for itm in finitem:
+		bom=frappe.db.get_value('Finished Product BOM',{'item':itm.item_code,'uom':itm.default_uom,'is_default':'1'},'name')
+		if bom:
+			itm.update({'default_bom':bom})
+		else:
+			itm.update({'default_bom':''})
+
+	return finitem
+
+

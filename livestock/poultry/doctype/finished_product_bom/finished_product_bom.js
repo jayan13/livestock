@@ -1,7 +1,7 @@
 // Copyright (c) 2023, alantechnologies and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Egg Packing Materials', {
+frappe.ui.form.on('Finished Product BOM', {
 	// refresh: function(frm) {
 
 	// }
