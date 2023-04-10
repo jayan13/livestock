@@ -1219,17 +1219,9 @@ frappe.ui.form.on('Layer Batch', {
                                         fieldname: "secbklbl_"+itm.item_code+"_"+i,                                                                     
                                         }); */
 
-                                        prompt_fields.push({  fieldtype: "Column Break",
-                                        fieldname: "lblcolbk_"+itm.item_code+"_"+i,                                                               
-                                        });
-
-                                        prompt_fields.push({  fieldtype: "Float",
-                                        label:'Qty',
-                                        fieldname: "qty_"+itm.item_code+"_"+i,
-                                        default:'0',                                
-                                        });
                                         
-                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        
+                                        /*prompt_fields.push({  fieldtype: "Column Break",
                                         fieldname: "colbk_"+itm.item_code+"_"+i,                                                               
                                         });
 
@@ -1237,8 +1229,8 @@ frappe.ui.form.on('Layer Batch', {
                                         label: ' Uom',
                                         fieldname: "uom_"+itm.item_code+"_"+i,
                                         default:itm.default_uom,options:'UOM',                                
-                                        });
-
+                                        }); */
+                                        
                                         prompt_fields.push({  fieldtype: "Column Break",
                                         fieldname: "colbku_"+itm.item_code+"_"+i,                                                               
                                         });
@@ -1258,6 +1250,29 @@ frappe.ui.form.on('Layer Batch', {
                                             options:'Finished Product BOM',                                
                                             });
                                         }
+
+                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        fieldname: "colbk_"+itm.item_code+"_"+i,                                                               
+                                        });
+
+                                        prompt_fields.push({
+                                        fetch_from:"bom_"+itm.item_code+"_"+i+".uom",  
+                                        fieldtype: "Data",
+                                        label: ' Uom',
+                                        fieldname: "uom_"+itm.item_code+"_"+i,
+                                        default:itm.default_uom,                                      
+                                                                      
+                                        });
+
+                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        fieldname: "lblcolbk_"+itm.item_code+"_"+i,                                                               
+                                        });
+
+                                        prompt_fields.push({  fieldtype: "Float",
+                                        label:'Qty',
+                                        fieldname: "qty_"+itm.item_code+"_"+i,
+                                        default:'0',                                
+                                        });
 
                                         prompt_fields.push({  fieldtype: "Section Break",
                                         fieldname: "secbk_"+itm.item_code+"_"+i,                                                                     
@@ -1342,11 +1357,34 @@ frappe.ui.form.on('Layer Batch', {
                                                     }
                                             }
                                         }
+                                       
                                     }
                                    
                                     d.show();
                                     d.$wrapper.find('.modal-content').css("width", "800px");
                                     d.$wrapper.find('.row').css("padding-bottom", "0px");
+                                    d.$wrapper.find("[data-fieldname='date']").css("width", "150px");
+                                    for(var i=0;i< res.length;i++)
+                                    {
+                                        let itm=res[i];                                        
+                                        let bomfield="bom_"+itm.item_code+"_"+i;
+                                        var uomfield="uom_"+itm.item_code+"_"+i;
+                                        
+                                        d.$wrapper.find("[data-fieldname='"+bomfield+"']").on('focusout',function(e) {
+                                           let v=$(this).val();
+                                            //console.log("hai"+v);
+                                            if (v){
+                                            frappe.db.get_value('Finished Product BOM', v, 'uom')
+                                                    .then(r => {
+                                                        console.log(r.message.uom);
+                                                        d.$wrapper.find("[data-fieldname='"+uomfield+"']").val(r.message.uom); 
+                                                        
+                                                    });
+                                                }
+                                        });
+
+                                       
+                                    }
                                 } 
                         }
                 });
