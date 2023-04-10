@@ -1215,8 +1215,12 @@ frappe.ui.form.on('Layer Batch', {
                                         fieldname:itm.item_code+'_'+i,                                                         
                                         });
 
-                                        prompt_fields.push({  fieldtype: "Section Break",
+                                       /* prompt_fields.push({  fieldtype: "Section Break",
                                         fieldname: "secbklbl_"+itm.item_code+"_"+i,                                                                     
+                                        }); */
+
+                                        prompt_fields.push({  fieldtype: "Column Break",
+                                        fieldname: "lblcolbk_"+itm.item_code+"_"+i,                                                               
                                         });
 
                                         prompt_fields.push({  fieldtype: "Float",
@@ -1341,7 +1345,8 @@ frappe.ui.form.on('Layer Batch', {
                                     }
                                    
                                     d.show();
-                                    
+                                    d.$wrapper.find('.modal-content').css("width", "800px");
+                                    d.$wrapper.find('.row').css("padding-bottom", "0px");
                                 } 
                         }
                 });
