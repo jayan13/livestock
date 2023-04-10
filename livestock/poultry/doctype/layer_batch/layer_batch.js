@@ -1376,7 +1376,7 @@ frappe.ui.form.on('Layer Batch', {
                                             if (v){
                                             frappe.db.get_value('Finished Product BOM', v, 'uom')
                                                     .then(r => {
-                                                        console.log(r.message.uom);
+                                                        //console.log(r.message.uom);
                                                         d.$wrapper.find("[data-fieldname='"+uomfield+"']").val(r.message.uom); 
                                                         
                                                     });
