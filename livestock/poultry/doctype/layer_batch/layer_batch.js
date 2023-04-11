@@ -959,6 +959,22 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='date']").on('change',function() {
+                    let v=$(this).val();
+                    if(v && frm.doc.doc_placed_date)
+                    {
+                        var dtar=v.split('-');
+                        var dt=dtar[2]+'-'+dtar[1]+'-'+dtar[0]
+                        var date1, date2;  
+                        date1 = new Date(frm.doc.doc_placed_date);  
+                        date2 = new Date(dt);
+                        var time_difference = date2.getTime() - date1.getTime();  
+                        var days_difference = Math.ceil(time_difference / (1000 * 60 * 60 * 24))+1;
+                        d.$wrapper.find("[data-fieldname='age']").val(days_difference);
+                    }
+                    
+                    
+                });
 
                 
             },
@@ -1040,6 +1056,22 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='date']").on('change',function() {
+                    let v=$(this).val();
+                    if(v && frm.doc.doc_placed_date)
+                    {
+                        var dtar=v.split('-');
+                        var dt=dtar[2]+'-'+dtar[1]+'-'+dtar[0]
+                        var date1, date2;  
+                        date1 = new Date(frm.doc.doc_placed_date);  
+                        date2 = new Date(dt);
+                        var time_difference = date2.getTime() - date1.getTime();  
+                        var days_difference = Math.ceil(time_difference / (1000 * 60 * 60 * 24))+1;
+                        d.$wrapper.find("[data-fieldname='age']").val(days_difference);
+                    }
+                    
+                    
+                });
                 
             },
             add_rearing_temperature:function(frm)
@@ -1226,6 +1258,22 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='date']").on('change',function() {
+                    let v=$(this).val();
+                    if(v && frm.doc.doc_placed_date)
+                    {
+                        var dtar=v.split('-');
+                        var dt=dtar[2]+'-'+dtar[1]+'-'+dtar[0]
+                        var date1, date2;  
+                        date1 = new Date(frm.doc.doc_placed_date);  
+                        date2 = new Date(dt);
+                        var time_difference = date2.getTime() - date1.getTime();  
+                        var week_difference = Math.floor((Math.ceil(time_difference / (1000 * 60 * 60 * 24))+1)/7);
+                        d.$wrapper.find("[data-fieldname='week']").val(week_difference);
+                    }
+                    
+                    
+                });
                 
             },
             add_laying_weight:function(frm)
@@ -1289,6 +1337,22 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='date']").on('change',function() {
+                    let v=$(this).val();
+                    if(v && frm.doc.doc_placed_date)
+                    {
+                        var dtar=v.split('-');
+                        var dt=dtar[2]+'-'+dtar[1]+'-'+dtar[0]
+                        var date1, date2;  
+                        date1 = new Date(frm.doc.doc_placed_date);  
+                        date2 = new Date(dt);
+                        var time_difference = date2.getTime() - date1.getTime();  
+                        var week_difference = Math.floor((Math.ceil(time_difference / (1000 * 60 * 60 * 24))+1)/7);
+                        d.$wrapper.find("[data-fieldname='week']").val(week_difference);
+                    }
+                    
+                    
+                });
                 
             },
             add_egg_production:function(frm)
