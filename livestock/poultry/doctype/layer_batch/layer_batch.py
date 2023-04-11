@@ -1106,9 +1106,10 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 def get_egg_products(cat):
 	finitem=frappe.db.get_all('Egg Finished Item Production Settings', filters={"category": cat },fields=['item_code','item_name','default_uom'])
 	for itm in finitem:
-		bom=frappe.db.get_value('Finished Product BOM',{'item':itm.item_code,'uom':itm.default_uom,'is_default':'1'},'name')
-		if bom:
-			itm.update({'default_bom':bom})
+		boms=frappe.db.get_value('Finished Product BOM',{'item':itm.item_code,'uom':itm.default_uom,'is_default':'1'},['name','uom'], as_dict=1)
+		if boms:
+			itm.update({'default_bom':boms.name})
+			itm.update({'uom':boms.uom})
 		else:
 			itm.update({'default_bom':''})
 
