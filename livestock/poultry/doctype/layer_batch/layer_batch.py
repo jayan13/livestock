@@ -12,7 +12,7 @@ from erpnext.stock.doctype.item.item import get_item_defaults
 
 class LayerBatch(Document):
 	def before_insert(self):		
-		shed=frappe.get_doc("Rearing Shed", self.rear_shed)
+		shed=frappe.get_doc("Rearing Shed", self.rearing_shed)
 		project = frappe.new_doc("Project")
 		project.project_name=self.batch_name
 		project.project_type="LAYER"
