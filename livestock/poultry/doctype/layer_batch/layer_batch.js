@@ -12,7 +12,27 @@ frappe.ui.form.on('Layer Batch', {
 		}
 			};
 		});
+
+        frm.set_query('rearing_shed', function(doc, cdt, cdn) {
+		  
+			return {
+			   "filters": {
+                "company": frm.doc.company,
+		}
+			};
+		});
+
+        frm.set_query('layer_shed', function(doc, cdt, cdn) {
+		  
+			return {
+			   "filters": {
+			"company": frm.doc.company,
+		}
+			};
+		});
         
+        //frm.fields_dict["rearing_feed"].grid.wrapper.find(".btn-open-row").hide();
+
         var totom=0
         $.each (frm.doc.laying_mortality, function(i, dt){
             totom+=dt.total; 
