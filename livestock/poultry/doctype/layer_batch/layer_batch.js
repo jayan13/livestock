@@ -225,6 +225,17 @@ frappe.ui.form.on('Layer Batch', {
          });
          
          d.show();
+         d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+            let v=$(this).val();                                            
+             if (v){
+             frappe.db.get_value('Item', v, 'stock_uom')
+                     .then(r => {
+                         
+                         d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                         
+                     });
+                 }
+         });
          
      },
             add_laying_feed:function(frm)
@@ -301,6 +312,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
 			add_rearing_medicine:function(frm)
@@ -385,6 +407,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_laying_medicine:function(frm)
@@ -469,6 +502,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_rearing_vaccine:function(frm)
@@ -553,6 +597,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_laying_vaccine:function(frm)
@@ -637,6 +692,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_rearing_items:function(frm)
@@ -714,6 +780,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_laying_items:function(frm)
@@ -791,6 +868,17 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
+                    let v=$(this).val();                                            
+                     if (v){
+                     frappe.db.get_value('Item', v, 'stock_uom')
+                             .then(r => {
+                                 
+                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
+                                 
+                             });
+                         }
+                 });
                 
             },
             add_rearing_mortality:function(frm)
@@ -871,6 +959,7 @@ frappe.ui.form.on('Layer Batch', {
                 });
                 
                 d.show();
+
                 
             },
             add_laying_mortality:function(frm)
@@ -1235,21 +1324,6 @@ frappe.ui.form.on('Layer Batch', {
                                         fieldname:itm.item_code+'_'+i,                                                         
                                         });
 
-                                       /* prompt_fields.push({  fieldtype: "Section Break",
-                                        fieldname: "secbklbl_"+itm.item_code+"_"+i,                                                                     
-                                        }); */
-
-                                        
-                                        
-                                        /*prompt_fields.push({  fieldtype: "Column Break",
-                                        fieldname: "colbk_"+itm.item_code+"_"+i,                                                               
-                                        });
-
-                                        prompt_fields.push({  fieldtype: "Link",
-                                        label: ' Uom',
-                                        fieldname: "uom_"+itm.item_code+"_"+i,
-                                        default:itm.default_uom,options:'UOM',                                
-                                        }); */
                                         
                                         prompt_fields.push({  fieldtype: "Column Break",
                                         fieldname: "colbku_"+itm.item_code+"_"+i,                                                               
@@ -1283,7 +1357,7 @@ frappe.ui.form.on('Layer Batch', {
                                         default:itm.default_uom,                                      
                                                                       
                                         });
-
+                                            
                                         prompt_fields.push({  fieldtype: "Column Break",
                                         fieldname: "lblcolbk_"+itm.item_code+"_"+i,                                                               
                                         });
@@ -1379,7 +1453,7 @@ frappe.ui.form.on('Layer Batch', {
                                         }
                                        
                                     }
-                                   
+                                    
                                     d.show();
                                     d.$wrapper.find('.modal-content').css("width", "800px");
                                     d.$wrapper.find('.row').css("padding-bottom", "0px");
