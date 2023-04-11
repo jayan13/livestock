@@ -11,18 +11,21 @@ from erpnext.stock.get_item_details import (get_conversion_factor)
 from erpnext.stock.doctype.item.item import get_item_defaults
 
 class LayerBatch(Document):
-	def before_insert(self):		
-		shed=frappe.get_doc("Rearing Shed", self.rearing_shed)
-		project = frappe.new_doc("Project")
-		project.project_name=self.batch_name
-		project.project_type="LAYER"
-		project.expected_start_date=self.start_date
-		project.expected_end_date=self.end_date
-		project.company=shed.company
-		project.cost_center=shed.cost_center
-		project.insert(ignore_permissions=True)
-		self.project=project.name
-
+	def before_insert(self):
+		if not self.project:		
+			shed=frappe.get_doc("Rearing Shed", self.rearing_shed)
+			project = frappe.new_doc("Project")
+			project.project_name=self.batch_name
+			project.project_type="LAYER"
+			project.expected_start_date=self.start_date
+			#project.expected_end_date=self.end_date
+			project.company=shed.company
+			project.cost_center=shed.cost_center
+			project.insert(ignore_permissions=True)
+			self.project=project.name
+		else:
+			self.batch_name=self.project
+			
 	def after_insert(self):
 		#pjt=frappe.get_doc("Project", self.project)
 		#pjt.broiler_batch=self.name

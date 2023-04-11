@@ -19,8 +19,8 @@
   "company",
   "column_break_5",
   "doc_placed",
+  "doc_placed_date",
   "start_date",
-  "end_date",
   "current_alive_chicks",
   "flock_transferred_to_layer",
   "flock_transfer_date",
@@ -116,12 +116,6 @@
    "fieldname": "start_date",
    "fieldtype": "Date",
    "label": "Start Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "end_date",
-   "fieldtype": "Date",
-   "label": "End Date",
    "reqd": 1
   },
   {
@@ -378,6 +372,11 @@
    "fieldtype": "Data",
    "label": "Egg Category",
    "read_only": 1
+  },
+  {
+   "fieldname": "doc_placed_date",
+   "fieldtype": "Date",
+   "label": "DOC Placed Date"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -395,7 +394,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-03-31 13:21:57.763929",
+ "modified": "2023-04-11 14:02:34.358695",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",
