@@ -172,7 +172,7 @@ frappe.ui.form.on('Layer Batch', {
                  {
                      label: 'Qty',
                      fieldname: 'qty',
-                     fieldtype: 'Int',
+                     fieldtype: 'Float',
                      reqd:'1'
                  },
                  {
@@ -259,7 +259,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -346,7 +346,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -441,7 +441,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -536,7 +536,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -631,7 +631,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -726,7 +726,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
@@ -814,7 +814,7 @@ frappe.ui.form.on('Layer Batch', {
 						{
                             label: 'Qty',
                             fieldname: 'qty',
-                            fieldtype: 'Int',
+                            fieldtype: 'Float',
                             reqd:'1'
                         },
 						{
