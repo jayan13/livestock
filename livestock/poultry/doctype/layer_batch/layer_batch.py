@@ -1136,14 +1136,14 @@ def get_egg_products(cat):
 @frappe.whitelist()
 def cancel_item(doc,event):
 
-	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name })
-	frappe.db.delete("Layer Feed", {"stock_entry": doc.name })
-	frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name })
-	frappe.db.delete("Layer Medicine", {"stock_entry": doc.name })
-	frappe.db.delete("Egg Production", {"stock_entry": doc.name })
-	lay=frappe.db.get_value("Layer Mortality",{'stock_entry':doc.name},['parent','total'], as_dict=1)
+	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name,'parent_field':'laying_items' })
+	frappe.db.delete("Layer Feed", {"stock_entry": doc.name,'parent_field':'laying_feed' })
+	frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name,'parent_field':'laying_vaccine' })
+	frappe.db.delete("Layer Medicine", {"stock_entry": doc.name,'parent_field': 'laying_medicine'})
+	frappe.db.delete("Egg Production", {"stock_entry": doc.name})
+	lay=frappe.db.get_value("Layer Mortality",{'stock_entry':doc.name,'parent_field':'laying_mortality'},['parent','total'], as_dict=1)
 	if lay:
 		current_alive_chicks=frappe.db.get_value("Layer Batch",{'name':lay.parent},['current_alive_chicks'])
 		current_alive_chicks=current_alive_chicks+lay.total
 		frappe.db.set_value('Layer Batch', lay.parent, 'current_alive_chicks', current_alive_chicks)
-		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name })
+		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name,'parent_field': 'laying_mortality'})
