@@ -153,7 +153,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			})
 			total_add_cost=total_add_cost+amount
 	
-	medicines=frappe.db.get_list('Layer Medicine',filters={'parent':batch,'parentfield':'rearing_feed'},
+	medicines=frappe.db.get_list('Layer Medicine',filters={'parent':batch,'parentfield':'rearing_medicine'},
     fields=['item_code,sum(qty) as qty'],group_by='item_code')
 	if medicines:
 		for itm in medicines:
@@ -193,7 +193,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			})
 			total_add_cost=total_add_cost+amount
 
-	vaccines=frappe.db.get_list('Layer Vaccine',filters={'parent':batch,'parentfield':'rearing_feed'},
+	vaccines=frappe.db.get_list('Layer Vaccine',filters={'parent':batch,'parentfield':'rearing_vaccine'},
     fields=['item_code,sum(qty) as qty'],group_by='item_code')
 	if vaccines:
 		for itm in vaccines:
@@ -233,7 +233,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			})
 			total_add_cost=total_add_cost+amount
 
-	items=frappe.db.get_list('Layer Other Items',filters={'parent':batch,'parentfield':'rearing_feed'},
+	items=frappe.db.get_list('Layer Other Items',filters={'parent':batch,'parentfield':'rearing_items'},
     fields=['item_code,sum(qty) as qty'],group_by='item_code')
 	if items:
 		for itm in items:
@@ -296,7 +296,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 				batch.manufacturing_date=posting_date
 				batch.stock_uom=stock_uom
 				batch.insert()
-				
+
 			stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
 							'item_code': sett.finished_product,
