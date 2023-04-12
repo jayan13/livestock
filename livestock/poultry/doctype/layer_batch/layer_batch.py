@@ -70,7 +70,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry.company = lbatch.company
 	stock_entry.purpose = "Manufacture"
 	stock_entry.stock_entry_type = "Manufacture"
-	stock_entry.manufacturing_type = "Egg"
+	stock_entry.manufacturing_type = "Layer Chicken"
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
 	stock_entry.set_posting_time='1'
@@ -1135,6 +1135,11 @@ def get_egg_products(cat):
 
 @frappe.whitelist()
 def cancel_item(doc,event):
+	
+	if doc.manufacturing_type=='Layer Chicken':
+		batch=frappe.db.get_value("Layer Feed",{"stock_entry": doc.name},['parent'])
+		if batch:
+			frappe.db.set_value('Layer Batch', batch, 'item_processed', '0')
 
 	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name,'parentfield':'laying_items' })
 	frappe.db.delete("Layer Feed", {"stock_entry": doc.name,'parentfield':'laying_feed' })
@@ -1147,3 +1152,5 @@ def cancel_item(doc,event):
 		current_alive_chicks=current_alive_chicks+lay.total
 		frappe.db.set_value('Layer Batch', lay.parent, 'current_alive_chicks', current_alive_chicks)
 		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name,'parentfield': 'laying_mortality'})
+	
+	
