@@ -217,6 +217,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('rearing_feed');
+                                        $(".grid-add-row").hide();
                                      } 
                              }
                      });
@@ -304,6 +305,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 frm.refresh_field('laying_feed');
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
+                                                $(".grid-add-row").hide();
                                             } 
                                     }
                             });
@@ -397,6 +399,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('rearing_medicine');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 
@@ -492,6 +495,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('laying_medicine');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 
@@ -587,6 +591,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('rearing_vaccine');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 
@@ -682,6 +687,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('laying_vaccine');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 
@@ -770,6 +776,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('rearing_items');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 
@@ -858,6 +865,7 @@ frappe.ui.form.on('Layer Batch', {
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
                                         frm.refresh_field('laying_items');
+                                        $(".grid-add-row").hide();
                                                 //var doclist = frappe.model.sync(r.message);
                                                 //doclist[0].name
                                             } 

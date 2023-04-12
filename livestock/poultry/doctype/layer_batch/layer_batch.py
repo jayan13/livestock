@@ -365,6 +365,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry.save()
 	lbatch.rooster_qty=rooster_qty
 	lbatch.item_processed=1
+	lbatch.flock_transfer_date=posting_date
 	lbatch.save()
 	items=frappe.db.get_all('Layer Other Items',filters={'parentfield':'rearing_items','parent':batch},fields=['name'])
 	if items:
@@ -1140,6 +1141,8 @@ def cancel_item(doc,event):
 		batch=frappe.db.get_value("Layer Feed",{"stock_entry": doc.name},['parent'])
 		if batch:
 			frappe.db.set_value('Layer Batch', batch, 'item_processed', '0')
+			frappe.db.set_value('Layer Batch', batch, 'flock_transferred_to_layer', '0')
+			
 
 	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name,'parentfield':'laying_items' })
 	frappe.db.delete("Layer Feed", {"stock_entry": doc.name,'parentfield':'laying_feed' })
