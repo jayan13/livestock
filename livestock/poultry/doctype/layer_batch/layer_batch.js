@@ -1557,6 +1557,118 @@ frappe.ui.form.on('Layer Batch', {
 
                 
                 
+            },
+            import_items_from_material_transfer:function(frm)
+            {
+                let d = new frappe.ui.Dialog({
+                    title: 'Import Items From Material Transfer',
+                    fields: [                        
+                        {
+                            label: 'Material Transfer',
+                            fieldname: 'stock_entry',
+                            fieldtype: 'Link',
+                            options:'Stock Entry',
+                            reqd:'1'
+                        }
+                    ],
+                    primary_action_label: 'Import Items',
+                    primary_action(values) {                        
+                        
+                        frappe.call(
+                            { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.get_material_transfer",
+                                args: {
+                                    material_transfer:values.stock_entry,
+                                    project:frm.doc.project,
+                                    shed:frm.doc.rearing_shed,
+                                },
+                                callback: function(r) 
+                                    { 
+                                        if(r.message.length > 0 ) 
+                                            { 
+                                                d.hide();
+                                                $.each (r.message,function(i, dt){
+                                                    if(dt.tbl=='vaccine')
+                                                    {
+                                                        let rw=frm.add_child("rearing_vaccine");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('rearing_vaccine');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                    }
+                                                    if(dt.tbl=='medicine')
+                                                    {
+                                                        let rw=frm.add_child("rearing_medicine");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('rearing_medicine');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                    }
+                                                    if(dt.tbl=='item')
+                                                    {
+                                                        let rw=frm.add_child("rearing_items");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('rearing_items');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                    }
+                                                    if(dt.tbl=='feed')
+                                                    {
+                                                        let rw=frm.add_child("rearing_feed");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('rearing_feed');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                    } 
+                                                });
+                                                
+                                            } else{
+                                                d.hide();
+                                                frappe.throw('Items are not in corresponding warehouses or it is already added');
+                                            }
+                                    }
+                            });
+       
+                    }
+                });
+                d.fields_dict['stock_entry'].get_query = function(){
+                    return {
+                            filters:{
+                                    "stock_entry_type": 'Material Transfer',
+                                    "docstatus":'1',
+                                    "company":frm.doc.company
+                            }
+                    }
+                }
+                d.show();
             }
 });
 

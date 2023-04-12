@@ -739,7 +739,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 	return stock_entry.as_dict()
 
 @frappe.whitelist()
-def added_feed_rearing(batch,parentfield,date,item_code,qty,uom):
+def added_feed_rearing(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
@@ -751,7 +751,7 @@ def added_feed_rearing(batch,parentfield,date,item_code,qty,uom):
 	if midx and midx[0][0] is not None:
 		curidx = cint(midx[0][0])+1
 	childtbl = frappe.new_doc("Layer Feed")
-	childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
+	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
 	if parentfield=='laying_feed':
 		create_stock_entry(childtbl,parentfield)
@@ -786,7 +786,7 @@ def delete_feed_rearing(name):
 
 
 @frappe.whitelist()
-def added_medicine_rearing(batch,parentfield,date,item_code,qty,uom,remark=''):
+def added_medicine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
@@ -798,7 +798,7 @@ def added_medicine_rearing(batch,parentfield,date,item_code,qty,uom,remark=''):
 	if midx and midx[0][0] is not None:
 		curidx = cint(midx[0][0])+1
 	childtbl = frappe.new_doc("Layer Medicine")
-	childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
+	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
 	if parentfield=='laying_medicine':
 		create_stock_entry(childtbl,parentfield)
@@ -831,7 +831,7 @@ def delete_medicine_rearing(name):
 	frappe.db.delete('Layer Medicine', {"name": name })
 
 @frappe.whitelist()
-def add_vaccine_rearing(batch,parentfield,date,item_code,qty,uom,remark=''):
+def add_vaccine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
@@ -842,7 +842,7 @@ def add_vaccine_rearing(batch,parentfield,date,item_code,qty,uom,remark=''):
 	if midx and midx[0][0] is not None:
 		curidx = cint(midx[0][0])+1
 	childtbl = frappe.new_doc("Layer Vaccine")
-	childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
+	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
 	if parentfield=='laying_vaccine':
 		create_stock_entry(childtbl,parentfield)
@@ -876,7 +876,7 @@ def delete_vaccine_rearing(name):
 
 
 @frappe.whitelist()
-def add_rearing_items(batch,parentfield,date,item_code,qty,uom):
+def add_rearing_items(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
@@ -888,7 +888,7 @@ def add_rearing_items(batch,parentfield,date,item_code,qty,uom):
 	if midx and midx[0][0] is not None:
 		curidx = cint(midx[0][0])+1
 	childtbl = frappe.new_doc("Layer Other Items")
-	childtbl.update({'idx':curidx,'date':date,'item_code':item_code,'rate':rate,'conversion_factor':conversion_factor,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
+	childtbl.update({'idx':curidx,'date':date,'item_code':item_code,'material_transfer':material_transfer,'rate':rate,'conversion_factor':conversion_factor,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
 	if parentfield=='laying_items':
 		create_stock_entry(childtbl,parentfield)
@@ -1156,5 +1156,38 @@ def cancel_item(doc,event):
 		current_alive_chicks=current_alive_chicks+lay.total
 		frappe.db.set_value('Layer Batch', lay.parent, 'current_alive_chicks', current_alive_chicks)
 		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name,'parentfield': 'laying_mortality'})
+
+
+@frappe.whitelist()
+def get_material_transfer(material_transfer,project,shed):
+	sett=shed=frappe.get_doc("Rearing Shed", shed)
+	values = {'parent': material_transfer,'project':project}
+	data = frappe.db.sql(""" SELECT DATE(creation) as cdate,item_code,item_name,qty,uom,t_warehouse,basic_rate,conversion_factor       
+    FROM `tabStock Entry Detail`  WHERE parent = %(parent)s and project=%(project)s """, values=values, as_dict=1,debug=0)
+	if data:
+		for dt in data:
+			if sett.vaccine_warehouse==dt.t_warehouse:
+				if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
+					dt.update({'tbl':'vaccine','material_transfer':material_transfer})
+					remarks=''
+					add_vaccine_rearing(dt.project,'rearing_vaccine',dt.cdate,dt.item_code,dt.qty,dt.uom,remarks,material_transfer)
+
+			if sett.medicine_warehouse==dt.t_warehouse:
+				if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
+					dt.update({'tbl':'medicine','material_transfer':material_transfer})
+					remarks=''
+					added_medicine_rearing(dt.project,'rearing_medicine',dt.cdate,dt.item_code,dt.qty,dt.uom,remarks,material_transfer)
+
+			if sett.other_item_warehouse==dt.t_warehouse:
+				if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
+					dt.update({'tbl':'item','material_transfer':material_transfer})
+					add_rearing_items(dt.project,'rearing_items',dt.cdate,dt.item_code,dt.qty,dt.uom,material_transfer)
+
+			if sett.feed_warehouse==dt.t_warehouse:
+				if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
+					dt.update({'tbl':'feed','material_transfer':material_transfer})
+					added_feed_rearing(dt.project,'rearing_feed',dt.cdate,dt.item_code,dt.qty,dt.uom,material_transfer)
+			
+	return data
 	
 	

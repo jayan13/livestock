@@ -12,7 +12,8 @@
   "uom",
   "rate",
   "conversion_factor",
-  "stock_entry"
+  "stock_entry",
+  "material_transfer"
  ],
  "fields": [
   {
@@ -68,12 +69,19 @@
    "hidden": 1,
    "label": "Stock Entry",
    "options": "Stock Entry"
+  },
+  {
+   "fieldname": "material_transfer",
+   "fieldtype": "Link",
+   "label": "Material Transfer",
+   "options": "Stock Entry",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-03-26 16:09:18.139318",
+ "modified": "2023-04-12 14:28:26.274694",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Other Items",

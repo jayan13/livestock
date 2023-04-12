@@ -27,6 +27,7 @@
   "project",
   "status",
   "rearing_period_section",
+  "import_items_from_material_transfer",
   "rearing_feed",
   "add_rearing_feed",
   "rearing_medicine",
@@ -378,6 +379,11 @@
    "fieldname": "doc_placed_date",
    "fieldtype": "Date",
    "label": "DOC Placed Date"
+  },
+  {
+   "fieldname": "import_items_from_material_transfer",
+   "fieldtype": "Button",
+   "label": "Import Items From Material Transfer"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -395,7 +401,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-04-11 15:18:54.411517",
+ "modified": "2023-04-12 16:33:23.358222",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",
