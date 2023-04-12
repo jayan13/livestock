@@ -284,18 +284,19 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			precision = cint(frappe.db.get_default("float_precision")) or 3
 			cost=((int(transfer_qty)*base_row_rate) + total_add_cost) / int(transfer_qty)
 			amount=flt(int(transfer_qty) * flt(cost), precision)
-
-			manufacture_date=posting_date.strftime("%d-%m-%Y")
-			batch_no='LH'+'-'+str(manufacture_date)
-			if not frappe.db.exists("Batch", {"name": batch_no}):
-				batch = frappe.new_doc("Batch")
-				batch.batch_id=batch_no
-				batch.item=sett.finished_product
-				batch.item_name=item_account_details.name
-				batch.batch_qty=transfer_qty
-				batch.manufacturing_date=posting_date
-				batch.stock_uom=stock_uom
-				batch.insert()
+			batch_no=''
+			if item_account_details.has_batch_no:
+				manufacture_date=posting_date.strftime("%d-%m-%Y")
+				batch_no='LH'+'-'+str(manufacture_date)
+				if not frappe.db.exists("Batch", {"name": batch_no}):
+					batch = frappe.new_doc("Batch")
+					batch.batch_id=batch_no
+					batch.item=sett.finished_product
+					batch.item_name=item_account_details.name
+					batch.batch_qty=transfer_qty
+					batch.manufacturing_date=posting_date
+					batch.stock_uom=stock_uom
+					batch.insert()
 
 			stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
