@@ -1584,6 +1584,7 @@ frappe.ui.form.on('Layer Batch', {
                                 },
                                 callback: function(r) 
                                     { 
+                                        var flg=0;
                                         if(r.message.length > 0 ) 
                                             { 
                                                 d.hide();
@@ -1602,6 +1603,7 @@ frappe.ui.form.on('Layer Batch', {
                                                         frm.refresh_field('rearing_vaccine');                                                
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
+                                                        flg=1;
                                                     }
                                                     if(dt.tbl=='medicine')
                                                     {
@@ -1617,6 +1619,7 @@ frappe.ui.form.on('Layer Batch', {
                                                         frm.refresh_field('rearing_medicine');                                                
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
+                                                        flg=1;
                                                     }
                                                     if(dt.tbl=='item')
                                                     {
@@ -1632,6 +1635,7 @@ frappe.ui.form.on('Layer Batch', {
                                                         frm.refresh_field('rearing_items');                                                
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
+                                                        flg=1;
                                                     }
                                                     if(dt.tbl=='feed')
                                                     {
@@ -1647,8 +1651,15 @@ frappe.ui.form.on('Layer Batch', {
                                                         frm.refresh_field('rearing_feed');                                                
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
+                                                        flg=1;
                                                     } 
                                                 });
+
+                                                if(flg==0)
+                                                {
+                                                   
+                                                    frappe.throw('Items are not in corresponding warehouses or it is already added');
+                                                }
                                                 
                                             } else{
                                                 d.hide();
