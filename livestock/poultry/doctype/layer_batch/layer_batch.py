@@ -1163,7 +1163,7 @@ def get_material_transfer(material_transfer,project,shed):
 	sett=shed=frappe.get_doc("Rearing Shed", shed)
 	values = {'parent': material_transfer,'project':project}
 	data = frappe.db.sql(""" SELECT DATE(creation) as cdate,item_code,item_name,qty,uom,t_warehouse,basic_rate,conversion_factor       
-    FROM `tabStock Entry Detail`  WHERE parent = %(parent)s and project=%(project)s """, values=values, as_dict=1,debug=0)
+    FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
 	if data:
 		for dt in data:
 			if sett.vaccine_warehouse==dt.t_warehouse:
