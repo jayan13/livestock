@@ -1169,24 +1169,49 @@ def get_material_transfer(material_transfer,project,shed):
 			if sett.vaccine_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'vaccine','material_transfer':material_transfer})
-					remarks=''
-					add_vaccine_rearing(dt.project,'rearing_vaccine',dt.cdate,dt.item_code,dt.qty,dt.uom,remarks,material_transfer)
+					
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{1}' """.format(project))
+					curidx=1
+					if midx and midx[0][0] is not None:
+						curidx = cint(midx[0][0])+1
+					childtbl = frappe.new_doc("Layer Vaccine")
+					childtbl.update({'idx':curidx,'date':dt.cdate,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
+					childtbl.save()
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'medicine','material_transfer':material_transfer})
-					remarks=''
-					added_medicine_rearing(dt.project,'rearing_medicine',dt.cdate,dt.item_code,dt.qty,dt.uom,remarks,material_transfer)
-
+					
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='rearing_medicine' and parent='{1}' """.format(project))
+					curidx=1
+					if midx and midx[0][0] is not None:
+						curidx = cint(midx[0][0])+1
+					childtbl = frappe.new_doc("Layer Medicine")
+					childtbl.update({'idx':curidx,'date':dt.cdate,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
+					childtbl.save()
 			if sett.other_item_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'item','material_transfer':material_transfer})
-					add_rearing_items(dt.project,'rearing_items',dt.cdate,dt.item_code,dt.qty,dt.uom,material_transfer)
+					
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Other Items` where parentfield='rearing_items' and parent='{1}' """.format(project))
+					curidx=1
+					if midx and midx[0][0] is not None:
+						curidx = cint(midx[0][0])+1
+					childtbl = frappe.new_doc("Layer Other Items")
+					childtbl.update({'idx':curidx,'date':dt.cdate,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
+					childtbl.save()
 
 			if sett.feed_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'feed','material_transfer':material_transfer})
-					added_feed_rearing(dt.project,'rearing_feed',dt.cdate,dt.item_code,dt.qty,dt.uom,material_transfer)
+					
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Feed` where parentfield='rearing_feed' and parent='{1}' """.format(project))
+					curidx=1
+					if midx and midx[0][0] is not None:
+						curidx = cint(midx[0][0])+1
+					childtbl = frappe.new_doc("Layer Feed")
+					childtbl.update({'idx':curidx,'date':dt.cdate,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
+					childtbl.save()
 			
 	return data
 	
