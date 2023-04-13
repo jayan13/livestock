@@ -1170,7 +1170,7 @@ def get_material_transfer(material_transfer,project,shed):
 				if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'vaccine','material_transfer':material_transfer})
 					
-					midx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{1}' """.format(project))
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{0}' """.format(project))
 					curidx=1
 					if midx and midx[0][0] is not None:
 						curidx = cint(midx[0][0])+1
@@ -1182,7 +1182,7 @@ def get_material_transfer(material_transfer,project,shed):
 				if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'medicine','material_transfer':material_transfer})
 					
-					midx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='rearing_medicine' and parent='{1}' """.format(project))
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='rearing_medicine' and parent='{0}' """.format(project))
 					curidx=1
 					if midx and midx[0][0] is not None:
 						curidx = cint(midx[0][0])+1
@@ -1193,7 +1193,7 @@ def get_material_transfer(material_transfer,project,shed):
 				if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'item','material_transfer':material_transfer})
 					
-					midx=frappe.db.sql("""select max(idx) from `tabLayer Other Items` where parentfield='rearing_items' and parent='{1}' """.format(project))
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Other Items` where parentfield='rearing_items' and parent='{0}' """.format(project))
 					curidx=1
 					if midx and midx[0][0] is not None:
 						curidx = cint(midx[0][0])+1
@@ -1205,7 +1205,7 @@ def get_material_transfer(material_transfer,project,shed):
 				if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
 					dt.update({'tbl':'feed','material_transfer':material_transfer})
 					
-					midx=frappe.db.sql("""select max(idx) from `tabLayer Feed` where parentfield='rearing_feed' and parent='{1}' """.format(project))
+					midx=frappe.db.sql("""select max(idx) from `tabLayer Feed` where parentfield='rearing_feed' and parent='{0}' """.format(project))
 					curidx=1
 					if midx and midx[0][0] is not None:
 						curidx = cint(midx[0][0])+1
