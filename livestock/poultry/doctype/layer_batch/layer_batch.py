@@ -1165,7 +1165,7 @@ def get_material_transfer(material_transfer,project,shed):
 	posting_date=frappe.db.get_value("Stock Entry",material_transfer,'posting_date')
 	data = frappe.db.sql(""" SELECT item_code,item_name,qty,uom,t_warehouse,basic_rate,conversion_factor       
     FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
-	
+
 	vacc=[]
 	medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{0}' """.format(project))
 	vidx=1
@@ -1195,26 +1195,26 @@ def get_material_transfer(material_transfer,project,shed):
 		for dt in data:
 			if sett.vaccine_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-					dt.update({'tbl':'vaccine','material_transfer':material_transfer})
+					dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
 					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
 					vidx+=1
 
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
-					dt.update({'tbl':'medicine','material_transfer':material_transfer})
+					dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
 					med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
 					midx+=1
 
 			if sett.other_item_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
-					dt.update({'tbl':'item','material_transfer':material_transfer})
+					dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
 					other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
 					oidx+=1
 
 			if sett.feed_warehouse==dt.t_warehouse:
 				if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
-					dt.update({'tbl':'feed','material_transfer':material_transfer})					
+					dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
 					feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
 					fidx+=1
 		
