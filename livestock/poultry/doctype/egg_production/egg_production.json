@@ -70,15 +70,14 @@
   },
   {
    "fieldname": "bom",
-   "fieldtype": "Link",
-   "label": "Bom",
-   "options": "Finished Product BOM"
+   "fieldtype": "Data",
+   "label": "Bom"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-16 09:29:23.626710",
+ "modified": "2023-04-16 09:48:53.484420",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Egg Production",
