@@ -274,15 +274,7 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Feed',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("laying_feed");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						frm.refresh_field('laying_feed');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
+                        
                         
 						frappe.call(
                             { 
@@ -299,14 +291,19 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+                                                let rw=frm.add_child("laying_feed");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;                                                
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
                                                 frm.refresh_field('laying_feed');
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                frm.doc.__unsaved=0;
+                                                d.hide();
                                                 $(".grid-add-row").hide();
-                                            } 
+                                            }
                                     }
                             });
 
@@ -464,16 +461,7 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Medicine',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("laying_medicine");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						rw.remark=values.remark;
-						frm.refresh_field('laying_medicine');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
+                        
                         
 						frappe.call(
                             { 
@@ -491,13 +479,21 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+
+                                                let rw=frm.add_child("laying_medicine");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;
+                                                rw.remark=values.remark;                                                
                                                 rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('laying_medicine');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                rw.conversion_factor=r.message.conversion_factor;
+                                                rw.item_name=r.message.item_name;
+                                                frm.refresh_field('laying_medicine');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
+                                                
                                             } 
                                     }
                             });
@@ -656,16 +652,7 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Vaccine',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("laying_vaccine");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						rw.remark=values.remark;
-						frm.refresh_field('laying_vaccine');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
+                        
                         
 						frappe.call(
                             { 
@@ -683,13 +670,19 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+                                                let rw=frm.add_child("laying_vaccine");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;
+                                                rw.remark=values.remark;                                                
                                                 rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('laying_vaccine');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                rw.conversion_factor=r.message.conversion_factor;
+                                                rw.item_name=r.message.item_name;
+                                                frm.refresh_field('laying_vaccine');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
@@ -836,15 +829,7 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Items',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("laying_items");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;						
-						frm.refresh_field('laying_items');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
+                        
                         
 						frappe.call(
                             { 
@@ -861,13 +846,19 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+                                                let rw=frm.add_child("laying_items");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;				
+                                               
                                                 rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('laying_items');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                rw.conversion_factor=r.message.conversion_factor;
+                                                rw.item_name=r.message.item_name;
+                                                frm.refresh_field('laying_items');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
@@ -1026,17 +1017,7 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Mortality',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("laying_mortality");
-						rw.date=values.date;
-						rw.age=values.age;
-						rw.evening=values.evening;
-						rw.morning=values.morning;
-						rw.total=values.evening+values.morning;
-                        rw.remark=values.remark;
-						frm.refresh_field('laying_mortality');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
+                       
                         
 						frappe.call(
                             { 
@@ -1054,8 +1035,17 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                let rw=frm.add_child("laying_mortality");
+                                                rw.date=values.date;
+                                                rw.age=values.age;
+                                                rw.evening=values.evening;
+                                                rw.morning=values.morning;
+                                                rw.total=values.evening+values.morning;
+                                                rw.remark=values.remark;
+                                                frm.refresh_field('laying_mortality');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
