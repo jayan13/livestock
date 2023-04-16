@@ -14,6 +14,7 @@
   "cost_center",
   "base_row_material",
   "row_material_target_warehouse",
+  "packing_material_source_warehouse",
   "vaccine_expense_account",
   "vaccine_warehouse",
   "column_break_6",
@@ -127,11 +128,17 @@
    "fieldtype": "Select",
    "label": "Egg Category",
    "options": "Layer Eggs\nOrganic Eggs\nBreeder Eggs"
+  },
+  {
+   "fieldname": "packing_material_source_warehouse",
+   "fieldtype": "Link",
+   "label": "Packing Material Source Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-03 18:42:02.186801",
+ "modified": "2023-04-16 10:31:08.216612",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Laying Shed",

@@ -641,7 +641,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 			packed_qty=float(pcitem.qty)*float(fitem.qty)
 			pck_rate = get_incoming_rate({
 							"item_code": pcitem.item,
-							"warehouse": sett.row_material_target_warehouse,
+							"warehouse": sett.packing_material_source_warehouse,
 							"posting_date": posting_date,
 							"posting_time": posting_time,
 							"qty": -1 * packed_qty,
@@ -653,7 +653,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 			itemscost+=transfer_qty * pck_rate
 			#pcitems.append({
 			stock_entry.append('items', {
-						's_warehouse': sett.row_material_target_warehouse,
+						's_warehouse': sett.packing_material_source_warehouse,
 						'item_code': pcitem.item,
 						'qty': packed_qty,
 						'actual_qty':packed_qty,
