@@ -375,6 +375,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.docstatus=1
 			litem.stock_entry=stock_entry.name
 			litem.save()
+			frappe.db.set_value('Layer Other Items',itm.name, 'docstatus', 1)
 
 	vaccines=frappe.db.get_all('Layer Vaccine',filters={'parentfield':'rearing_vaccine','parent':batch},fields=['name'])
 	if vaccines:
@@ -383,6 +384,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.docstatus=1
 			litem.stock_entry=stock_entry.name
 			litem.save()
+			frappe.db.set_value('Layer Vaccine',itm.name, 'docstatus', 1)
 
 	medicines=frappe.db.get_all('Layer Medicine',filters={'parentfield':'rearing_medicine','parent':batch},fields=['name'])
 	if medicines:
@@ -391,6 +393,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.docstatus=1
 			litem.stock_entry=stock_entry.name
 			litem.save()
+			frappe.db.set_value('Layer Medicine',itm.name, 'docstatus', 1)
 
 	feeds=frappe.db.get_all('Layer Feed',filters={'parentfield':'rearing_feed','parent':batch},fields=['name'])
 	if feeds:
@@ -399,6 +402,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.docstatus=1
 			litem.stock_entry=stock_entry.name
 			litem.save()
+			frappe.db.set_value('Layer Feed',itm.name, 'docstatus', 1)
 			 
 
 	mortalitys=frappe.db.get_all('Layer Mortality',filters={'parentfield':'rearing_daily_mortality','parent':batch},fields=['name'])
@@ -408,6 +412,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.docstatus=1
 			litem.stock_entry=stock_entry.name
 			litem.save()
+			frappe.db.set_value('Layer Mortality',itm.name, 'docstatus', 1)
 	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return stock_entry.as_dict()
 
@@ -482,6 +487,7 @@ def create_stock_entry_mortality(item,parent_field=''):
 	litem.docstatus=1
 	litem.stock_entry=stock_entry.name
 	litem.save()
+	frappe.db.set_value('Layer Mortality',item.name, 'docstatus', 1)
 	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return stock_entry.as_dict()
 
@@ -579,11 +585,13 @@ def create_stock_entry(item,parent_field=''):
 		tbl='Layer Feed'
 	elif parent_field=='laying_mortality':
 		tbl='Layer Mortality'
+		
 	if tbl:
 		litem=frappe.get_doc(tbl,item.name)
 		litem.docstatus=1
 		litem.stock_entry=stock_entry.name
 		litem.save()
+		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
 	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return stock_entry.as_dict()
 
@@ -738,6 +746,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		litem.docstatus=1
 		litem.stock_entry=stock_entry.name
 		litem.save()
+		frappe.db.set_value('Egg Production',fitem.name, 'docstatus', 1)
 
 	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return stock_entry.as_dict()
