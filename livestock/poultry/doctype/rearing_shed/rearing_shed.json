@@ -11,6 +11,7 @@
   "rearing_shed",
   "company",
   "cost_center",
+  "expense_account",
   "base_row_material",
   "row_material_target_warehouse",
   "vaccine_warehouse",
@@ -105,11 +106,17 @@
    "fieldtype": "Link",
    "label": "Other Item Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "label": " Expense Account",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-31 12:55:38.579373",
+ "modified": "2023-04-16 08:48:49.510956",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Rearing Shed",

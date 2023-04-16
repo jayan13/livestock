@@ -60,7 +60,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		time=get_datetime(time)
 	if transfer_date:
 		date=getdate(transfer_date)
-
+	sett.expense_account
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
 	posting_time=time.strftime("%H:%M:%S")
@@ -81,7 +81,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		stock_uom = item_account_details.stock_uom
 		conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
 		cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-		expense_account=item_account_details.get("expense_account")
+		expense_account=sett.expense_account or item_account_details.get("expense_account")
 		base_row_rate = get_incoming_rate({
 						"item_code": sett.base_row_material,
 						"warehouse": sett.row_material_target_warehouse,
@@ -122,7 +122,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")
+			expense_account=sett.expense_account or item_account_details.get("expense_account")
 			rate = get_incoming_rate({
 							"item_code": itm.item_code,
 							"warehouse": sett.feed_warehouse,
@@ -162,7 +162,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")
+			expense_account=sett.expense_account or item_account_details.get("expense_account")
 			rate = get_incoming_rate({
 							"item_code": itm.item_code,
 							"warehouse": sett.medicine_warehouse,
@@ -202,7 +202,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")
+			expense_account=sett.expense_account or item_account_details.get("expense_account")
 			rate = get_incoming_rate({
 							"item_code": itm.item_code,
 							"warehouse": sett.vaccine_warehouse,
@@ -242,7 +242,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")
+			expense_account=sett.expense_account or item_account_details.get("expense_account")
 			rate = get_incoming_rate({
 							"item_code": itm.item_code,
 							"warehouse": sett.other_item_warehouse,
@@ -280,7 +280,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(sett.finished_product, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")                                
+			expense_account=sett.expense_account or item_account_details.get("expense_account")                                
 			precision = cint(frappe.db.get_default("float_precision")) or 3
 			cost=((int(transfer_qty)*base_row_rate) + total_add_cost) / int(transfer_qty)
 			amount=flt(int(transfer_qty) * flt(cost), precision)
@@ -327,7 +327,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			stock_uom = item_account_details.stock_uom
 			conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
 			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=item_account_details.get("expense_account")                                
+			expense_account=sett.expense_account or item_account_details.get("expense_account")                                
 			precision = cint(frappe.db.get_default("float_precision")) or 3
 			base_row_rate = get_incoming_rate({
 							"item_code": sett.base_row_material,
