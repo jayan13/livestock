@@ -65,23 +65,21 @@
   },
   {
    "fieldname": "stock_entry",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Stock Entry",
-   "options": "Stock Entry",
    "read_only": 1
   },
   {
    "fieldname": "material_transfer",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Material Transfer",
-   "options": "Stock Entry",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-12 14:28:15.865612",
+ "modified": "2023-04-16 09:31:31.956655",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Feed",
