@@ -626,7 +626,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		#Finished Product BOM
 
 		#stock_entry.set_stock_entry_type()
-		precision = cint(frappe.db.get_default("float_precision")) or 3
+		precision = 6
 		itemscost=0
 		item_account_details = get_item_defaults(fitem.item_code, lbatch.company)
 		stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
@@ -648,7 +648,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 							'company':lbatch.company
 						}) or 0
 									
-			transfer_qty=flt(float(packed_qty) * float(conversion_factor),2)
+			transfer_qty=flt(float(packed_qty) * float(conversion_factor),6)
 			amount=flt(float(transfer_qty) * float(pck_rate), precision)
 			itemscost+=transfer_qty * pck_rate
 			#pcitems.append({
@@ -723,8 +723,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 						'batch_no':batch_no,                  
 				})
 		litem=frappe.get_doc('Egg Production',fitem.name)
-		litem.docstatus=1
-		litem.stock_entry=stock_entry.name
+		litem.rate=stock_uom_rate
 		litem.save()
 
 	for pc in pcitems:
@@ -734,7 +733,12 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 	stock_entry.docstatus=1
 	stock_entry.save()
 
-	
+	for fitem in fitemdata:
+		litem=frappe.get_doc('Egg Production',fitem.name)
+		litem.docstatus=1
+		litem.stock_entry=stock_entry.name
+		litem.save()
+
 	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return stock_entry.as_dict()
 
