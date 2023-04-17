@@ -118,7 +118,8 @@ frappe.ui.form.on('Layer Batch', {
                                                     frm.refresh_field('rearing_feed');
                                                     frm.refresh_field('rearing_items');
                                                     frm.refresh_field('rearing_medicine');
-                                                    frm.refresh_field('rearing_vaccine'); 
+                                                    frm.refresh_field('rearing_vaccine');
+                                                    frm.reload_doc(); 
                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
                                                 } 
                                         }
@@ -309,6 +310,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 frm.doc.__unsaved=0;
                                                 d.hide();
                                                 $(".grid-add-row").hide();
+                                                frm.reload_doc();
                                             }
                                     }
                             });
@@ -499,6 +501,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
+                                                frm.reload_doc();
                                                 
                                             } 
                                     }
@@ -689,6 +692,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
+                                                frm.reload_doc();
                                             } 
                                     }
                             });
@@ -865,6 +869,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
+                                                frm.reload_doc();
                                             } 
                                     }
                             });
@@ -1052,6 +1057,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
+                                                frm.reload_doc()
                                             } 
                                     }
                             });
@@ -1495,8 +1501,9 @@ frappe.ui.form.on('Layer Batch', {
                                                                     //frm.refresh_field('egg_production');
                                                                     //var doclist = frappe.model.sync(r.message);
                                                                     //doclist[0].name
-                                                                    var doclist = frappe.model.sync(rs.message);
+                                                                    //var doclist = frappe.model.sync(rs.message);
                                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                                                    frm.reload_doc();
                                                                 } 
                                                         }
                                                 }); 
@@ -1831,6 +1838,7 @@ frappe.ui.form.on('Layer Batch', {
                                             frm.refresh_field('laying_items');
                                             frm.refresh_field('laying_medicine');
                                             frm.refresh_field('laying_vaccine'); 
+                                            frm.reload_doc();
                                         }   
                                     }
                             });
