@@ -1158,17 +1158,17 @@ def cancel_item(doc,event):
 			frappe.db.set_value('Layer Batch', batch, 'flock_transferred_to_layer', '0')
 			
 
-	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name,'parentfield':'laying_items' })
-	frappe.db.delete("Layer Feed", {"stock_entry": doc.name,'parentfield':'laying_feed' })
-	frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name,'parentfield':'laying_vaccine' })
-	frappe.db.delete("Layer Medicine", {"stock_entry": doc.name,'parentfield': 'laying_medicine'})
+	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name})
+	frappe.db.delete("Layer Feed", {"stock_entry": doc.name })
+	frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name })
+	frappe.db.delete("Layer Medicine", {"stock_entry": doc.name})
 	frappe.db.delete("Egg Production", {"stock_entry": doc.name})
-	lay=frappe.db.get_value("Layer Mortality",{'stock_entry':doc.name,'parentfield':'laying_mortality'},['parent','total'], as_dict=1)
+	lay=frappe.db.get_value("Layer Mortality",{'stock_entry':doc.name},['parent','total'], as_dict=1)
 	if lay:
 		current_alive_chicks=frappe.db.get_value("Layer Batch",{'name':lay.parent},['current_alive_chicks'])
 		current_alive_chicks=current_alive_chicks+lay.total
 		frappe.db.set_value('Layer Batch', lay.parent, 'current_alive_chicks', current_alive_chicks)
-		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name,'parentfield': 'laying_mortality'})
+		frappe.db.delete("Layer Mortality", {"stock_entry": doc.name})
 
 
 @frappe.whitelist()
@@ -1207,29 +1207,116 @@ def get_material_transfer(material_transfer,project,shed):
 	if data:
 		for dt in data:
 			if sett.vaccine_warehouse==dt.t_warehouse:
-				if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-					dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
-					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
-					vidx+=1
+				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
+				vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
+				vidx+=1
 
 
 			if sett.medicine_warehouse==dt.t_warehouse:
-				if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
-					dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
-					med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
-					midx+=1
+				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
+				med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
+				midx+=1
 
 			if sett.other_item_warehouse==dt.t_warehouse:
-				if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
-					dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
-					other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
-					oidx+=1
+				#if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
+				other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
+				oidx+=1
 
 			if sett.feed_warehouse==dt.t_warehouse:
-				if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
-					dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
-					feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
-					fidx+=1
+				#if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
+				feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
+				fidx+=1
+		
+		if len(vacc):
+			for vc in vacc:
+				childtbl = frappe.new_doc("Layer Vaccine")
+				childtbl.update(vc)
+				childtbl.save()
+
+		if len(med):
+			for vc in med:
+				childtbl = frappe.new_doc("Layer Medicine")
+				childtbl.update(vc)
+				childtbl.save()
+
+		if len(feed):			
+			for vc in feed:
+				childtbl = frappe.new_doc("Layer Feed")
+				childtbl.update(vc)
+				childtbl.save()
+
+		if len(other):
+			for vc in other:
+				childtbl = frappe.new_doc("Layer Other Items")
+				childtbl.update(vc)
+				childtbl.save()
+			
+		
+	return data
+
+@frappe.whitelist()
+def get_material_transfer_lay(material_transfer,project,shed):
+	sett=shed=frappe.get_doc("Laying Shed", shed)
+	values = {'parent': material_transfer,'project':project}
+	posting_date=frappe.db.get_value("Stock Entry",material_transfer,'posting_date')
+	data = frappe.db.sql(""" SELECT item_code,item_name,qty,uom,t_warehouse,basic_rate,conversion_factor       
+    FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
+
+	vacc=[]
+	medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='laying_vaccine' and parent='{0}' """.format(project))
+	vidx=1
+	if medidx and medidx[0][0] is not None:
+		vidx = cint(medidx[0][0])+1
+
+	med=[]
+	medidx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='laying_medicine' and parent='{0}' """.format(project))
+	midx=1
+	if medidx and medidx[0][0] is not None:
+		midx = cint(medidx[0][0])+1
+
+	feed=[]
+	medidx=frappe.db.sql("""select max(idx) from `tabLayer Feed` where parentfield='laying_feed' and parent='{0}' """.format(project))
+	fidx=1
+	if medidx and medidx[0][0] is not None:
+		fidx = cint(medidx[0][0])+1
+
+	other=[]
+	medidx=frappe.db.sql("""select max(idx) from `tabLayer Other Items` where parentfield='laying_items' and parent='{0}' """.format(project))
+	oidx=1
+	if medidx and medidx[0][0] is not None:
+		oidx = cint(medidx[0][0])+1
+
+
+	if data:
+		for dt in data:
+			if sett.vaccine_warehouse==dt.t_warehouse:
+				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
+				vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_vaccine'})
+				vidx+=1
+
+
+			if sett.medicine_warehouse==dt.t_warehouse:
+				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
+				med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_medicine'})
+				midx+=1
+
+			if sett.other_item_warehouse==dt.t_warehouse:
+				#if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
+				other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_items'})
+				oidx+=1
+
+			if sett.feed_warehouse==dt.t_warehouse:
+				#if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
+				dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
+				feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_feed'})
+				fidx+=1
 		
 		if len(vacc):
 			for vc in vacc:
@@ -1258,4 +1345,212 @@ def get_material_transfer(material_transfer,project,shed):
 		
 	return data
 	
+@frappe.whitelist()
+def laying_material_issue(batch,date):
+	lbatch=frappe.get_doc('Layer Batch',batch)	
+	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	time=''
+	date=''
+	if date:
+		date=getdate(date)
+	
+	posting_date=date or nowdate() 
+	time=time or get_datetime()
+	posting_time=time.strftime("%H:%M:%S")
+
+	stock_entry = frappe.new_doc("Stock Entry")    
+	stock_entry.company = lbatch.company	
+	stock_entry.stock_entry_type = "Material Issue"	
+	stock_entry.project = lbatch.project
+	stock_entry.posting_date=posting_date
+	stock_entry.set_posting_time='1'
+	stock_entry.posting_time=posting_time
+	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
+
+	items=[]
+	vaccine=frappe.db.sql("""select * from `tabLayer Vaccine` where docstatus=0 and parentfield='laying_vaccine' and parent='{0}' """.format(batch),as_dict=1)
+	for item in vaccine:
+		items.append(item)
+		item_account_details = get_item_defaults(item.item_code, sett.company)
+		expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")		
+		row_material_target_warehouse=sett.vaccine_warehouse
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
+		item_code=item.item_code
+
+		rate = get_incoming_rate({
+                                "item_code": item_code,
+                                "warehouse": row_material_target_warehouse,
+                                "posting_date": posting_date,
+                                "posting_time": posting_time,
+                                "qty": -1 * item.qty,
+                                'company':sett.company
+                            }) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(item.qty) * float(rate), precision)
+		stock_entry.append('items', {
+									's_warehouse': row_material_target_warehouse,
+									'item_code': item_code,
+									'qty': item.qty,
+									'actual_qty':item.qty,
+									'uom': item.uom,
+									'cost_center':cost_center,					
+									'ste_detail': item_account_details.name,
+									'stock_uom': stock_uom,
+									'expense_account':expense_account,
+									'valuation_rate': rate,
+									"basic_rate":rate, 	
+									"basic_amount":amount,  
+									"amount":amount,  
+									"transfer_qty":item.qty,
+									'conversion_factor': flt(conversion_factor),
+											
+					})
+
+	medicine=frappe.db.sql("""select * from `tabLayer Medicine` where docstatus=0 and parentfield='laying_medicine' and parent='{0}' """.format(batch),as_dict=1)
+	for item in medicine:
+		items.append(item)
+		item_account_details = get_item_defaults(item.item_code, sett.company)
+		expense_account=sett.medicine_expense_account or item_account_details.get("expense_account")
+		row_material_target_warehouse=sett.medicine_warehouse
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
+		item_code=item.item_code
+		rate = get_incoming_rate({
+                                "item_code": item_code,
+                                "warehouse": row_material_target_warehouse,
+                                "posting_date": posting_date,
+                                "posting_time": posting_time,
+                                "qty": -1 * item.qty,
+                                'company':sett.company
+                            }) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(item.qty) * float(rate), precision)
+		stock_entry.append('items', {
+									's_warehouse': row_material_target_warehouse,
+									'item_code': item_code,
+									'qty': item.qty,
+									'actual_qty':item.qty,
+									'uom': item.uom,
+									'cost_center':cost_center,					
+									'ste_detail': item_account_details.name,
+									'stock_uom': stock_uom,
+									'expense_account':expense_account,
+									'valuation_rate': rate,
+									"basic_rate":rate, 	
+									"basic_amount":amount,  
+									"amount":amount,  
+									"transfer_qty":item.qty,
+									'conversion_factor': flt(conversion_factor),
+											
+					})
+
+	feed=frappe.db.sql("""select * from `tabLayer Feed` where docstatus=0 and parentfield='laying_feed' and parent='{0}' """.format(batch),as_dict=1)
+	for item in feed:
+		items.append(item)
+		item_account_details = get_item_defaults(item.item_code, sett.company)
+		expense_account=sett.feed_expense_account or item_account_details.get("expense_account")
+		row_material_target_warehouse=sett.feed_warehouse
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
+		item_code=item.item_code
+		rate = get_incoming_rate({
+                                "item_code": item_code,
+                                "warehouse": row_material_target_warehouse,
+                                "posting_date": posting_date,
+                                "posting_time": posting_time,
+                                "qty": -1 * item.qty,
+                                'company':sett.company
+                            }) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(item.qty) * float(rate), precision)
+		stock_entry.append('items', {
+									's_warehouse': row_material_target_warehouse,
+									'item_code': item_code,
+									'qty': item.qty,
+									'actual_qty':item.qty,
+									'uom': item.uom,
+									'cost_center':cost_center,					
+									'ste_detail': item_account_details.name,
+									'stock_uom': stock_uom,
+									'expense_account':expense_account,
+									'valuation_rate': rate,
+									"basic_rate":rate, 	
+									"basic_amount":amount,  
+									"amount":amount,  
+									"transfer_qty":item.qty,
+									'conversion_factor': flt(conversion_factor),
+											
+					})
+
+	items=frappe.db.sql("""select * from `tabLayer Other Items` where docstatus=0 and parentfield='laying_items' and parent='{0}' """.format(batch),as_dict=1)
+	for item in items:
+		items.append(item)
+		item_account_details = get_item_defaults(item.item_code, sett.company)
+		expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
+		row_material_target_warehouse=sett.other_item_warehouse
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
+		item_code=item.item_code
+		rate = get_incoming_rate({
+                                "item_code": item_code,
+                                "warehouse": row_material_target_warehouse,
+                                "posting_date": posting_date,
+                                "posting_time": posting_time,
+                                "qty": -1 * item.qty,
+                                'company':sett.company
+                            }) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(item.qty) * float(rate), precision)
+		stock_entry.append('items', {
+									's_warehouse': row_material_target_warehouse,
+									'item_code': item_code,
+									'qty': item.qty,
+									'actual_qty':item.qty,
+									'uom': item.uom,
+									'cost_center':cost_center,					
+									'ste_detail': item_account_details.name,
+									'stock_uom': stock_uom,
+									'expense_account':expense_account,
+									'valuation_rate': rate,
+									"basic_rate":rate, 	
+									"basic_amount":amount,  
+									"amount":amount,  
+									"transfer_qty":item.qty,
+									'conversion_factor': flt(conversion_factor),
+											
+					})
+
+	if len(items):
+		stock_entry.insert()
+		stock_entry.docstatus=1
+		stock_entry.save()
+
+	for item in items:
+		tbl=''
+		parent_field=item.parentfield
+		if parent_field=='laying_items':
+			tbl='Layer Other Items'
+		elif parent_field=='laying_medicine':
+			tbl='Layer Medicine'
+		elif parent_field=='laying_vaccine':
+			tbl='Layer Vaccine'
+		elif parent_field=='laying_feed':
+			tbl='Layer Feed'
+
+		litem=frappe.get_doc(tbl,item.name)
+		litem.docstatus=1
+		litem.stock_entry=stock_entry.name
+		litem.save()
+		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
+
+	return items
 	

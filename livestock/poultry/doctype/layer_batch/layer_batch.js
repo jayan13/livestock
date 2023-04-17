@@ -113,6 +113,12 @@ frappe.ui.form.on('Layer Batch', {
                                             if(r.message) 
                                                 { 
                                                     var doclist = frappe.model.sync(r.message);
+                                                    frm.doc.item_processed=1;
+                                                    frm.refresh_field('item_processed');
+                                                    frm.refresh_field('rearing_feed');
+                                                    frm.refresh_field('rearing_items');
+                                                    frm.refresh_field('rearing_medicine');
+                                                    frm.refresh_field('rearing_vaccine'); 
                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
                                                 } 
                                         }
@@ -1669,6 +1675,167 @@ frappe.ui.form.on('Layer Batch', {
                             }
                     }
                 }
+                d.show();
+            },
+            import_items_from_material_transfer_lay:function(frm)
+            {
+                let d = new frappe.ui.Dialog({
+                    title: 'Import Items From Material Transfer',
+                    fields: [                        
+                        {
+                            label: 'Material Transfer',
+                            fieldname: 'stock_entry',
+                            fieldtype: 'Link',
+                            options:'Stock Entry',
+                            reqd:'1'
+                        }
+                    ],
+                    primary_action_label: 'Import Items',
+                    primary_action(values) {                        
+                        
+                        frappe.call(
+                            { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.get_material_transfer_lay",
+                                args: {
+                                    material_transfer:values.stock_entry,
+                                    project:frm.doc.project,
+                                    shed:frm.doc.layer_shed,
+                                },
+                                callback: function(r) 
+                                    { 
+                                        var flg=0;
+                                        if(r.message.length > 0 ) 
+                                            { 
+                                                d.hide();
+                                                $.each (r.message,function(i, dt){
+                                                    if(dt.tbl=='vaccine')
+                                                    {
+                                                        let rw=frm.add_child("laying_vaccine");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('laying_vaccine');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                        flg=1;
+                                                    }
+                                                    if(dt.tbl=='medicine')
+                                                    {
+                                                        let rw=frm.add_child("laying_medicine");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('laying_medicine');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                        flg=1;
+                                                    }
+                                                    if(dt.tbl=='item')
+                                                    {
+                                                        let rw=frm.add_child("laying_items");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('laying_items');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                        flg=1;
+                                                    }
+                                                    if(dt.tbl=='feed')
+                                                    {
+                                                        let rw=frm.add_child("laying_feed");
+                                                        rw.date=dt.cdate;
+                                                        rw.item_code=dt.item_code;
+                                                        rw.qty=dt.qty;
+                                                        rw.uom=dt.uom;
+                                                        rw.rate=dt.basic_rate;
+                                                        rw.conversion_factor=dt.conversion_factor;
+                                                        rw.item_name=dt.item_name;
+                                                        rw.material_transfer=dt.material_transfer;
+                                                        frm.refresh_field('laying_feed');                                                
+                                                        $(".grid-add-row").hide();
+                                                        frm.doc.__unsaved=0;
+                                                        flg=1;
+                                                    } 
+                                                });
+
+                                                if(flg==0)
+                                                {
+                                                   
+                                                    frappe.throw('Items are not in corresponding warehouses or it is already added');
+                                                }
+                                                
+                                            } else{
+                                                d.hide();
+                                                frappe.throw('Items are not in corresponding warehouses or it is already added');
+                                            }
+                                    }
+                            });
+       
+                    }
+                });
+                d.fields_dict['stock_entry'].get_query = function(){
+                    return {
+                            filters:{
+                                    "stock_entry_type": 'Material Transfer',
+                                    "docstatus":'1',
+                                    "company":frm.doc.company
+                            }
+                    }
+                }
+                d.show();
+            },
+            issue_imported_items:function(frm)
+            {
+                let d = new frappe.ui.Dialog({
+                    title: 'Imported Items Material Issue',
+                    fields: [                        
+                        {
+                            label: 'Issue Date',
+                            fieldname: 'date',
+                            fieldtype: 'Date',
+                            reqd:'1'
+                        }
+                    ],
+                    primary_action_label: 'Issue Materials',
+                    primary_action(values) {
+                        frappe.call(
+                            { 
+                                    method: "livestock.poultry.doctype.layer_batch.layer_batch.laying_material_issue",
+                                    args: {
+                                        batch:frm.doc.batch_name,
+                                        date:values.date
+                                    },
+                                    callback: function(r) {  
+                                        if(r.message) 
+                                        { 
+                                            d.hide();
+                                            //var doclist = frappe.model.sync(r.message);
+                                            //doclist[0].name
+                                            frm.refresh_field('laying_feed');
+                                            frm.refresh_field('laying_items');
+                                            frm.refresh_field('laying_medicine');
+                                            frm.refresh_field('laying_vaccine'); 
+                                        }   
+                                    }
+                            });
+                        }
+                });
                 d.show();
             }
 });
