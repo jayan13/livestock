@@ -37,7 +37,27 @@ frappe.ui.form.on('Layer Batch', {
         $('body').find('[data-fieldname="import_items_from_material_transfer"]').find('[data-fieldtype="Button"]').css("background-color",'green');
         $('body').find('[data-fieldname="import_items_from_material_transfer"]').find('[data-fieldtype="Button"]').css("color",'#fff');
         
+        $('body').find('[data-fieldname="add_egg_production"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_weight"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_temperature"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_mortality"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_items"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_weight"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_temperature"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_mortality"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_items"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+        $('body').find('[data-fieldname="add_rearing_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         
+                
+        $('body').find('[data-fieldname="issue_laying_items"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_laying_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         //frm.fields_dict["rearing_feed"].grid.wrapper.find(".btn-open-row").hide();
 
         var totom=0
