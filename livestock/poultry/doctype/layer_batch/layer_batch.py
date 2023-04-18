@@ -1567,6 +1567,6 @@ def laying_material_issue(batch,parentfield,items):
 		litem.stock_entry=stock_entry.name
 		litem.save()
 		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
-
+	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
 	return items
 	

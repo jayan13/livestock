@@ -85,7 +85,6 @@
   },
   {
    "default": "No",
-   "depends_on": "eval:doc.docstatus==0 && doc.parentfield=='laying_vaccine'",
    "fieldname": "issue",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -96,7 +95,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-17 17:02:29.978367",
+ "modified": "2023-04-18 11:52:18.803502",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Vaccine",
