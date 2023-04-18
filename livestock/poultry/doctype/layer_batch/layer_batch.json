@@ -45,15 +45,18 @@
   "add_rearing_weight",
   "laying_feed_section",
   "import_items_from_material_transfer_lay",
-  "issue_imported_items",
   "laying_feed",
   "add_laying_feed",
+  "issue_laying_feed",
   "laying_medicine",
   "add_laying_medicine",
+  "issue_laying_medicine",
   "laying_vaccine",
   "add_laying_vaccine",
+  "issue_laying_vaccine",
   "laying_items",
   "add_laying_items",
+  "issue_laying_items",
   "laying_mortality",
   "add_laying_mortality",
   "total_laying_mortality",
@@ -392,9 +395,24 @@
    "label": "Import Items From Material Transfer"
   },
   {
-   "fieldname": "issue_imported_items",
+   "fieldname": "issue_laying_feed",
    "fieldtype": "Button",
-   "label": "Issue Imported Items"
+   "label": "Issue Feed"
+  },
+  {
+   "fieldname": "issue_laying_medicine",
+   "fieldtype": "Button",
+   "label": "Issue Medicine"
+  },
+  {
+   "fieldname": "issue_laying_vaccine",
+   "fieldtype": "Button",
+   "label": "Issue Vaccine"
+  },
+  {
+   "fieldname": "issue_laying_items",
+   "fieldtype": "Button",
+   "label": "Issue Items"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -412,7 +430,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-04-17 09:21:44.643626",
+ "modified": "2023-04-18 10:55:19.349033",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",

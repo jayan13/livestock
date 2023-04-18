@@ -10,6 +10,7 @@
   "qty",
   "uom",
   "remark",
+  "issue",
   "item_name",
   "rate",
   "conversion_factor",
@@ -81,12 +82,20 @@
    "fieldtype": "Data",
    "label": "Material Transfer",
    "read_only": 1
+  },
+  {
+   "default": "No",
+   "fieldname": "issue",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Issued",
+   "options": "No\nYes"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-16 09:32:21.680916",
+ "modified": "2023-04-18 10:19:43.072835",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Medicine",

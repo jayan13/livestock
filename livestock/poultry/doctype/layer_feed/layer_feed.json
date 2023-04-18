@@ -9,6 +9,7 @@
   "item_code",
   "qty",
   "uom",
+  "issue",
   "item_name",
   "rate",
   "conversion_factor",
@@ -74,12 +75,21 @@
    "fieldtype": "Data",
    "label": "Material Transfer",
    "read_only": 1
+  },
+  {
+   "default": "No",
+   "depends_on": "eval:doc.docstatus==0 && doc.parentfield=='laying_feed'",
+   "fieldname": "issue",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Issued",
+   "options": "No\nYes"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-04-16 09:31:31.956655",
+ "modified": "2023-04-17 17:03:18.866073",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Feed",
