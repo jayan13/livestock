@@ -417,7 +417,8 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.stock_entry=stock_entry.name
 			litem.save()
 			frappe.db.set_value('Layer Mortality',itm.name, 'docstatus', 1)
-	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
+	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
 def create_stock_entry_mortality(item,parent_field=''):
@@ -492,7 +493,8 @@ def create_stock_entry_mortality(item,parent_field=''):
 	litem.stock_entry=stock_entry.name
 	litem.save()
 	frappe.db.set_value('Layer Mortality',item.name, 'docstatus', 1)
-	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
+	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
 def create_stock_entry(item,parent_field=''):
@@ -593,12 +595,13 @@ def create_stock_entry(item,parent_field=''):
 	if tbl:
 		litem=frappe.get_doc(tbl,item.name)
 		litem.docstatus=1
-		if tbl in ['laying_items','laying_medicine','laying_vaccine','laying_feed']:
+		if parent_field in ['laying_items','laying_medicine','laying_vaccine','laying_feed']:
 			litem.issue='Yes'
 		litem.stock_entry=stock_entry.name
 		litem.save()
 		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
-	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
+	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
 def create_production_stock_entry(fitemdata,batch,date,time):
@@ -754,7 +757,8 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		litem.save()
 		frappe.db.set_value('Egg Production',fitem.name, 'docstatus', 1)
 
-	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
+	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
 @frappe.whitelist()
@@ -1352,7 +1356,7 @@ def get_material_transfer_lay(material_transfer,project,shed):
 	return data
 	
 @frappe.whitelist()
-def laying_material_issue(batch,parentfield,items):
+def laying_materials_issue(batch,parentfield,items):
 	import json
 	aList = json.loads(items)
 	itemkeys=[]
@@ -1554,6 +1558,8 @@ def laying_material_issue(batch,parentfield,items):
 		parent_field=item.parentfield
 		if parent_field=='laying_items':
 			tbl='Layer Other Items'
+			expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
+			row_material_target_warehouse=sett.other_item_warehouse
 		elif parent_field=='laying_medicine':
 			tbl='Layer Medicine'
 		elif parent_field=='laying_vaccine':
@@ -1567,6 +1573,103 @@ def laying_material_issue(batch,parentfield,items):
 		litem.stock_entry=stock_entry.name
 		litem.save()
 		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
-	frappe.msgprint('Stock Entry '+str(stock_entry.name)+' created')
+	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return items
 	
+@frappe.whitelist()
+def laying_material_issue(batch,parentfield,items):
+	import json
+	aList = json.loads(items)
+	lbatch=frappe.get_doc('Layer Batch',batch)	
+	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	time=''
+	date=''
+	if date:
+		date=getdate(date)
+	
+	posting_date=date or nowdate() 
+	time=time or get_datetime()
+	posting_time=time.strftime("%H:%M:%S")
+	items=[]
+	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
+
+	for itm in aList:
+		row_name=itm.get('name')
+
+		if parentfield=='laying_vaccine':
+			item=frappe.get_doc('Layer Vaccine',row_name)
+			item_account_details = get_item_defaults(item.item_code, sett.company)
+			expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")
+		if parentfield=='laying_medicine':
+			item=frappe.get_doc('Layer Medicine',row_name)
+			item_account_details = get_item_defaults(item.item_code, sett.company)
+			expense_account=sett.medicine_expense_account or item_account_details.get("expense_account")
+			row_material_target_warehouse=sett.medicine_warehouse
+		if parentfield=='laying_feed':
+			item=frappe.get_doc('Layer Feed',row_name)
+			item_account_details = get_item_defaults(item.item_code, sett.company)
+			expense_account=sett.feed_expense_account or item_account_details.get("expense_account")
+			row_material_target_warehouse=sett.feed_warehouse
+		if parentfield=='laying_items':
+			item=frappe.get_doc('Layer Other Items',row_name)
+			item_account_details = get_item_defaults(item.item_code, sett.company)
+			expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
+			row_material_target_warehouse=sett.other_item_warehouse
+
+		posting_date=getdate(item.date)
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
+		item_code=item.item_code
+
+		stock_entry = frappe.new_doc("Stock Entry")    
+		stock_entry.company = lbatch.company	
+		stock_entry.stock_entry_type = "Material Issue"	
+		stock_entry.project = lbatch.project
+		stock_entry.posting_date=posting_date
+		stock_entry.set_posting_time='1'
+		stock_entry.posting_time=posting_time
+
+		rate = get_incoming_rate({
+									"item_code": item_code,
+									"warehouse": row_material_target_warehouse,
+									"posting_date": posting_date,
+									"posting_time": posting_time,
+									"qty": -1 * item.qty,
+									'company':sett.company
+								}) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(item.qty) * float(rate), precision)
+		stock_entry.append('items', {
+										's_warehouse': row_material_target_warehouse,
+										'item_code': item_code,
+										'qty': item.qty,
+										'actual_qty':item.qty,
+										'uom': item.uom,
+										'cost_center':cost_center,					
+										'ste_detail': item_account_details.name,
+										'stock_uom': stock_uom,
+										'expense_account':expense_account,
+										'valuation_rate': rate,
+										"basic_rate":rate, 	
+										"basic_amount":amount,  
+										"amount":amount,  
+										"transfer_qty":item.qty,
+										'conversion_factor': flt(conversion_factor),
+												
+						})
+
+		stock_entry.insert()
+		stock_entry.docstatus=1
+		stock_entry.save()
+
+		item.docstatus=1
+		item.issue='Yes'
+		item.stock_entry=stock_entry.name
+		item.save()
+		frappe.db.set_value(item.doctype, item.name, 'docstatus', 1)
+		items.append(item)
+	frappe.msgprint('Stock Entrys created')
+	return items

@@ -4,6 +4,7 @@
 frappe.ui.form.on('Layer Batch', {
 	 refresh: function(frm) {
 		$(".grid-add-row").hide();
+        //frm.get_field("egg_production").grid.df.cannot_delete_rows = true;
         frm.set_query('from_hatchery_project', function(doc, cdt, cdn) {
 		  
 			return {
@@ -333,11 +334,12 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
+                                                rw.issue='Yes'; 
                                                 frm.refresh_field('laying_feed');
                                                 frm.doc.__unsaved=0;
                                                 d.hide();
                                                 $(".grid-add-row").hide();
-                                                frm.reload_doc();
+                                                //frm.reload_doc();
                                             }
                                     }
                             });
@@ -524,11 +526,12 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
+                                                rw.issue='Yes'; 
                                                 frm.refresh_field('laying_medicine');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
-                                                frm.reload_doc();
+                                                //frm.reload_doc();
                                                 
                                             } 
                                     }
@@ -715,11 +718,12 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
+                                                rw.issue='Yes'; 
                                                 frm.refresh_field('laying_vaccine');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
-                                                frm.reload_doc();
+                                                //frm.reload_doc();
                                             } 
                                     }
                             });
@@ -892,11 +896,12 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
+                                                rw.issue='Yes'; 
                                                 frm.refresh_field('laying_items');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
-                                                frm.reload_doc();
+                                                //frm.reload_doc();
                                             } 
                                     }
                             });
@@ -1084,7 +1089,7 @@ frappe.ui.form.on('Layer Batch', {
                                                 d.hide();
                                                 $(".grid-add-row").hide();
                                                 frm.doc.__unsaved=0;
-                                                frm.reload_doc()
+                                                //frm.reload_doc()
                                             } 
                                     }
                             });
@@ -1530,7 +1535,7 @@ frappe.ui.form.on('Layer Batch', {
                                                                     //doclist[0].name
                                                                     //var doclist = frappe.model.sync(rs.message);
                                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
-                                                                    frm.reload_doc();
+                                                                    //frm.reload_doc();
                                                                 } 
                                                         }
                                                 }); 
@@ -1863,7 +1868,14 @@ frappe.ui.form.on('Layer Batch', {
                                 callback: function(r) {  
                                     if(r.message) 
                                     {  
-                                        frm.reload_doc();
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('laying_feed');
                                     }   
                                 }
                         });
@@ -1902,7 +1914,14 @@ frappe.ui.form.on('Layer Batch', {
                                 callback: function(r) {  
                                     if(r.message) 
                                     {  
-                                        frm.reload_doc();
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('laying_medicine');
                                     }   
                                 }
                         });
@@ -1940,7 +1959,14 @@ frappe.ui.form.on('Layer Batch', {
                                 callback: function(r) {  
                                     if(r.message) 
                                     {  
-                                        frm.reload_doc();
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('laying_vaccine');
                                     }   
                                 }
                         });
@@ -1978,7 +2004,14 @@ frappe.ui.form.on('Layer Batch', {
                                 callback: function(r) {  
                                     if(r.message) 
                                     {  
-                                        frm.reload_doc();
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('laying_items');
                                     }   
                                 }
                         });
@@ -1987,6 +2020,7 @@ frappe.ui.form.on('Layer Batch', {
                     frappe.throw("Please select not issued items for Issuing");
                 }
             },
+           
 });
 
 
@@ -3166,6 +3200,8 @@ frappe.ui.form.on('Layer Weight', {
 frappe.ui.form.on('Egg Production', {
     refresh: function(frm, cdt, cdn) {
         //console.log("ref");
+        //$(".grid-add-row").hide();
+        //$(".grid-remove-rows").hide();
     },
     qty:function(frm, cdt, cdn) {
         var d = locals[cdt][cdn];
