@@ -61,6 +61,92 @@ frappe.ui.form.on('Layer Batch', {
         $('body').find('[data-fieldname="issue_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         //frm.fields_dict["rearing_feed"].grid.wrapper.find(".btn-open-row").hide();
 
+        if(frm.doc.item_processed > 0 )
+        {
+            
+            frm.get_field("rearing_feed").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_items").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_vaccine").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_medicine").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_temperature").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_weight").grid.df.cannot_delete_rows = true;
+            frm.get_field("rearing_daily_mortality").grid.df.cannot_delete_rows = true;
+        }else{
+            frm.fields_dict['rearing_feed'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_medicine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_items'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_daily_mortality'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_temperature'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+    
+            frm.fields_dict['rearing_weight'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+                $(".grid-add-row").hide();
+                $(".grid-remove-rows").hide();
+            });
+        }
+        frm.fields_dict['egg_production'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_feed'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_medicine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_items'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_mortality'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_temperature'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
+        frm.fields_dict['laying_weight'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            $(".grid-add-row").hide();
+			$(".grid-remove-rows").hide();
+        });
+
         var totom=0
         $.each (frm.doc.laying_mortality, function(i, dt){
             totom+=dt.total; 
@@ -3327,6 +3413,10 @@ frappe.ui.form.on('Egg Production', {
             }
         }
  
+    },
+    egg_production_on_form_rendered:function(frm, cdt, cdn) {
+        frm.fields_dict["egg_production"].grid.wrapper.find('.grid-remove-rows').hide();
+        //frm.get_field("egg_production").grid.df.cannot_delete_rows = true;
     }
 });
 
