@@ -1593,7 +1593,7 @@ def laying_material_issue(batch,parentfield,items):
 	posting_time=time.strftime("%H:%M:%S")
 	items=[]
 	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-
+	
 	for itm in aList:
 		row_name=itm.get('name')
 
@@ -1601,6 +1601,7 @@ def laying_material_issue(batch,parentfield,items):
 			item=frappe.get_doc('Layer Vaccine',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
 			expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")
+			row_material_target_warehouse=sett.vaccine_warehouse
 		if parentfield=='laying_medicine':
 			item=frappe.get_doc('Layer Medicine',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
