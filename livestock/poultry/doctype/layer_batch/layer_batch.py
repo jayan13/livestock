@@ -1597,6 +1597,7 @@ def laying_material_issue(batch,parentfield,items):
 	for itm in aList:
 		row_name=itm.get('name')
 
+		row_material_target_warehouse=''
 		if parentfield=='laying_vaccine':
 			item=frappe.get_doc('Layer Vaccine',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
