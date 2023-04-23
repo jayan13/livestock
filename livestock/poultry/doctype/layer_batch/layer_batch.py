@@ -1213,33 +1213,76 @@ def get_material_transfer(material_transfer,project,shed):
 	if medidx and medidx[0][0] is not None:
 		oidx = cint(medidx[0][0])+1
 
+	retdata=[]
 
 	if data:
 		for dt in data:
+			issuedqty=0
+			tranqty=0
 			if sett.vaccine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
-				vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
-				vidx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
+					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
+					vidx+=1
+					retdata.append(dt)
 
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
-				med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
-				midx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Medicine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
+					med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_medicine'})
+					midx+=1
+					retdata.append(dt)
 
 			if sett.other_item_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
-				other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
-				oidx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Other Items` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'item','material_transfer':material_transfer})
+					other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_items'})
+					oidx+=1
+					retdata.append(dt)
 
 			if sett.feed_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
-				feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
-				fidx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Feed` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
+					feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_feed'})
+					fidx+=1
+					retdata.append(dt)
 		
 		if len(vacc):
 			for vc in vacc:
@@ -1266,7 +1309,7 @@ def get_material_transfer(material_transfer,project,shed):
 				childtbl.save()
 			
 		
-	return data
+	return retdata
 
 @frappe.whitelist()
 def get_material_transfer_lay(material_transfer,project,shed):
@@ -1300,33 +1343,78 @@ def get_material_transfer_lay(material_transfer,project,shed):
 	if medidx and medidx[0][0] is not None:
 		oidx = cint(medidx[0][0])+1
 
+	retdata=[]
 
 	if data:
 		for dt in data:
+			issuedqty=0
+			tranqty=0
+				
 			if sett.vaccine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
-				vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_vaccine'})
-				vidx+=1
+				
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
+					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_vaccine'})
+					vidx+=1
+					retdata.append(dt)
 
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
-				med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_medicine'})
-				midx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Medicine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'medicine','material_transfer':material_transfer})
+					med.append({'idx':midx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_medicine'})
+					midx+=1
+					retdata.append(dt)
 
 			if sett.other_item_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Other Items", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'item','material_transfer':material_transfer})
-				other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_items'})
-				oidx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Other Items` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'item','material_transfer':material_transfer})
+					other.append({'idx':oidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_items'})
+					oidx+=1
+					retdata.append(dt)
 
 			if sett.feed_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Feed", {"material_transfer": material_transfer}):
-				dt.update({'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
-				feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_feed'})
-				fidx+=1
+				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Feed` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
+				if chk:
+					issuedqty=chk[0].qty or 0
+				if float(issuedqty) < float(dt.qty):
+					if issuedqty > 0:
+						tranqty=float(dt.qty)-float(issuedqty)
+					else:
+						tranqty=float(dt.qty)
+				if tranqty>0:
+					dt.update({'qty':tranqty,'date':posting_date,'tbl':'feed','material_transfer':material_transfer})					
+					feed.append({'idx':fidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_feed'})
+					fidx+=1
+					retdata.append(dt)
 		
 		if len(vacc):
 			for vc in vacc:
@@ -1353,7 +1441,7 @@ def get_material_transfer_lay(material_transfer,project,shed):
 				childtbl.save()
 			
 		
-	return data
+	return retdata
 	
 @frappe.whitelist()
 def laying_materials_issue(batch,parentfield,items):
