@@ -287,7 +287,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			batch_no=''
 			if item_account_details.has_batch_no:
 				manufacture_date=posting_date.strftime("%d-%m-%Y")
-				batch_no='LH'+'-'+str(manufacture_date)
+				batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
 				if not frappe.db.exists("Batch", {"name": batch_no}):
 					batch = frappe.new_doc("Batch")
 					batch.batch_id=batch_no
@@ -446,6 +446,12 @@ def create_stock_entry_mortality(item,parent_field=''):
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
 	stock_entry.set_posting_time='1'
+	batch_no=''
+	rearbatch=frappe.db.sql("""select d.batch_no as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
+	d.item_code='{0}' and s.stock_entry_type='Manufacture' and s.manufacturing_type='Layer Chicken' and 
+	s.docstatus=1 and s.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
+	if rearbatch:
+		batch_no=rearbatch[0].batch_no
 
 	item_account_details = get_item_defaults(item_code, sett.company)
 	expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
@@ -481,6 +487,7 @@ def create_stock_entry_mortality(item,parent_field=''):
                                 "amount":amount,  
                                 "transfer_qty":qty,
                                 'conversion_factor': flt(conversion_factor),
+								'batch_no':batch_no,
                                         
                 })
 	stock_entry.insert()
