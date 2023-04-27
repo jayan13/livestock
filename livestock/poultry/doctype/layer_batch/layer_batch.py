@@ -40,6 +40,9 @@ class LayerBatch(Document):
 				pjt.expected_end_date=nowdate()
 			pjt.save()
 
+		if self.status=='Completed':
+			frappe.db.set_value('Layer Batch',self.name,'item_processed','2')
+
 @frappe.whitelist()
 def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=''):
 	lbatch=frappe.get_doc('Layer Batch',batch)
@@ -447,18 +450,20 @@ def create_stock_entry_mortality(item,parent_field=''):
 	stock_entry.posting_date=posting_date
 	stock_entry.set_posting_time='1'
 	batch_no=''
-	rearbatch=frappe.db.sql("""select d.batch_no as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
+	rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
 	d.item_code='{0}' and s.stock_entry_type='Manufacture' and s.manufacturing_type='Layer Chicken' and 
 	s.docstatus=1 and s.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
+	row_material_target_warehouse=sett.row_material_target_warehouse
 	if rearbatch:
 		batch_no=rearbatch[0].batch_no
+		row_material_target_warehouse=rearbatch[0].t_warehouse or sett.row_material_target_warehouse
 
 	item_account_details = get_item_defaults(item_code, sett.company)
 	expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
 	stock_uom = item_account_details.stock_uom
 	conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor")
 	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-	row_material_target_warehouse=sett.row_material_target_warehouse
+	
 	rate = get_incoming_rate({
                                 "item_code": item_code,
                                 "warehouse": row_material_target_warehouse,
