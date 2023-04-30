@@ -162,12 +162,12 @@ frappe.ui.form.on('Layer Batch', {
         frm.refresh_field('total_mortaliy');
 
 
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality-frm.doc.total_mortaliy
+        frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality-frm.doc.total_mortaliy-frm.doc.sales_qty
         frm.refresh_field('current_alive_chicks');
 
         //====================================================
         //frm.doc.egg_category
-        if (frm.doc.item_processed!=1)
+        if (frm.doc.item_processed==0)
         {       
             frm.add_custom_button(__('Transfer Flock To layer Shed'), function(){
         
@@ -247,6 +247,52 @@ frappe.ui.form.on('Layer Batch', {
            
                 }).removeClass("btn-default").addClass("btn-success");
         }
+
+              
+				frm.add_custom_button(__('Create Sales Invoice'), function(){
+            
+                    
+                        
+                        frappe.prompt(
+                            [
+                            {  fieldtype: "Int",
+                                label: __("Sales Quantity"),
+                                fieldname: "transfer_qty",
+                                reqd:'1'                                
+                            },{  fieldtype: "Date",
+                            label: __("Transfer Date"),
+                            fieldname: "transfer_date",
+                            reqd:'1'                                
+                            }
+                            ],
+                            function(data) {
+                                
+                                frappe.call(
+                                    { 
+                                        method: "livestock.poultry.doctype.layer_batch.layer_batch.sales_entry",
+                                        args: {
+                                            batch:frm.doc.name,
+                                            transfer_qty:data.transfer_qty,
+                                            transfer_date:data.transfer_date,                                            
+                                        },
+                                        callback: function(r) 
+                                            { 
+                                                if(r.message) 
+                                                    { 
+                                                        var doclist = frappe.model.sync(r.message);
+                                                        frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
+                                                    } 
+                                            }
+                                    });
+                            },
+                            __("Create Sales Invoice"),
+                            __("Confirm")
+                        );       
+                //console.log(frm.doc);  
+                    
+               
+                    }).removeClass("btn-default").addClass("btn-success");
+			
 	 },
      number_received:function(frm)
      {
@@ -264,13 +310,15 @@ frappe.ui.form.on('Layer Batch', {
      },
      total_laying_mortality:function(frm)
      {
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality
-        frm.refresh_field('current_alive_chicks');
+        //frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality
+        //frm.refresh_field('current_alive_chicks');
+        //console.log("mortalil");
      },
      total_mortaliy:function(frm)
      {
-        frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_mortaliy
-        frm.refresh_field('current_alive_chicks');
+        //frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_mortaliy
+        //frm.refresh_field('current_alive_chicks');
+        //console.log("mortali");
      },
      add_rearing_feed:function(frm)
      {
@@ -2860,6 +2908,9 @@ frappe.ui.form.on('Layer Mortality', {
             frm.doc.total_laying_mortality=totom
             frm.refresh_field('total_laying_mortality');
 
+            frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality-frm.doc.total_mortaliy-frm.doc.sales_qty
+            frm.refresh_field('current_alive_chicks');
+
         frm.doc.__unsaved=0;
         d.__unsaved=0;
         
@@ -2903,11 +2954,14 @@ frappe.ui.form.on('Layer Mortality', {
             });
             frm.doc.total_laying_mortality=totom
             frm.refresh_field('total_laying_mortality');
+            
+            frm.doc.current_alive_chicks=frm.doc.doc_placed-frm.doc.total_laying_mortality-frm.doc.total_mortaliy-frm.doc.sales_qty
+            frm.refresh_field('current_alive_chicks');
 
         frm.doc.__unsaved=0;
         d.__unsaved=0;
         
-    },
+    },    
     date:function(frm, cdt, cdn) {
         var d = locals[cdt][cdn];
             frappe.call(

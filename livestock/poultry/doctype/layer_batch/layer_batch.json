@@ -26,6 +26,7 @@
   "flock_transfer_date",
   "project",
   "status",
+  "layer_status",
   "rearing_period_section",
   "import_items_from_material_transfer",
   "rearing_feed",
@@ -66,7 +67,8 @@
   "add_laying_weight",
   "egg_production",
   "add_egg_production",
-  "item_processed"
+  "item_processed",
+  "sales_qty"
  ],
  "fields": [
   {
@@ -85,7 +87,7 @@
   {
    "default": "0",
    "fieldname": "number_received",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Number Of DOC Received"
   },
   {
@@ -96,7 +98,7 @@
   {
    "default": "0",
    "fieldname": "mortality",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Received DOC Mortality"
   },
   {
@@ -114,7 +116,7 @@
    "default": "0",
    "description": "Number of doc placed in the broiler shed ",
    "fieldname": "doc_placed",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "DOC Placed"
   },
   {
@@ -126,7 +128,7 @@
   {
    "default": "0",
    "fieldname": "current_alive_chicks",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Current Alive Chicks",
    "read_only": 1
   },
@@ -200,31 +202,37 @@
    "label": "Total Mortality"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_feed",
    "fieldtype": "Button",
    "label": "Add Feed"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_medicine",
    "fieldtype": "Button",
    "label": "Add Medicine"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_vaccine",
    "fieldtype": "Button",
    "label": "Add Vaccine"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_items",
    "fieldtype": "Button",
    "label": "Add Items"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_mortality",
    "fieldtype": "Button",
    "label": "Add Mortality"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_temperature",
    "fieldtype": "Button",
    "label": "Add Temperature"
@@ -250,6 +258,7 @@
    "options": "Layer Feed"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_feed",
    "fieldtype": "Button",
    "label": "Add Feed"
@@ -261,6 +270,7 @@
    "options": "Layer Medicine"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_medicine",
    "fieldtype": "Button",
    "label": "Add Medicine"
@@ -272,6 +282,7 @@
    "options": "Layer Vaccine"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_vaccine",
    "fieldtype": "Button",
    "label": "Add Vaccine"
@@ -283,6 +294,7 @@
    "options": "Layer Other Items"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_items",
    "fieldtype": "Button",
    "label": "Add Item"
@@ -294,6 +306,7 @@
    "options": "Layer Mortality"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_mortality",
    "fieldtype": "Button",
    "label": "Add Mortality"
@@ -301,8 +314,7 @@
   {
    "fieldname": "total_mortaliy",
    "fieldtype": "Int",
-   "label": "Total Mortaliy",
-   "read_only": 1
+   "label": "Total Mortaliy"
   },
   {
    "fieldname": "rearing_temperature",
@@ -311,6 +323,7 @@
    "options": "Layer Temperature"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_temperature",
    "fieldtype": "Button",
    "label": "Add Temperature"
@@ -322,13 +335,14 @@
    "options": "Layer Weight"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "add_rearing_weight",
    "fieldtype": "Button",
    "label": "Add Weight"
   },
   {
    "fieldname": "flock_transferred_to_layer",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Flock Transferred To Layer",
    "read_only": 1
   },
@@ -357,6 +371,7 @@
    "label": "Flock Transfer Date"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_laying_weight",
    "fieldtype": "Button",
    "label": "Add Weight"
@@ -368,6 +383,7 @@
    "options": "Egg Production"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "add_egg_production",
    "fieldtype": "Button",
    "label": "Add Egg Production"
@@ -385,34 +401,55 @@
    "label": "DOC Placed Date"
   },
   {
+   "depends_on": "eval:doc.item_processed==0",
    "fieldname": "import_items_from_material_transfer",
    "fieldtype": "Button",
    "label": "Import Items From Material Transfer"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "import_items_from_material_transfer_lay",
    "fieldtype": "Button",
    "label": "Import Items From Material Transfer"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "issue_laying_feed",
    "fieldtype": "Button",
    "label": "Issue Feed"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "issue_laying_medicine",
    "fieldtype": "Button",
    "label": "Issue Medicine"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "issue_laying_vaccine",
    "fieldtype": "Button",
    "label": "Issue Vaccine"
   },
   {
+   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "issue_laying_items",
    "fieldtype": "Button",
    "label": "Issue Items"
+  },
+  {
+   "default": "Rearing",
+   "fieldname": "layer_status",
+   "fieldtype": "Select",
+   "label": "Layer Status",
+   "options": "Rearing\nLaying",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sales_qty",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Sales Qty"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -430,7 +467,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-04-18 10:55:19.349033",
+ "modified": "2023-04-30 16:37:07.680706",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",

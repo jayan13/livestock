@@ -369,6 +369,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry.save()
 	lbatch.rooster_qty=rooster_qty
 	lbatch.item_processed=1
+	lbatch.layer_status='Laying'
 	lbatch.flock_transfer_date=posting_date
 	lbatch.save()
 	items=frappe.db.get_all('Layer Other Items',filters={'parentfield':'rearing_items','parent':batch},fields=['name'])
@@ -1177,6 +1178,7 @@ def cancel_item(doc,event):
 		batch=frappe.db.get_value("Layer Feed",{"stock_entry": doc.name},['parent'])
 		if batch:
 			frappe.db.set_value('Layer Batch', batch, 'item_processed', '0')
+			frappe.db.set_value('Layer Batch', batch, 'layer_status', 'Rearing')
 			frappe.db.set_value('Layer Batch', batch, 'flock_transferred_to_layer', '0')
 			
 
@@ -1775,3 +1777,128 @@ def laying_material_issue(batch,parentfield,items):
 		items.append(item)
 	frappe.msgprint('Stock Entrys created')
 	return items
+
+@frappe.whitelist()
+def sales_entry(batch,transfer_qty,transfer_date):
+	lbatch=frappe.get_doc('Layer Batch',batch)
+	
+	if lbatch.item_processed=='0':
+		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+		item=sett.base_row_material
+		warehouse=sett.row_material_target_warehouse
+		batch_no=''	
+	else:
+		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+		item=sett.base_row_material
+		warehouse=sett.row_material_target_warehouse
+		rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
+	d.item_code='{0}' and s.stock_entry_type='Manufacture' and s.manufacturing_type='Layer Chicken' and 
+	s.docstatus=1 and s.project='{1}' """.format(item,lbatch.project),as_dict=1)
+		
+		if rearbatch:
+			batch_no=rearbatch[0].batch_no
+			warehouse=rearbatch[0].t_warehouse or sett.row_material_target_warehouse
+
+	
+	transfer_qty=float(transfer_qty)
+
+	sales = frappe.new_doc("Sales Invoice")
+	sales.company = sett.company
+	sales.posting_date=transfer_date
+	sales.project=lbatch.project
+	sales.cost_center=sett.cost_center
+
+	item_account_details = get_item_defaults(item, sett.company)
+	stock_uom = item_account_details.stock_uom
+	conversion_factor = get_conversion_factor(item, stock_uom).get("conversion_factor")
+	cost_center=sett.cost_center or item_account_details.get("buying_cost_center")
+	expense_account=item_account_details.get("expense_account")
+	base_row_rate = get_incoming_rate({
+						"item_code": item,
+						"warehouse": warehouse,
+						"posting_date": sales.posting_date,
+						"posting_time": sales.posting_time,
+						"qty": -1 * transfer_qty,
+                        'company':sett.company
+					})
+	if warehouse:
+		validate_stock_qty(item,transfer_qty,warehouse,stock_uom,stock_uom)
+
+	precision = cint(frappe.db.get_default("float_precision")) or 3    
+	amount=flt(transfer_qty * flt(base_row_rate), precision)
+	sales.append('items', {
+                        'warehouse': warehouse,
+                        'item_code': item,
+						'item_name':item_account_details.item_name,
+                        'qty': transfer_qty,
+                        'uom': stock_uom,
+                        'cost_center':cost_center,				
+                        'stock_uom': stock_uom,
+                        'expense_account':expense_account,
+                        'rate': base_row_rate,                        
+                        "amount":amount, 
+                        'conversion_factor': flt(conversion_factor),                         
+        })
+
+	return sales.as_dict()
+
+def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
+    
+    if uom != stock_uom:
+        conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor") or 1
+        stock_qty=flt(req_qty*flt(conversion_factor),2)
+    else:
+        stock_qty=flt(req_qty,2)
+
+    qty=frappe.db.get_value('Bin', {'item_code': item_code,'warehouse':warehouse}, ['actual_qty as qty'],debug=0)
+    qty=qty or 0
+    if(stock_qty > qty):
+        frappe.throw(_("Req Qty {0}. There is no sufficient qty in {1} Please select another warehouse for {2}").format(stock_qty,warehouse,item_code))
+
+@frappe.whitelist()
+def sales_submit(doc,event):
+	lbatch=frappe.get_doc('Layer Batch',doc.project)
+	if lbatch:
+		if lbatch.rearing_shed:
+			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+			reare_item=sett.base_row_material
+			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,reare_item),as_dict=1)
+			if rs:
+				sales_qty=float(lbatch.sales_qty)+float(rs[0].qty)
+				current_alive_chicks=float(lbatch.current_alive_chicks)-float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+			
+		if lbatch.layer_shed:
+			sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+			layer_item=sett.base_row_material
+			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,layer_item),as_dict=1)
+			if rs:
+				sales_qty=float(lbatch.sales_qty)+float(rs[0].qty)
+				current_alive_chicks=float(lbatch.current_alive_chicks)-float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+		
+
+@frappe.whitelist()
+def sales_cancel(doc,event):
+	lbatch=frappe.get_doc('Layer Batch',doc.project)
+	if lbatch:
+		if lbatch.rearing_shed:
+			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+			reare_item=sett.base_row_material
+			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,reare_item),as_dict=1)
+			if rs:
+				sales_qty=float(lbatch.sales_qty)-float(rs[0].qty)
+				current_alive_chicks=float(lbatch.current_alive_chicks)+float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+		if lbatch.layer_shed:
+			sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+			layer_item=sett.base_row_material
+			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,layer_item),as_dict=1)
+			if rs:
+				sales_qty=float(lbatch.sales_qty)-float(rs[0].qty)
+				current_alive_chicks=float(lbatch.current_alive_chicks)+float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
