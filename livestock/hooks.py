@@ -122,12 +122,12 @@ doc_events = {
 		"on_submit":[
 			"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.update_item_stat",
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_selling_cost",
-			"livestock.poultry.doctype.layer_batch.layer_batch.sales_submit"
+			#"livestock.poultry.doctype.layer_batch.layer_batch.sales_submit"
 		],
 		"on_cancel":[
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.cancel_selling_cost",
 			"livestock.slaughtering.doctype.chicken_co_packing.sales_invoice.cancel_item",
-			"livestock.poultry.doctype.layer_batch.layer_batch.sales_cancel"
+			#"livestock.poultry.doctype.layer_batch.layer_batch.sales_cancel"
 		]
 	}
 }
