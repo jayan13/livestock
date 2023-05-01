@@ -645,6 +645,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		time=time or get_datetime()
 		posting_time=time.strftime("%H:%M:%S")
 
+		pcmaterials=''
 		if fitem.bom:
 			pcmaterials=frappe.get_doc('Finished Product BOM',fitem.bom)
 		else:
@@ -660,45 +661,46 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		itemscost=0
 		item_account_details = get_item_defaults(fitem.item_code, lbatch.company)
 		stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
-		for pcitem in pcmaterials.packing_item:
-			pack_item_details = get_item_defaults(pcitem.item, lbatch.company)
-			stock_uom = pack_item_details.stock_uom
-			conversion_factor = get_conversion_factor(pcitem.item, pcitem.uom).get("conversion_factor")
-			cost_center=sett.cost_center or pack_item_details.get("buying_cost_center")
-			#expense_account=pack_item_details.get("expense_account")		
-			expense_account=stock_adjustment_account or item_account_details.get("expense_account")                
-			item_name=pack_item_details.get("item_name")
-			packed_qty=float(pcitem.qty)*float(fitem.qty)
-			pck_rate = get_incoming_rate({
-							"item_code": pcitem.item,
-							"warehouse": sett.packing_material_source_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * packed_qty,
-							'company':lbatch.company
-						}) or 0
-									
-			transfer_qty=flt(float(packed_qty) * float(conversion_factor),6)
-			amount=flt(float(transfer_qty) * float(pck_rate), precision)
-			itemscost+=transfer_qty * pck_rate
-			#pcitems.append({
-			stock_entry.append('items', {
-						's_warehouse': sett.packing_material_source_warehouse,
-						'item_code': pcitem.item,
-						'qty': packed_qty,
-						'actual_qty':packed_qty,
-						'uom': pcitem.uom,
-						'cost_center':cost_center,					
-						'ste_detail': item_name,
-						'stock_uom': stock_uom,
-						'expense_account':expense_account,
-						'valuation_rate': pck_rate,
-						"basic_rate":pck_rate, 	
-						"basic_amount":amount,  
-						"amount":amount,  
-						"transfer_qty":transfer_qty,
-						'conversion_factor': flt(conversion_factor),
-						}) 
+		if pcmaterials:
+			for pcitem in pcmaterials.packing_item:
+				pack_item_details = get_item_defaults(pcitem.item, lbatch.company)
+				stock_uom = pack_item_details.stock_uom
+				conversion_factor = get_conversion_factor(pcitem.item, pcitem.uom).get("conversion_factor")
+				cost_center=sett.cost_center or pack_item_details.get("buying_cost_center")
+				#expense_account=pack_item_details.get("expense_account")		
+				expense_account=stock_adjustment_account or item_account_details.get("expense_account")                
+				item_name=pack_item_details.get("item_name")
+				packed_qty=float(pcitem.qty)*float(fitem.qty)
+				pck_rate = get_incoming_rate({
+								"item_code": pcitem.item,
+								"warehouse": sett.packing_material_source_warehouse,
+								"posting_date": posting_date,
+								"posting_time": posting_time,
+								"qty": -1 * packed_qty,
+								'company':lbatch.company
+							}) or 0
+										
+				transfer_qty=flt(float(packed_qty) * float(conversion_factor),6)
+				amount=flt(float(transfer_qty) * float(pck_rate), precision)
+				itemscost+=transfer_qty * pck_rate
+				#pcitems.append({
+				stock_entry.append('items', {
+							's_warehouse': sett.packing_material_source_warehouse,
+							'item_code': pcitem.item,
+							'qty': packed_qty,
+							'actual_qty':packed_qty,
+							'uom': pcitem.uom,
+							'cost_center':cost_center,					
+							'ste_detail': item_name,
+							'stock_uom': stock_uom,
+							'expense_account':expense_account,
+							'valuation_rate': pck_rate,
+							"basic_rate":pck_rate, 	
+							"basic_amount":amount,  
+							"amount":amount,  
+							"transfer_qty":transfer_qty,
+							'conversion_factor': flt(conversion_factor),
+							}) 
 		stock_uom = item_account_details.stock_uom
 		
 		conversion_factor = get_conversion_factor(fitem.item_code, fitem.uom).get("conversion_factor")
