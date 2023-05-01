@@ -1857,7 +1857,8 @@ def validate_stock_qty(item_code,req_qty,warehouse,uom,stock_uom):
 
 @frappe.whitelist()
 def sales_submit(doc,event):
-	lbatch=frappe.get_doc('Layer Batch',doc.project)
+	
+	lbatch=frappe.db.sql(""" select * from `tabLayer Batch` where name='{0}' """.format(doc.project),as_dict=1)
 	if lbatch:
 		if lbatch.rearing_shed:
 			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
@@ -1882,7 +1883,7 @@ def sales_submit(doc,event):
 
 @frappe.whitelist()
 def sales_cancel(doc,event):
-	lbatch=frappe.get_doc('Layer Batch',doc.project)
+	lbatch=frappe.db.sql(""" select * from `tabLayer Batch` where name='{0}' """.format(doc.project),as_dict=1)
 	if lbatch:
 		if lbatch.rearing_shed:
 			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
