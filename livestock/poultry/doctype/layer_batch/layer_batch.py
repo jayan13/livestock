@@ -1807,6 +1807,7 @@ def sales_entry(batch,transfer_qty,transfer_date):
 	sales.posting_date=transfer_date
 	sales.project=lbatch.project
 	sales.cost_center=sett.cost_center
+	sales.set_posting_time='1'
 
 	item_account_details = get_item_defaults(item, sett.company)
 	stock_uom = item_account_details.stock_uom
