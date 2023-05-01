@@ -716,7 +716,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 			itemname=str(fitem.item_code)
 			itemname=itemname[0:2]
 			cat=sett.egg_category or 'Normal'
-			pre_fix=frappe.db.get_value('Egg Finished Item Production Settings',{'item':fitem.item_code,'category':cat},'batch_prefix')
+			pre_fix=frappe.db.get_value('Egg Finished Item Production Settings',{'item_code':fitem.item_code,'category':cat},'batch_prefix')
 			pre_fix= pre_fix or itemname
 			batch_no=str(pre_fix)+'-'+str(manufacture_date)		
 			if not frappe.db.exists("Batch", {"name": batch_no}):
