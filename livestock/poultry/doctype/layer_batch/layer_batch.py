@@ -71,6 +71,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
+	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'
 	stock_entry.purpose = "Manufacture"
 	stock_entry.stock_entry_type = "Manufacture"
 	stock_entry.manufacturing_type = "Layer Chicken"
@@ -195,7 +196,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 									
 			})
 			total_add_cost=total_add_cost+amount
-
+	'''
 	vaccines=frappe.db.get_list('Layer Vaccine',filters={'parent':batch,'parentfield':'rearing_vaccine'},
     fields=['item_code,sum(qty) as qty'],group_by='item_code')
 	if vaccines:
@@ -235,7 +236,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 									
 			})
 			total_add_cost=total_add_cost+amount
-
+	'''
 	items=frappe.db.get_list('Layer Other Items',filters={'parent':batch,'parentfield':'rearing_items'},
     fields=['item_code,sum(qty) as qty'],group_by='item_code')
 	if items:
@@ -381,7 +382,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.stock_entry=stock_entry.name
 			litem.save()
 			frappe.db.set_value('Layer Other Items',itm.name, 'docstatus', 1)
-
+	'''
 	vaccines=frappe.db.get_all('Layer Vaccine',filters={'parentfield':'rearing_vaccine','parent':batch},fields=['name'])
 	if vaccines:
 		for itm in vaccines:
@@ -391,7 +392,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 			litem.stock_entry=stock_entry.name
 			litem.save()
 			frappe.db.set_value('Layer Vaccine',itm.name, 'docstatus', 1)
-
+	'''
 	medicines=frappe.db.get_all('Layer Medicine',filters={'parentfield':'rearing_medicine','parent':batch},fields=['name'])
 	if medicines:
 		for itm in medicines:
@@ -445,7 +446,8 @@ def create_stock_entry_mortality(item,parent_field=''):
 	posting_time=time.strftime("%H:%M:%S")
 
 	stock_entry = frappe.new_doc("Stock Entry")    
-	stock_entry.company = lbatch.company	
+	stock_entry.company = lbatch.company
+	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
 	stock_entry.stock_entry_type = "Material Issue"	
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
@@ -527,7 +529,8 @@ def create_stock_entry(item,parent_field=''):
 	posting_time=time.strftime("%H:%M:%S")
 
 	stock_entry = frappe.new_doc("Stock Entry")    
-	stock_entry.company = lbatch.company	
+	stock_entry.company = lbatch.company
+	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
 	stock_entry.stock_entry_type = "Material Issue"	
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
@@ -624,7 +627,8 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
 
 	stock_entry = frappe.new_doc("Stock Entry")    
-	stock_entry.company = lbatch.company    
+	stock_entry.company = lbatch.company
+	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'    
 	stock_entry.posting_date = date
 	stock_entry.posting_time = time
 	stock_entry.set_posting_time='1'
@@ -867,7 +871,7 @@ def update_medicine_rearing(idx,parent,parentfield,name,date,item_code,qty,uom,r
 @frappe.whitelist()
 def delete_medicine_rearing(name):
 	frappe.db.delete('Layer Medicine', {"name": name })
-
+'''
 @frappe.whitelist()
 def add_vaccine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',material_transfer=''):
 	
@@ -911,7 +915,7 @@ def update_vaccine_rearing(idx,parent,parentfield,name,date,item_code,qty,uom,re
 @frappe.whitelist()
 def delete_vaccine_rearing(name):
 	frappe.db.delete('Layer Vaccine', {"name": name })
-
+'''
 
 @frappe.whitelist()
 def add_rearing_items(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
@@ -1186,7 +1190,7 @@ def cancel_item(doc,event):
 
 	frappe.db.delete("Layer Other Items", {"stock_entry": doc.name})
 	frappe.db.delete("Layer Feed", {"stock_entry": doc.name })
-	frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name })
+	#frappe.db.delete("Layer Vaccine", {"stock_entry": doc.name })
 	frappe.db.delete("Layer Medicine", {"stock_entry": doc.name})
 	frappe.db.delete("Egg Production", {"stock_entry": doc.name})
 	lay=frappe.db.get_value("Layer Mortality",{'stock_entry':doc.name},['parent','total'], as_dict=1)
@@ -1206,10 +1210,10 @@ def get_material_transfer(material_transfer,project,shed):
     FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
 
 	vacc=[]
-	medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{0}' """.format(project))
+	'''medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='rearing_vaccine' and parent='{0}' """.format(project))
 	vidx=1
 	if medidx and medidx[0][0] is not None:
-		vidx = cint(medidx[0][0])+1
+		vidx = cint(medidx[0][0])+1'''
 
 	med=[]
 	medidx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='rearing_medicine' and parent='{0}' """.format(project))
@@ -1233,8 +1237,10 @@ def get_material_transfer(material_transfer,project,shed):
 
 	if data:
 		for dt in data:
+			
 			issuedqty=0
 			tranqty=0
+			'''
 			if sett.vaccine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
 				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
@@ -1250,7 +1256,7 @@ def get_material_transfer(material_transfer,project,shed):
 					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
 					vidx+=1
 					retdata.append(dt)
-
+			'''
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
@@ -1300,11 +1306,11 @@ def get_material_transfer(material_transfer,project,shed):
 					fidx+=1
 					retdata.append(dt)
 		
-		if len(vacc):
-			for vc in vacc:
-				childtbl = frappe.new_doc("Layer Vaccine")
-				childtbl.update(vc)
-				childtbl.save()
+		#if len(vacc):
+			#for vc in vacc:
+				#childtbl = frappe.new_doc("Layer Vaccine")
+				#childtbl.update(vc)
+				#childtbl.save()
 
 		if len(med):
 			for vc in med:
@@ -1336,10 +1342,10 @@ def get_material_transfer_lay(material_transfer,project,shed):
     FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
 
 	vacc=[]
-	medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='laying_vaccine' and parent='{0}' """.format(project))
+	'''medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='laying_vaccine' and parent='{0}' """.format(project))
 	vidx=1
 	if medidx and medidx[0][0] is not None:
-		vidx = cint(medidx[0][0])+1
+		vidx = cint(medidx[0][0])+1'''
 
 	med=[]
 	medidx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='laying_medicine' and parent='{0}' """.format(project))
@@ -1366,7 +1372,7 @@ def get_material_transfer_lay(material_transfer,project,shed):
 			issuedqty=0
 			tranqty=0
 				
-			if sett.vaccine_warehouse==dt.t_warehouse:
+			'''if sett.vaccine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
 				
 				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
@@ -1381,7 +1387,7 @@ def get_material_transfer_lay(material_transfer,project,shed):
 					dt.update({'qty':tranqty,'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
 					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_vaccine'})
 					vidx+=1
-					retdata.append(dt)
+					retdata.append(dt)'''
 
 
 			if sett.medicine_warehouse==dt.t_warehouse:
@@ -1432,11 +1438,11 @@ def get_material_transfer_lay(material_transfer,project,shed):
 					fidx+=1
 					retdata.append(dt)
 		
-		if len(vacc):
+		'''if len(vacc):
 			for vc in vacc:
 				childtbl = frappe.new_doc("Layer Vaccine")
 				childtbl.update(vc)
-				childtbl.save()
+				childtbl.save()'''
 
 		if len(med):
 			for vc in med:
@@ -1481,7 +1487,8 @@ def laying_materials_issue(batch,parentfield,items):
 	posting_time=time.strftime("%H:%M:%S")
 
 	stock_entry = frappe.new_doc("Stock Entry")    
-	stock_entry.company = lbatch.company	
+	stock_entry.company = lbatch.company
+	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'
 	stock_entry.stock_entry_type = "Material Issue"	
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
@@ -1490,6 +1497,7 @@ def laying_materials_issue(batch,parentfield,items):
 	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
 
 	items=[]
+	'''
 	if parentfield=='laying_vaccine':
 		vaccine=frappe.db.sql("""select * from `tabLayer Vaccine` where docstatus=0 and parentfield='laying_vaccine' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
 		for item in vaccine:
@@ -1531,6 +1539,7 @@ def laying_materials_issue(batch,parentfield,items):
 										'conversion_factor': flt(conversion_factor),
 												
 						})
+						'''
 	if parentfield=='laying_medicine':
 		medicine=frappe.db.sql("""select * from `tabLayer Medicine` where docstatus=0 and parentfield='laying_medicine' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
 		for item in medicine:
@@ -1729,7 +1738,8 @@ def laying_material_issue(batch,parentfield,items):
 		item_code=item.item_code
 
 		stock_entry = frappe.new_doc("Stock Entry")    
-		stock_entry.company = lbatch.company	
+		stock_entry.company = lbatch.company
+		stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
 		stock_entry.stock_entry_type = "Material Issue"	
 		stock_entry.project = lbatch.project
 		stock_entry.posting_date=posting_date

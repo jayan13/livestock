@@ -33,8 +33,6 @@
   "add_rearing_feed",
   "rearing_medicine",
   "add_rearing_medicine",
-  "rearing_vaccine",
-  "add_rearing_vaccine",
   "rearing_items",
   "add_rearing_items",
   "rearing_daily_mortality",
@@ -52,9 +50,6 @@
   "laying_medicine",
   "add_laying_medicine",
   "issue_laying_medicine",
-  "laying_vaccine",
-  "add_laying_vaccine",
-  "issue_laying_vaccine",
   "laying_items",
   "add_laying_items",
   "issue_laying_items",
@@ -167,12 +162,6 @@
    "options": "Layer Medicine"
   },
   {
-   "fieldname": "laying_vaccine",
-   "fieldtype": "Table",
-   "label": "Vaccine",
-   "options": "Layer Vaccine"
-  },
-  {
    "fieldname": "laying_items",
    "fieldtype": "Table",
    "label": "Other Items",
@@ -212,12 +201,6 @@
    "fieldname": "add_laying_medicine",
    "fieldtype": "Button",
    "label": "Add Medicine"
-  },
-  {
-   "depends_on": "eval:doc.item_processed==1",
-   "fieldname": "add_laying_vaccine",
-   "fieldtype": "Button",
-   "label": "Add Vaccine"
   },
   {
    "depends_on": "eval:doc.item_processed==1",
@@ -274,18 +257,6 @@
    "fieldname": "add_rearing_medicine",
    "fieldtype": "Button",
    "label": "Add Medicine"
-  },
-  {
-   "fieldname": "rearing_vaccine",
-   "fieldtype": "Table",
-   "label": "Vaccine",
-   "options": "Layer Vaccine"
-  },
-  {
-   "depends_on": "eval:doc.item_processed==0",
-   "fieldname": "add_rearing_vaccine",
-   "fieldtype": "Button",
-   "label": "Add Vaccine"
   },
   {
    "fieldname": "rearing_items",
@@ -426,12 +397,6 @@
   },
   {
    "depends_on": "eval:doc.item_processed==1",
-   "fieldname": "issue_laying_vaccine",
-   "fieldtype": "Button",
-   "label": "Issue Vaccine"
-  },
-  {
-   "depends_on": "eval:doc.item_processed==1",
    "fieldname": "issue_laying_items",
    "fieldtype": "Button",
    "label": "Issue Items"
@@ -467,7 +432,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-04-30 16:37:07.680706",
+ "modified": "2023-05-03 15:49:21.961549",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",

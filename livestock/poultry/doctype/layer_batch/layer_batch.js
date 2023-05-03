@@ -43,20 +43,20 @@ frappe.ui.form.on('Layer Batch', {
         $('body').find('[data-fieldname="add_laying_temperature"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_laying_mortality"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_laying_items"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
-        $('body').find('[data-fieldname="add_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+       // $('body').find('[data-fieldname="add_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_laying_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_weight"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_temperature"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_mortality"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_items"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
-        $('body').find('[data-fieldname="add_rearing_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
+       // $('body').find('[data-fieldname="add_rearing_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         $('body').find('[data-fieldname="add_rearing_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#f1ed83');
         
                 
         $('body').find('[data-fieldname="issue_laying_items"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
-        $('body').find('[data-fieldname="issue_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+       // $('body').find('[data-fieldname="issue_laying_vaccine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         $('body').find('[data-fieldname="issue_laying_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         $('body').find('[data-fieldname="issue_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         //frm.fields_dict["rearing_feed"].grid.wrapper.find(".btn-open-row").hide();
@@ -66,7 +66,7 @@ frappe.ui.form.on('Layer Batch', {
             
             frm.get_field("rearing_feed").grid.df.cannot_delete_rows = true;
             frm.get_field("rearing_items").grid.df.cannot_delete_rows = true;
-            frm.get_field("rearing_vaccine").grid.df.cannot_delete_rows = true;
+            //frm.get_field("rearing_vaccine").grid.df.cannot_delete_rows = true;
             frm.get_field("rearing_medicine").grid.df.cannot_delete_rows = true;
             frm.get_field("rearing_temperature").grid.df.cannot_delete_rows = true;
             frm.get_field("rearing_weight").grid.df.cannot_delete_rows = true;
@@ -82,10 +82,10 @@ frappe.ui.form.on('Layer Batch', {
                 $(".grid-remove-rows").hide();
             });
     
-            frm.fields_dict['rearing_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+            /*frm.fields_dict['rearing_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
                 $(".grid-add-row").hide();
                 $(".grid-remove-rows").hide();
-            });
+            });*/
     
             frm.fields_dict['rearing_items'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
                 $(".grid-add-row").hide();
@@ -122,10 +122,10 @@ frappe.ui.form.on('Layer Batch', {
 			$(".grid-remove-rows").hide();
         });
 
-        frm.fields_dict['laying_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
+       /* frm.fields_dict['laying_vaccine'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
             $(".grid-add-row").hide();
 			$(".grid-remove-rows").hide();
-        });
+        }); */
 
         frm.fields_dict['laying_items'].grid.wrapper.on('change', 'input[type="checkbox"]', function(e) {
             $(".grid-add-row").hide();
@@ -232,7 +232,7 @@ frappe.ui.form.on('Layer Batch', {
                                                     frm.refresh_field('rearing_feed');
                                                     frm.refresh_field('rearing_items');
                                                     frm.refresh_field('rearing_medicine');
-                                                    frm.refresh_field('rearing_vaccine');
+                                                    //frm.refresh_field('rearing_vaccine');
                                                     frm.reload_doc(); 
                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
                                                 } 
@@ -688,7 +688,7 @@ frappe.ui.form.on('Layer Batch', {
                  });
                 
             },
-            add_rearing_vaccine:function(frm)
+           /* add_rearing_vaccine:function(frm)
             {
                 let d = new frappe.ui.Dialog({
                     title: 'Add Vaccine',
@@ -878,7 +878,7 @@ frappe.ui.form.on('Layer Batch', {
                          }
                  });
                 
-            },
+            },*/
             add_rearing_items:function(frm)
             {
                 let d = new frappe.ui.Dialog({
@@ -1758,7 +1758,7 @@ frappe.ui.form.on('Layer Batch', {
                                             { 
                                                 d.hide();
                                                 $.each (r.message,function(i, dt){
-                                                    if(dt.tbl=='vaccine')
+                                                   /* if(dt.tbl=='vaccine')
                                                     {
                                                         let rw=frm.add_child("rearing_vaccine");
                                                         rw.date=dt.date;
@@ -1773,7 +1773,7 @@ frappe.ui.form.on('Layer Batch', {
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
                                                         flg=1;
-                                                    }
+                                                    }*/
                                                     if(dt.tbl=='medicine')
                                                     {
                                                         let rw=frm.add_child("rearing_medicine");
@@ -1881,7 +1881,7 @@ frappe.ui.form.on('Layer Batch', {
                                             { 
                                                 d.hide();
                                                 $.each (r.message,function(i, dt){
-                                                    if(dt.tbl=='vaccine')
+                                                   /* if(dt.tbl=='vaccine')
                                                     {
                                                         let rw=frm.add_child("laying_vaccine");
                                                         rw.date=dt.date;
@@ -1896,7 +1896,7 @@ frappe.ui.form.on('Layer Batch', {
                                                         $(".grid-add-row").hide();
                                                         frm.doc.__unsaved=0;
                                                         flg=1;
-                                                    }
+                                                    }*/
                                                     if(dt.tbl=='medicine')
                                                     {
                                                         let rw=frm.add_child("laying_medicine");
@@ -2064,7 +2064,7 @@ frappe.ui.form.on('Layer Batch', {
                     frappe.throw("Please select not issued items for Issuing");
                 }
             },
-	        issue_laying_vaccine:function(frm){
+	       /* issue_laying_vaccine:function(frm){
                 let items=[]
                 let selected = frm.get_selected();
                     if(selected.laying_vaccine){
@@ -2108,7 +2108,7 @@ frappe.ui.form.on('Layer Batch', {
                 }else{
                     frappe.throw("Please select not issued items for Issuing");
                 }
-            },
+            }, */
 	        issue_laying_items:function(frm){
                 let items=[]
                 let selected = frm.get_selected();
@@ -2500,7 +2500,7 @@ frappe.ui.form.on('Layer Medicine', {
 //--------------------- end Medicine------------------------------
 
 //------------------ Vaccine --------------------------------
-
+/*
 frappe.ui.form.on('Layer Vaccine', {
     refresh: function(frm, cdt, cdn) {
         //console.log("ref");
@@ -2678,7 +2678,7 @@ frappe.ui.form.on('Layer Vaccine', {
  
     }
 });
-
+*/
 //--------------------- end Vaccine------------------------------
 
 //------------------ Other items --------------------------------

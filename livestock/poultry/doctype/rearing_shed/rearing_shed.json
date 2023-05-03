@@ -14,7 +14,6 @@
   "expense_account",
   "base_row_material",
   "row_material_target_warehouse",
-  "vaccine_warehouse",
   "medicine_warehouse",
   "column_break_6",
   "other_item_warehouse",
@@ -90,12 +89,6 @@
    "options": "Item"
   },
   {
-   "fieldname": "vaccine_warehouse",
-   "fieldtype": "Link",
-   "label": "Vaccine Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "medicine_warehouse",
    "fieldtype": "Link",
    "label": "Medicine Warehouse",
@@ -108,15 +101,16 @@
    "options": "Warehouse"
   },
   {
+   "description": "This will be assigned to Difference Account of stock entry items to avoid unnecessary debit & credit GL entry in Item default expense account & company stock adjustment account.",
    "fieldname": "expense_account",
    "fieldtype": "Link",
-   "label": " Expense Account",
+   "label": "Stock Adjustment Account(While Manufacture Entry)",
    "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-16 08:48:49.510956",
+ "modified": "2023-05-03 15:47:05.020866",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Rearing Shed",

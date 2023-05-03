@@ -15,10 +15,8 @@
   "base_row_material",
   "row_material_target_warehouse",
   "packing_material_source_warehouse",
-  "vaccine_expense_account",
-  "vaccine_warehouse",
-  "column_break_6",
   "medicine_expense_account",
+  "column_break_6",
   "medicine_warehouse",
   "other_items_expense_account",
   "other_item_warehouse",
@@ -75,12 +73,6 @@
    "options": "Item"
   },
   {
-   "fieldname": "vaccine_expense_account",
-   "fieldtype": "Link",
-   "label": "Vaccine Expense Account",
-   "options": "Account"
-  },
-  {
    "fieldname": "medicine_expense_account",
    "fieldtype": "Link",
    "label": "Medicine Expense Account",
@@ -103,12 +95,6 @@
    "fieldtype": "Link",
    "label": "Feed Expense Account",
    "options": "Account"
-  },
-  {
-   "fieldname": "vaccine_warehouse",
-   "fieldtype": "Link",
-   "label": "Vaccine Warehouse",
-   "options": "Warehouse"
   },
   {
    "fieldname": "medicine_warehouse",
@@ -138,7 +124,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-16 10:31:08.216612",
+ "modified": "2023-05-03 15:48:09.687532",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Laying Shed",
