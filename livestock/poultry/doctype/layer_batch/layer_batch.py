@@ -65,8 +65,9 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		date=getdate(transfer_date)
 	sett.expense_account
 	posting_date=date or nowdate() 
-	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
+	#time=time or get_datetime()
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
 	total_add_cost=0
 
 	stock_entry = frappe.new_doc("Stock Entry")    
@@ -442,9 +443,9 @@ def create_stock_entry_mortality(item,parent_field=''):
 	uom='Nos'
 
 	posting_date=date or nowdate() 
-	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
-
+	#time=time or get_datetime()
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
 	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
@@ -526,8 +527,8 @@ def create_stock_entry(item,parent_field=''):
 
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
-
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
 	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
@@ -646,8 +647,9 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 			time=get_datetime(fitem.creation)
 			
 		posting_date=date or nowdate() 
-		time=time or get_datetime()
-		posting_time=time.strftime("%H:%M:%S")
+		#time=time or get_datetime()
+		#posting_time=time.strftime("%H:%M:%S")
+		posting_time='23:59:00'
 
 		pcmaterials=''
 		if fitem.bom:
@@ -1087,7 +1089,8 @@ def add_eggs_production(batch,parentfield,items):
 	item_data=[]
 	res=''
 	times=get_datetime()
-	time=times.strftime("%H:%M:%S")
+	#time=times.strftime("%H:%M:%S")
+	time='23:59:00'
 
 	for lst in aList:
 		item_code=lst.get('item_code')
@@ -1149,7 +1152,8 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 	sett = frappe.get_doc('Laying Shed',shed)
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
 	base_row_rate = get_incoming_rate({
 										"item_code": item,
 										"warehouse": sett.row_material_target_warehouse,
@@ -1484,7 +1488,8 @@ def laying_materials_issue(batch,parentfield,items):
 	
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
 
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
@@ -1702,8 +1707,10 @@ def laying_material_issue(batch,parentfield,items):
 		date=getdate(date)
 	
 	posting_date=date or nowdate() 
-	time=time or get_datetime()
-	posting_time=time.strftime("%H:%M:%S")
+	#time=time or get_datetime()
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
+	
 	items=[]
 	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
 	
