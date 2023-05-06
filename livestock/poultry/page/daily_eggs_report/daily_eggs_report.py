@@ -91,7 +91,7 @@ def get_todays_production():
                 and `tabStock Ledger Entry`.voucher_type='Stock Entry'
                 and `tabStock Ledger Entry`.company = '{0}' 
                 AND `tabStock Ledger Entry`.is_cancelled = 0 
-                AND `tabStock Entry`.stock_entry_type_option='Production' 
+                AND `tabStock Entry`.manufacturing_type='Egg' 
                 AND `tabStock Ledger Entry`.posting_date = '{1}'
                 {2}
                 {3}
