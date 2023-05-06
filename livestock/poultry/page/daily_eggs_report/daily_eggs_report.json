@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2023-05-05 11:51:25.549021",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2023-05-05 11:51:25.549021",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "daily-eggs-report",
+ "owner": "Administrator",
+ "page_name": "daily-eggs-report",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Daily Egg Production Report"
+}
