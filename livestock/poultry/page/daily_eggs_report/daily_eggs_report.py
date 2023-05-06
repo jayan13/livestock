@@ -670,11 +670,11 @@ def get_egg_report(company=None,posted_on=None):
     for project in projects:
         itemqty=[]
         itemtot=0
-        lay=project.project_name.split('-')
+        lay=project.project.split('-')
         if lay:
             layer=lay[0].replace("LH", "Layer Shed No. ").replace("RH", "Rearing Sheds No. ")
         else:
-            layer=project.project_name
+            layer=project.project
         
         project.update({'layers':layer})
         for item in items:
@@ -696,7 +696,7 @@ def get_egg_report(company=None,posted_on=None):
                 AND `tabStock Ledger Entry`.project='{3}'
             GROUP BY
                 `tabStock Ledger Entry`.item_code
-            """.format(company,posted_on,item.item_code,project.project_name),as_dict=1,debug=0)
+            """.format(company,posted_on,item.item_code,project.project),as_dict=1,debug=0)
             itmqty=0         
             for sl_entry in sl_entrys:
                 itmqty=get_item_ctn_qty(item.item_code,sl_entry.qty)
