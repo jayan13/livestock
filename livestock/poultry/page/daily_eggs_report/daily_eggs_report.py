@@ -523,7 +523,7 @@ def get_egg_report(company=None,posted_on=None):
                 {3}
             GROUP BY
                 item_code
-            """.format(company,posted_on,item.item_code,item_conditions_sql),as_dict=1,debug=1)
+            """.format(company,posted_on,item.item_code,item_conditions_sql),as_dict=1,debug=0)
             itmqty=0         
             for sl_entry in sl_entrys:
                 itmqty=get_item_ctn_qty(item.item_code,sl_entry.qty)
