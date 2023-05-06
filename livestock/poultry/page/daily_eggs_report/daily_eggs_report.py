@@ -57,10 +57,13 @@ def get_todays_production():
     data = {}
     company="ABU DHABI POULTRY FARM - SOLE PROPRIETORSHIP L.L.C.";    
     cur_date=frappe.utils.today()
-    oppeingstockqr=frappe.db.sql("""select  project_name from tabProject p left join  `tabStock Ledger Entry`  s  on s.project=p.project_name  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}'  and p.company='{1}'  and (p.project_name LIKE 'LH%' or p.project_name LIKE 'Herz%')  group by s.project having sum(s.actual_qty) >0 order by p.project_name """.format(cur_date,company),as_dict=1)
+    #oppeingstockqr=frappe.db.sql("""select  project_name from tabProject p left join  `tabStock Ledger Entry`  s  on s.project=p.project_name  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}'  and p.company='{1}'  and (p.project_name LIKE 'LH%' or p.project_name LIKE 'Herz%')  group by s.project having sum(s.actual_qty) >0 order by p.project_name """.format(cur_date,company),as_dict=1)
+    oppeingstockqr=frappe.db.sql("""select  p.project from `tabLayer Batch` p left join  `tabStock Ledger Entry`  s  on s.project=p.project  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}'  and p.company='{1}' group by s.project having sum(s.actual_qty) >0 order by p.project """.format(cur_date,company),as_dict=1)
+    
+    #select project from `tabLayer Batch` where status='Open'
     oppeingstockwh=[]    
     for oppeingstoc in oppeingstockqr:
-        oppeingstockwh.append(oppeingstoc.project_name)
+        oppeingstockwh.append(oppeingstoc.project)
      
     warehouse_conditions_sql = ''
     if oppeingstockwh:
@@ -482,7 +485,9 @@ def get_egg_report(company=None,posted_on=None):
         
     data['company']=company
     data['posted_on']=posted_on
-    projects= frappe.db.sql("""select  project_name from tabProject p left join  `tabStock Ledger Entry`  s  on s.project=p.project_name  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}' and p.company='{1}'  and (p.project_name LIKE 'LH%' or p.project_name LIKE 'Herz%') group by s.project having sum(s.actual_qty) >0 order by p.project_name """.format(posted_on,company),as_dict=1)
+    #projects= frappe.db.sql("""select  project_name from tabProject p left join  `tabStock Ledger Entry`  s  on s.project=p.project_name  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}' and p.company='{1}'  and (p.project_name LIKE 'LH%' or p.project_name LIKE 'Herz%') group by s.project having sum(s.actual_qty) >0 order by p.project_name """.format(posted_on,company),as_dict=1)
+    projects= frappe.db.sql("""select  p.project from `tabLayer Batch` p left join  `tabStock Ledger Entry`  s  on s.project=p.project  where (p.status='Open' OR p.status='Completed')  and s.actual_qty > 0  and voucher_type='Stock Entry'  and s.is_cancelled=0 and  s.posting_date='{0}' and p.company='{1}'   group by s.project having sum(s.actual_qty) >0 order by p.project """.format(posted_on,company),as_dict=1)
+    
     items= frappe.db.sql("""select  item_code,item_name from tabItem where (item_group='EGGS' or item_code in ('ORG EGG','ORG EGG BROWN')) """,as_dict=1)
     data['items']=items
 
@@ -684,7 +689,7 @@ def get_egg_report(company=None,posted_on=None):
                 `tabStock Ledger Entry`.company = '{0}' 
                 and `tabStock Ledger Entry`.actual_qty > 0 
                 and `tabStock Ledger Entry`.voucher_type='Stock Entry'
-                AND `tabStock Entry`.stock_entry_type_option='Production' 
+                AND `tabStock Entry`.manufacturing_type='Egg' 
                 AND `tabStock Ledger Entry`.is_cancelled = 0 
                 AND `tabStock Ledger Entry`.posting_date ='{1}'
                 AND `tabStock Ledger Entry`.item_code='{2}'
