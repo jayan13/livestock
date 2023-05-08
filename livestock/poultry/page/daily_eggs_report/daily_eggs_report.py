@@ -5,7 +5,8 @@ def get_company_list():
     data = {}
     data["companys"] = frappe.get_list("Company", fields=['name'],limit_page_length=0, order_by="name",debug=0)
     return data
-    
+
+# vin comment    
 @frappe.whitelist()
 def get_opening_stock():
     data = {}
