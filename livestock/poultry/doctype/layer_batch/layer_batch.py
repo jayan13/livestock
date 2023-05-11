@@ -78,6 +78,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry.manufacturing_type = "Layer Chicken"
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
+	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 
 	if sett.base_row_material:
@@ -452,6 +453,7 @@ def create_stock_entry_mortality(item,parent_field=''):
 	stock_entry.stock_entry_type = "Material Issue"	
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
+	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 	batch_no=''
 	rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
@@ -535,6 +537,7 @@ def create_stock_entry(item,parent_field=''):
 	stock_entry.stock_entry_type = "Material Issue"	
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
+	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 	item_account_details = get_item_defaults(item.item_code, sett.company)
 	stock_uom = item_account_details.stock_uom
@@ -621,17 +624,17 @@ def create_stock_entry(item,parent_field=''):
 	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
-def create_production_stock_entry(fitemdata,batch,date,time):
+def create_production_stock_entry(fitemdata,batch,posting_date,posting_time):
 	
 	lbatch=frappe.get_doc('Layer Batch',batch)
 	if lbatch.layer_shed:
 		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
-
+	
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
 	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'    
-	stock_entry.posting_date = date
-	stock_entry.posting_time = time
+	stock_entry.posting_date = posting_date
+	stock_entry.posting_time = posting_time
 	stock_entry.set_posting_time='1'
 	stock_entry.purpose = "Manufacture"
 	stock_entry.project = lbatch.project
@@ -640,16 +643,16 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 	pcitems=[]
 	for fitem in fitemdata:
 
-		if fitem.date:
-			date=getdate(fitem.date)
+		#if fitem.date:
+		#	date=getdate(fitem.date)
 
-		if fitem.creation:
-			time=get_datetime(fitem.creation)
+		#if fitem.creation:
+		#	time=get_datetime(fitem.creation)
 			
-		posting_date=date or nowdate() 
+		#posting_date=date or nowdate() 
 		#time=time or get_datetime()
 		#posting_time=time.strftime("%H:%M:%S")
-		posting_time='00:00:00'
+		#posting_time='23:59:00'
 
 		pcmaterials=''
 		if fitem.bom:
@@ -718,7 +721,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 
 		batch_no=''
 		if item_account_details.has_batch_no:
-			manufacture_date=posting_date.strftime("%d-%m-%Y")
+			manufacture_date=posting_date
 			itemname=str(fitem.item_code)
 			itemname=itemname[0:2]
 			cat=lbatch.batch_type or 'Layer Eggs'
@@ -1059,7 +1062,7 @@ def update_weight_rearing(idx,parent,parentfield,name,date,week=0,weight=0):
 @frappe.whitelist()
 def delete_weight_rearing(name):
 	frappe.db.delete('Layer Weight', {"name": name })
-
+'''
 @frappe.whitelist()
 def add_egg_production(batch,parentfield,date,item_code,qty,uom):
 	
@@ -1079,27 +1082,37 @@ def add_egg_production(batch,parentfield,date,item_code,qty,uom):
 	create_production_stock_entry(childtbl)
 
 	return childtbl.as_dict()
+'''
 
 @frappe.whitelist()
-def add_eggs_production(batch,parentfield,items):
+def add_eggs_production(batch,parentfield,items,production_date,production_time):
 	
 	import json
 	aList = json.loads(items)
 	#frappe.msgprint(items)
 	item_data=[]
 	res=''
-	times=get_datetime()
-	#time=times.strftime("%H:%M:%S")
-	time='00:00:00'
+	if not production_date:
+		date=getdate()
+	else:
+		date=getdate(production_date)
+
+	if not production_time:
+		times=get_datetime()
+	else:
+		times=get_datetime(production_time)
+
+	time=times.strftime("%H:%M:%S")
+
 
 	for lst in aList:
 		item_code=lst.get('item_code')
 		qty=lst.get('qty')
 		uom=lst.get('uom')
 		bom=lst.get('bom')
-		date=lst.get('date')
+		#date=lst.get('date')
 		item_name=frappe.db.get_value('Item',item_code,'item_name')
-		itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
+		itemdet=get_item_rate(batch,item_code,qty,uom,date,time)
 		rate=itemdet.rate
 		conversion_factor=itemdet.conversion_factor
 		
@@ -1146,14 +1159,16 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 	shed=frappe.get_value('Layer Batch',{'batch_name':batch},'layer_shed')
 	if time:
 		time=get_datetime(time)
+	else:
+		time=get_datetime('23:59:00')
 	if date:
 		date=getdate(date)
 
 	sett = frappe.get_doc('Laying Shed',shed)
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
-	#posting_time=time.strftime("%H:%M:%S")
-	posting_time='23:59:00'
+	posting_time=time.strftime("%H:%M:%S")
+	#posting_time='23:59:00'
 	base_row_rate = get_incoming_rate({
 										"item_code": item,
 										"warehouse": sett.row_material_target_warehouse,

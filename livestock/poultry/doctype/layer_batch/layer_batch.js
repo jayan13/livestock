@@ -1537,7 +1537,17 @@ frappe.ui.form.on('Layer Batch', {
             var prompt_fields=[{  fieldtype: "Date",
             label: __("Date"),
             fieldname: "date",
-            reqd:'1'                                
+            reqd:'1',
+            default:frappe.datetime.get_today(),                                
+            },
+            {  fieldtype: "Column Break",
+                fieldname: "lblcolbk_00",                                                               
+            },
+            {  fieldtype: "Time",
+            label: __("Time"),
+            fieldname: "time",
+            reqd:'1',
+            default:frappe.datetime.get_today(),                                
             },
             {'fieldname': 'sec_top', 'fieldtype': 'Section Break'},
             //{'fieldname': 'ht', 'fieldtype': 'HTML'},Column Break Section Break
@@ -1655,7 +1665,9 @@ frappe.ui.form.on('Layer Batch', {
                                                     args: {
                                                         batch:frm.doc.name,
                                                         parentfield:'egg_production',
-                                                        items:itemss,                                                                
+                                                        items:itemss,
+                                                        production_date:values.date,
+                                                        production_time:values.time,                                                                
                                                     },
                                                     callback: function(rs) 
                                                         { 
@@ -1699,6 +1711,7 @@ frappe.ui.form.on('Layer Batch', {
                                     d.$wrapper.find('.modal-content').css("width", "800px");
                                     d.$wrapper.find('.row').css("padding-bottom", "0px");
                                     d.$wrapper.find("[data-fieldname='date']").css("width", "150px");
+                                    d.$wrapper.find("[data-fieldname='time']").css("width", "150px");
                                     for(var i=0;i< res.length;i++)
                                     {
                                         let itm=res[i];                                        
