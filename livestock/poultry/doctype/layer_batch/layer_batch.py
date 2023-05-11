@@ -649,7 +649,7 @@ def create_production_stock_entry(fitemdata,batch,date,time):
 		posting_date=date or nowdate() 
 		#time=time or get_datetime()
 		#posting_time=time.strftime("%H:%M:%S")
-		posting_time='23:59:00'
+		posting_time='00:00:00'
 
 		pcmaterials=''
 		if fitem.bom:
@@ -1090,7 +1090,7 @@ def add_eggs_production(batch,parentfield,items):
 	res=''
 	times=get_datetime()
 	#time=times.strftime("%H:%M:%S")
-	time='23:59:00'
+	time='00:00:00'
 
 	for lst in aList:
 		item_code=lst.get('item_code')
