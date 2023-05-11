@@ -1548,7 +1548,7 @@ frappe.ui.form.on('Layer Batch', {
                 { 
                     method: "livestock.poultry.doctype.layer_batch.layer_batch.get_egg_products",
                     args: {
-                        cat:frm.doc.egg_category
+                        cat:frm.doc.batch_type
                     },
                     callback: function(r) 
                         { 

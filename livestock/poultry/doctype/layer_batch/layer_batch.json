@@ -11,21 +11,21 @@
   "company",
   "rearing_shed",
   "layer_shed",
-  "egg_category",
   "strain",
   "from_hatchery_project",
   "number_received",
   "receiving_date",
   "mortality",
-  "column_break_5",
   "doc_placed",
   "doc_placed_date",
+  "column_break_5",
   "start_date",
   "current_alive_chicks",
   "flock_transferred_to_layer",
   "flock_transfer_date",
   "project",
   "status",
+  "batch_type",
   "layer_status",
   "rearing_period_section",
   "import_items_from_material_transfer",
@@ -360,13 +360,6 @@
    "label": "Add Egg Production"
   },
   {
-   "fetch_from": "layer_shed.egg_category",
-   "fieldname": "egg_category",
-   "fieldtype": "Data",
-   "label": "Egg Category",
-   "read_only": 1
-  },
-  {
    "fieldname": "doc_placed_date",
    "fieldtype": "Date",
    "label": "DOC Placed Date"
@@ -415,6 +408,13 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Sales Qty"
+  },
+  {
+   "default": "Layer Eggs",
+   "fieldname": "batch_type",
+   "fieldtype": "Link",
+   "label": "Batch Type",
+   "options": "Batch Type"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -432,7 +432,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-05-03 15:49:21.961549",
+ "modified": "2023-05-11 10:06:51.919517",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",
