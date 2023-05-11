@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:batch_type",
+ "creation": "2023-05-11 09:48:50.494226",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch_type",
+  "break_even_period"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch_type",
+   "fieldtype": "Data",
+   "label": "Batch Type",
+   "unique": 1
+  },
+  {
+   "description": "Rearing cost will be divided by number of break even period and added to cost of production for this period",
+   "fieldname": "break_even_period",
+   "fieldtype": "Float",
+   "label": "Break Even Period ( in months)"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-05-11 09:50:06.398273",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Batch Type",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
