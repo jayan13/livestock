@@ -1,0 +1,80 @@
+
+<div id="report_egg" style="background-color:#fff;width:100%; padding:14px;">
+  
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link " id="budget-tab" data-toggle="tab" href="#budget" role="tab" aria-controls="budget" aria-selected="false">Budget </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="rearing-tab" data-toggle="tab" href="#rearing" role="tab" aria-controls="rearing" aria-selected="true">Rearing Costs</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="production-tab" data-toggle="tab" href="#production" role="tab" aria-controls="production" aria-selected="false">Production Costs</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade" id="budget" role="tabpanel" aria-labelledby="budget-tab">
+      
+     <div style="min-height:100px;width:100%;padding:4px;" >
+      <span style="padding:15px; ;"><b>Budget</b></span>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+     </div> 
+
+    </div>
+    <div class="tab-pane fade show active" id="rearing" role="tabpanel" aria-labelledby="rearing-tab">
+      <div style="min-height:100px;width:100%;padding:4px;overflow-x: auto;">
+        <span style="padding:15px; ;"><b>Rearing Costs</b></span>
+        <table class="table table-bordered" id="rer_exp">
+          
+        </table>
+      </div>
+      <div id="rear-chart"> </div>
+    </div>
+    <div class="tab-pane fade" id="production" role="tabpanel" aria-labelledby="production-tab">
+      <div style="min-height:100px;width:100%;padding:4px;overflow-x: auto;">
+        <span style="padding:15px; ;"><b>Production Costs</b></span>
+        <table class="table table-bordered" id="lay_exp">
+          
+        </table>
+      </div>
+      <div id="layer-chart"> </div>
+    </div>
+    
+  </div>
+  
+
+
+    
+
+    
+    
+</div>
+    
