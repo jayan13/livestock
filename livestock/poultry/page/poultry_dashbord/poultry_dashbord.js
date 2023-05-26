@@ -70,7 +70,7 @@ MyPage =Class.extend({
 			},
 			default:'Start Date Of Project'
 		});
-
+		this.page.add_inner_button('Print', () => print_rep());
 		let load_batch=function(){
 			$('[data-fieldname="batch"][type="text"]').empty();
 			frappe.call({
@@ -234,3 +234,18 @@ MyPage =Class.extend({
 	}
 })
 
+function print_rep()
+				{
+					
+					var divrear=document.getElementById('rearing');
+					var divlay=document.getElementById('production');
+					
+					  var newWin=window.open('','Print-Window');
+					  newWin.document.open();
+					  newWin.document.write('<html><style>table, th, td {border: 1px solid;border-collapse: collapse; } table{ width:100%;} table td{ text-align:right;} #rear-chart{display:none;}#layer-chart{display:none;}  @media print { #prod{overflow-x:unset !important;} #rer{overflow-x:unset !important;} } </style><body onload="window.print()">'+divrear.innerHTML+divlay.innerHTML+'</body></html>');
+					  newWin.document.close();
+					  setTimeout(function(){newWin.close();},10);
+		  
+				}
+
+				

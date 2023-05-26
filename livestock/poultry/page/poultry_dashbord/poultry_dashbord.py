@@ -508,7 +508,12 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_html=''
     for layin in lay_perod:
         
-        date_lbl=layin.get('start').strftime("%d/%m/%y")+'-'+layin.get('end').strftime("%d/%m/%y")
+        #date_lbl=layin.get('start').strftime("%d/%m/%y")+'-'+layin.get('end').strftime("%d/%m/%y")
+        if period=='Accounting Period':
+            date_lbl=rear.get('start').strftime("%b - %y")
+        else:
+            date_lbl=rear.get('start').strftime("%d/%m/%y")+'-'+rear.get('end').strftime("%d/%m/%y")
+
         lay_lbl.append(date_lbl)
         col_tot=0
 #----------------------------------------------
