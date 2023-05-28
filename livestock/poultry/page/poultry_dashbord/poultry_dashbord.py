@@ -929,19 +929,19 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                     for egg_dta in egg_dt:
                         #frappe.msgprint(str(egg_dta))
                         if item==egg_dta.item_code:
-                            row_sum+=egg_dta.qty
-                            lay_html+='<td class="text-right">'+str(flt(egg_dta.qty,2))+'</td>'
+                            row_sum+=egg_dta.qty/360
+                            lay_html+='<td class="text-right">'+str(flt(egg_dta.qty/360,3))+' Ctn</td>'
                 else:
                     lay_html+='<td class="text-right">0</td>'
 
-            lay_html+='<td class="text-right">'+str(row_sum)+'</td>'        
+            lay_html+='<td class="text-right">'+str(flt(row_sum,3))+' Ctn</td>'        
             lay_html+='</tr>'
    #------------------------------------
    
     lay_html+='<tr><th>Total Production </th>'
     i=0
     for doc in egg_prod:
-        lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
+        lay_html+='<td class="text-right">'+str(flt(doc/360,3))+' Ctn</td>'
 
     lay_html+='</tr>'
 #---------------------------------------------------
@@ -998,8 +998,25 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
+    #-------------------------------------------------------
+    lay_html+='<tr><th> Total Expenses</th>'
+    i=0
+    for doc in egg_packing:
+        cost=0
+        if egg_prod[i]:
+            cost=float(lay_oper[i])+float(egg_packing[i])
+        
+        lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
+        i+=1
+    lay_html+='</tr>'
 #-------------------------------------------------------
+    lay_html+='<tr><th>Total Egg Qty </th>'
+    i=0
+    for doc in egg_prod:
+        lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
 
+    lay_html+='</tr>'
+#-------------------------------------------------------
     lay_html+='<tr><th> Cost/Egg </th>'
     i=0
     for doc in egg_packing:
