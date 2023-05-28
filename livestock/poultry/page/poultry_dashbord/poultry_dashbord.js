@@ -71,6 +71,7 @@ MyPage =Class.extend({
 			default:'Start Date Of Project'
 		});
 		this.page.add_inner_button('Print', () => print_rep());
+		this.page.add_inner_button('Download', () => download_rep());
 		let load_batch=function(){
 			$('[data-fieldname="batch"][type="text"]').empty();
 			frappe.call({
@@ -197,6 +198,7 @@ MyPage =Class.extend({
 						//reqsnd=0;
 						 $('#rer_exp').html(r.message.rear);
 						 $('#lay_exp').html(r.message.lay);
+						 $('#budgets').html(r.message.budget);
 						 let l_lbl=[]
 						 let l_dta=[]
 						 let r_lbl=[]
@@ -248,4 +250,19 @@ function print_rep()
 		  
 				}
 
-				
+function download_rep()
+{
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_report',
+		args: {
+		  company: field.get_value(),
+		  batch: field1.get_value(),
+		  period: field2.get_value(),					  
+		},
+		callback: function (r) {
+		  if (r.message) {
+			
+		  }
+		},
+	  }); 
+}
