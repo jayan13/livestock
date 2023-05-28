@@ -30,7 +30,9 @@ def get_report(company,batch,period=None):
     lay_perod=[]
     if layer.doc_placed_date:
         doc_placed_date=getdate(layer.doc_placed_date)
-
+    else:
+        doc_placed_date=getdate(layer.start_date)
+        
     flock_transfer_date=''
     if layer.flock_transfer_date:
         flock_transfer_date=getdate(layer.flock_transfer_date)
@@ -108,7 +110,14 @@ def get_report(company,batch,period=None):
     reat_tot_tot=0
     
     rear_html=''
-    vaccine_list=frappe.db.get_list('Vaccine Items List',pluck='name')
+
+    vaccine_list=[]
+    itmgroup=frappe.db.get_list('Vaccine Item Group',fields=['item_group'],pluck='item_group')
+    for gp in itmgroup:
+        itms=frappe.db.get_list('Item',filters={'item_group':gp},fields=['item_code'],pluck='item_code')
+        for it in itms:
+            vaccine_list.append(it)
+    
 #=========================================================================
     for rear in rear_perid:
         if period=='Accounting Period':
@@ -712,10 +721,14 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     sale_tot=0
     sales=[]
     sales_data=[]
+    egg_pck_tot=0
+    egg_col_pck_tot=0
+    egg_packing=[]
     for layin in lay_perod:
         egg_col_tot=0
         sale_col_tot=0
         egg_tot_prod_col=0
+        egg_col_pck_tot=0
         ly_lbl=layin.get('start').strftime("%d-%m-%y")+'-'+layin.get('end').strftime("%d-%m-%y")
         eggp_lbl.append(ly_lbl)
         #------------------------------
@@ -732,7 +745,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         lay_oper_tot+=oper_cost
         col_cnt+=1
         #----------------------------------------------
-        egg_manu_sql=frappe.db.sql(""" select sum(d.transfer_qty) as qty,d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s 
+        egg_manu_sql=frappe.db.sql(""" select sum(d.transfer_qty) as qty,sum(d.amount) as amount,d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s 
                 on d.parent=s.name where s.stock_entry_type='Manufacture' and d.is_finished_item=1 and 
                 s.docstatus=1 and s.manufacturing_type='Egg' and s.posting_date between '{0}' and '{1}' and  s.project='{2}'
                  group by d.item_code""".format(layin.get('start'),layin.get('end'),layer.name),as_dict=1,debug=0)
@@ -743,10 +756,14 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                 egg_prod_item.append(p.item_code)
                 egg_tot+=p.qty
                 egg_col_tot+=p.qty
+                egg_pck_tot+=p.amount
+                egg_col_pck_tot+=p.amount
+            egg_packing.append(egg_col_pck_tot)
             egg_prod.append(egg_col_tot)
         else:
             egg_prod_data.append('')
             egg_prod.append(0)
+            egg_packing.append(0)
             
         #-----------------------------------------------------------------
         egg_tot_manu_sql=frappe.db.sql(""" select sum(d.transfer_qty) as qty,d.item_code from `tabStock Entry Detail` d left join `tabStock Entry` s 
@@ -775,6 +792,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 
     #-----------------------------
     egg_prod.append(egg_tot)
+    egg_packing.append(egg_pck_tot)
     #sales.append(sale_tot)
     lay_rear.append(lay_rear_tot)
     lay_oper.append(lay_oper_tot)
@@ -890,7 +908,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     i=0
     for doc in lay_tot:
         if i==0:
-            lay_html+='<th scope="row"></th>'
+            lay_html+='<th scope="row">Production Qty</th>'
         else:
             lay_html+='<td class="text-right"></td>'
         i+=1
@@ -920,14 +938,101 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             lay_html+='</tr>'
    #------------------------------------
    
-    lay_html+='<tr><th> </th>'
+    lay_html+='<tr><th>Total Production </th>'
     i=0
     for doc in egg_prod:
         lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
 
     lay_html+='</tr>'
 #---------------------------------------------------
+    #------------------------blank ---------------------------
+    lay_html+='<tr>'
+    i=0
+    for doc in lay_tot:
+        if i==0:
+            lay_html+='<th scope="row">Packing Cost</th>'
+        else:
+            lay_html+='<td class="text-right"></td>'
+        i+=1
+
+    lay_html+='</tr>'
+    
+#-------------------------egg packing cost -------------------
+    
+    if egg_prod_data:
+        egg_prod_item=list(dict.fromkeys(egg_prod_item))
+        
+        for item in egg_prod_item:
+            row_sum=0
+            lay_html+='<tr>'
+            lay_html+='<th scope="row">'+str(getitem_name(item))+'</th>'
+            for egg_dt in egg_prod_data:
+                if egg_dt:
+                    for egg_dta in egg_dt:
+                        #frappe.msgprint(str(egg_dta))
+                        if item==egg_dta.item_code:
+                            row_sum+=egg_dta.amount
+                            lay_html+='<td class="text-right">'+str(flt(egg_dta.amount,2))+'</td>'
+                else:
+                    lay_html+='<td class="text-right">0</td>'
+
+            lay_html+='<td class="text-right">'+str(row_sum)+'</td>'        
+            lay_html+='</tr>'
+
+ #------------------------------------
+   
+    lay_html+='<tr><th> Packing Total </th>'
+    i=0
+    for doc in egg_packing:
+        lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
+
+    lay_html+='</tr>'
 #------------------------blank ---------------------------
+    lay_html+='<tr>'
+    i=0
+    for doc in lay_tot:        
+        if i==0:
+            lay_html+='<th scope="row"></th>'
+        else:
+            lay_html+='<td class="text-right"></td>'
+        i+=1
+
+    lay_html+='</tr>'
+#-------------------------------------------------------
+
+    lay_html+='<tr><th> Cost/Egg </th>'
+    i=0
+    for doc in egg_packing:
+        cost=0
+        if egg_prod[i]:
+            cost=(float(lay_oper[i])+float(egg_packing[i]))/float(egg_prod[i])
+        
+        lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
+        i+=1
+    lay_html+='</tr>'
+
+#-------------------------------------------------------
+
+    lay_html+='<tr><th> Egg Price </th>'
+    
+    for sal in sales_data:
+        price=0
+        tamt=0
+        tqty=0
+        if sal:
+            for s in sal:
+                tamt+=float(s.amount)
+                tqty+=float(s.qty)
+
+        if tamt and tqty:
+            price=float(tamt)/float(tqty)
+
+        lay_html+='<td class="text-right">'+str(flt(price,2))+'</td>'
+
+    lay_html+='</tr>'
+
+
+    #------------------------blank ---------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_tot:
@@ -942,7 +1047,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     
     if sales:
         sale_totol=0
-        lay_html+='<tr><th>Sales </th>'
+        lay_html+='<tr><th>Sales Value</th>'
         j=0
         for s in sales:
             #frappe.msgprint(str(egg_prod[j]))
