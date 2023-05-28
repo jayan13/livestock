@@ -1024,8 +1024,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         if egg_prod[i]:
             cost=(float(lay_oper[i])+float(egg_packing[i]))/float(egg_prod[i])
         
-        lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
         i+=1
+        if len(egg_packing)==i:
+            continue
+        lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
+    lay_html+='<td class="text-right"></td>'
     lay_html+='</tr>'
 
 #-------------------------------------------------------
@@ -1045,7 +1048,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             price=float(tamt)/float(tqty)
 
         lay_html+='<td class="text-right">'+str(flt(price,2))+'</td>'
-
+    lay_html+='<td class="text-right"></td>'
     lay_html+='</tr>'
 
 
@@ -1079,6 +1082,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         lay_html+='<td class="text-right">'+str(flt(sale_totol,2))+'</td>'
         lay_html+='</tr>'
 
+    if lay_rear_tot:
+        lay_graph.append({"label":"Rearing ","data":flt(lay_rear_tot,2)})
+    if egg_pck_tot:
+        lay_graph.append({"label":"Packing","data":flt(egg_pck_tot,2)})
    
     return {'rear':rear_html,'lay':lay_html,'budget':'','lay_graph':lay_graph,'rear_graph':rear_graph}
 
