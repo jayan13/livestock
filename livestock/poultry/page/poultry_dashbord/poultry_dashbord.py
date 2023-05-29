@@ -44,8 +44,11 @@ def get_report(company,batch,period=None):
         lay_end_date=project_end or getdate(nowdate())
     else:
         
-        rear_start_date=get_first_day(getdate(layer.doc_placed_date))
-        lay_start_date=get_first_day(getdate(layer.flock_transfer_date))
+        rear_start_date=get_first_day(doc_placed_date)
+        if flock_transfer_date:
+            lay_start_date=get_first_day(flock_transfer_date)
+        else:
+            lay_start_date=''
         rear_end_date=get_last_day(flock_transfer_date) or get_last_day(nowdate())
         lay_end_date=get_last_day(project_end) or get_last_day(nowdate())
 
@@ -71,20 +74,22 @@ def get_report(company,batch,period=None):
 
         rear_perid.append(rear)
 
-    lstart=lay_start_date
-    while getdate(lstart) < getdate(lay_end_date):
-        rear={}
-        if period=='Start Date Of Project':
-            rend=add_days(lstart,30)
-            rear.update({'start':lstart,'end':rend})
-            lstart=add_days(rend,1)
-        else:
-            rend=get_last_day(lstart)
-            rear.update({'start':lstart,'end':rend})
-            lstart=add_days(rend,1)
+   
+    if lay_start_date:
+        lstart=lay_start_date
+        while getdate(lstart) < getdate(lay_end_date):
+            rear={}
+            if period=='Start Date Of Project':
+                rend=add_days(lstart,30)
+                rear.update({'start':lstart,'end':rend})
+                lstart=add_days(rend,1)
+            else:
+                rend=get_last_day(lstart)
+                rear.update({'start':lstart,'end':rend})
+                lstart=add_days(rend,1)
 
-        lay_perod.append(rear)
-
+            lay_perod.append(rear)
+    
     rear_data=[]
     lay_data=[]
 
@@ -282,7 +287,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         #-----------------------------------------
         start=rear.get('start')
         end=rear.get('end')
-        sal=frappe.db.get_list('Salary Slip',filters={'status':'Submitted','company':layer.company,'end_date':['between',[start,end]]},fields=['net_pay'],pluck='net_pay')
+        sal=frappe.db.get_list('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]]},fields=['net_pay'],pluck='net_pay')
         salary=0
         salary_expanse=0
         if sal:
