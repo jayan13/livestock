@@ -270,13 +270,7 @@ frappe.ui.form.on('Layer Batch', {
                                 label: __("Sales Quantity"),
                                 fieldname: "transfer_qty",
                                 reqd:'1'                                
-                            },
-                            /*{  fieldtype: "Link",
-                                label: __("UOM"),
-                                fieldname: "uom",
-                                options:"UOM",
-                                reqd:'1',                              
-                            },*/
+                            },                            
                             {  fieldtype: "Date",
                             label: __("Invoice Date"),
                             fieldname: "transfer_date",
