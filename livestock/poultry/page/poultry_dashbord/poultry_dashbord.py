@@ -12,6 +12,9 @@ def get_batch_list(company=None):
     data["batchs"] = frappe.get_list("Layer Batch",filters={'docstatus':['!=','2'],'company':company,'status':'Open'},fields=['name'],limit_page_length=0, order_by="name",debug=0)
     return data
 
+@frappe.whitelist()
+def get_sale_item_list():
+    return frappe.db.get_list('Item',filters={'item_group':['in',['LIVE STOCK','MANURE']]},fields=['item_code'],pluck='item_code')
 
 @frappe.whitelist()
 def get_report(company,batch,period=None):
@@ -19,10 +22,10 @@ def get_report(company,batch,period=None):
      
     period=period or 'Start Date Of Project'
     pjt=frappe.db.get_value('Project',layer.project,['expected_start_date','expected_end_date'], as_dict=1)
-    project_end=''
+    project_end=layer.completed_date
     if pjt:
-        if pjt.expected_end_date:
-            project_end=getdate(pjt.expected_end_date)
+        #if pjt.expected_end_date:
+         #   project_end=getdate(pjt.expected_end_date)
         project_start=getdate(pjt.expected_start_date)
         
     breakeven=frappe.db.get_value('Batch Type',layer.batch_type,'break_even_period')
@@ -65,6 +68,8 @@ def get_report(company,batch,period=None):
         rear={}
         if period=='Start Date Of Project':
             rend=add_days(rstart,30)
+            if rend > rear_end_date:
+                rend=rear_end_date
             rear.update({'start':rstart,'end':rend})
             rstart=add_days(rend,1)
         else:
@@ -311,11 +316,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
             mort_to=add_days(getdate(start),15)
             totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
-            left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}'
-            left join `tabProject` p on p.name=b.name 
+            left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}'            
             where b.company='{0}' 
-            and ((b.doc_placed_date < '{2}' and (p.expected_end_date is NULL or p.expected_end_date='')) 
-            or (b.doc_placed_date < '{2}' and p.expected_end_date >'{1}')) and b.name<>'{3}'
+            and ((b.doc_placed_date < '{2}' and (b.completed_date is NULL or b.completed_date='')) 
+            or (b.doc_placed_date < '{2}' and b.completed_date >'{1}')) and b.name<>'{3}'
             group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
             
             totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
@@ -649,10 +653,9 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 
             totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
             left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}'
-            left join `tabProject` p on p.name=b.name 
             where b.company='{0}' 
-            and ((b.doc_placed_date < '{2}' and (p.expected_end_date is NULL or p.expected_end_date='')) 
-            or (b.doc_placed_date < '{2}' and p.expected_end_date >'{1}')) and b.name<>'{3}'
+            and ((b.doc_placed_date < '{2}' and (b.completed_date is NULL or b.completed_date='')) 
+            or (b.doc_placed_date < '{2}' and b.completed_date >'{1}')) and b.name<>'{3}'
             group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
 
             totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
@@ -726,16 +729,27 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     sale_tot=0
     sales=[]
     sales_data=[]
+    sale_col_ret_tot=0
+    sale_ret_tot=0
+    sales_ret=[]
+    sales_ret_data=[]
     egg_pck_tot=0
     egg_col_pck_tot=0
     egg_packing=[]
+    manu=[]
+    flock=[]
+    dis=[]
+    pro=[]
+    manu_tot=0
+    flock_tot=0
     for layin in lay_perod:
         egg_col_tot=0
+        sale_col_ret_tot=0
         sale_col_tot=0
         egg_tot_prod_col=0
         egg_col_pck_tot=0
-        ly_lbl=layin.get('start').strftime("%d-%m-%y")+'-'+layin.get('end').strftime("%d-%m-%y")
-        eggp_lbl.append(ly_lbl)
+        #ly_lbl=layin.get('start').strftime("%d-%m-%y")+'-'+layin.get('end').strftime("%d-%m-%y")
+        eggp_lbl.append(layin.get('start'))
         #------------------------------
         rear_cost=0
         oper_cost=0
@@ -783,8 +797,9 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         else:
             egg_tot_prod.append(0)
 
-        egg_sale_sql=frappe.db.sql("""select i.item_code,sum(i.amount) as amount,sum(i.stock_qty) as qty from `tabSales Invoice Item` i left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='EGGS'
-        and s.company='{0}' and s.posting_date between '{1}' and '{2}' group by i.item_code """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
+        egg_sale_sql=frappe.db.sql("""select i.item_code,sum(i.amount) as amount,sum(i.stock_qty) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='EGGS'
+        and s.is_return<>'1' and s.company='{0}' and s.posting_date between '{1}' and '{2}' group by i.item_code """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
         if egg_sale_sql:
             sales_data.append(egg_sale_sql)
             for s in egg_sale_sql:
@@ -795,13 +810,66 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             sales_data.append('')
             sales.append(0)
 
+        egg_sale_ret_sql=frappe.db.sql("""select i.item_code,sum(i.amount) as amount,sum(i.stock_qty) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='EGGS'
+        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}' group by i.item_code """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
+        if egg_sale_ret_sql:
+            sales_ret_data.append(egg_sale_ret_sql)
+            for s in egg_sale_ret_sql:
+                sale_col_ret_tot+=s.amount
+                sale_ret_tot+=s.amount
+            sales_ret.append(sale_col_ret_tot)
+        else:
+            sales_ret_data.append('')
+            sales_ret.append(0)
+
+        egg_sale_manu_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='MAN001'
+        and  s.company='{0}' and s.posting_date between '{1}' and '{2}' and s.project='{3}'  """.format(layer.company,layin.get('start'),layin.get('end'),layer.name),as_dict=1,debug=0)
+        if egg_sale_manu_sql:
+            for m in egg_sale_manu_sql:
+                manu.append(m.amount)
+                manu_tot+=m.amount
+        else:
+            manu.append(0)
+
+        egg_sale_flock_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='LIVE STOCK'
+        and s.company='{0}' and s.posting_date between '{1}' and '{2}' and s.project='{3}'  """.format(layer.company,layin.get('start'),layin.get('end'),layer.name),as_dict=1,debug=0)
+        if egg_sale_flock_sql:
+            for m in egg_sale_flock_sql:
+                flock.append(m.amount)
+                flock_tot+=m.amount
+        else:
+            flock.append(0)
+
+        egg_sale_dis_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='DISCOUNT'
+        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}'  """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
+        if egg_sale_dis_sql:
+            for m in egg_sale_dis_sql:
+                dis.append(m.amount)
+        else:
+            dis.append(0)
+
+        egg_sale_pro_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
+        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='BUSINESS PROMOTION'
+        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}'  """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
+        if egg_sale_pro_sql:
+            for m in egg_sale_pro_sql:
+                pro.append(m.amount)
+        else:
+            pro.append(0)
+    
+
     #-----------------------------
     egg_prod.append(egg_tot)
     egg_packing.append(egg_pck_tot)
     #sales.append(sale_tot)
     lay_rear.append(lay_rear_tot)
     lay_oper.append(lay_oper_tot)
-    
+    manu.append(manu_tot)
+    flock.append(flock_tot)
     #-----------------------------------------
     lay_html+='<tr>'
     for lbl in lay_lbl:
@@ -1003,16 +1071,22 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
+    exp_tot=[]
+    
     #-------------------------------------------------------
+    
     lay_html+='<tr><th> Total Expenses</th>'
     i=0
+    lay_oper.remove(lay_oper[0])
+
     for doc in egg_packing:
         cost=0
         if egg_prod[i]:
             cost=float(lay_oper[i])+float(egg_packing[i])
-        
+        exp_tot.append(cost)
         lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
         i+=1
+
     lay_html+='</tr>'
 #-------------------------------------------------------
     lay_html+='<tr><th>Total Egg Qty </th>'
@@ -1069,10 +1143,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 
     lay_html+='</tr>'
   #------------------------ sale ------------------------
-    
+    sale=[]
+    ret=[]
     if sales:
         sale_totol=0
-        lay_html+='<tr><th>Sales Value</th>'
+        lay_html+='<tr><th>Egg Sales Value</th>'
         j=0
         for s in sales:
             #frappe.msgprint(str(egg_prod[j]))
@@ -1081,18 +1156,172 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                 a=(float(s)/100)*float(p)
                 sale_totol+=a
                 lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
+                sale.append(a)
             else:
                 lay_html+='<td class="text-right">0</td>'
+                sale.append(0)
             j+=1
+        sale.append(sale_totol)
         lay_html+='<td class="text-right">'+str(flt(sale_totol,2))+'</td>'
         lay_html+='</tr>'
 
+    if sales_ret:
+        sale_totol=0
+        lay_html+='<tr><th>Sales Return</th>'
+        j=0
+        for s in sales_ret:
+            #frappe.msgprint(str(egg_prod[j]))
+            if egg_prod[j] and j < len(egg_prod):
+                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
+                a=(float(s)/100)*float(p)
+                sale_totol+=a
+                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
+                ret.append(a)
+            else:
+                lay_html+='<td class="text-right">0</td>'
+                ret.append(0)
+            j+=1
+        ret.append(sale_totol)
+        lay_html+='<td class="text-right">'+str(flt(sale_totol,2))+'</td>'
+        lay_html+='</tr>'
+
+    if manu:
+        lay_html+='<tr><th>Manure Sales</th>'
+        for m in manu:
+            lay_html+='<td class="text-right">'+str(flt(m,2))+'</td>'
+        lay_html+='</tr>'
+
+    if flock:
+        lay_html+='<tr><th>Flock Sales</th>'
+        for f in flock:
+            lay_html+='<td class="text-right">'+str(flt(f,2))+'</td>'
+        lay_html+='</tr>'
+    disc=[]
+    prom=[]
+    
+    if dis:
+        dis_totol=0
+        lay_html+='<tr><th>Discount</th>'
+        j=0
+        for s in dis:
+           
+            if egg_prod[j] and j < len(egg_prod):
+                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
+                a=(float(s)/100)*float(p)
+                dis_totol+=a
+                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
+                disc.append(a)
+            else:
+                lay_html+='<td class="text-right">0</td>'
+                disc.append(0)
+            j+=1
+        disc.append(dis_totol)
+        lay_html+='<td class="text-right">'+str(flt(dis_totol,2))+'</td>'
+        lay_html+='</tr>'
+
+    if pro:
+        pro_totol=0
+        lay_html+='<tr><th>Business Promotion</th>'
+        j=0
+        for s in pro:
+           
+            if egg_prod[j] and j < len(egg_prod):
+                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
+                a=(float(s)/100)*float(p)
+                pro_totol+=a
+                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
+                prom.append(a)
+            else:
+                lay_html+='<td class="text-right">0</td>'
+                prom.append(0)
+            j+=1
+        prom.append(pro_totol)
+        lay_html+='<td class="text-right">'+str(flt(pro_totol,2))+'</td>'
+        lay_html+='</tr>'
+
+    t=0
+    tc_tot=0
+    tc_s=[]
+    lay_html+='<tr><th>Total Sales</th>'
+    for la in eggp_lbl:
+        tc=float(sale[t])+float(ret[t])+float(disc[t])+float(prom[t])+float(manu[t])+float(flock[t])
+        tc_s.append(tc)
+        tc_tot+=tc
+        lay_html+='<td class="text-right">'+str(flt(tc,2))+'</td>'
+        t+=1
+    tc_s.append(tc_tot)
+    lay_html+='<td class="text-right">'+str(flt(tc_tot,2))+'</td>'
+    lay_html+='</tr>'
+
+    t=0
+    rev_tot=0
+    lay_html+='<tr><th>Revenue</th>'
+    for la in eggp_lbl:
+        tc=float(tc_s[t])-float(exp_tot[t])
+        rev_tot+=tc
+        lay_html+='<td class="text-right">'+str(flt(tc,2))+'</td>'
+        t+=1
+    lay_html+='<td class="text-right">'+str(flt(rev_tot,2))+'</td>'
+    lay_html+='</tr>'   
+
+
+#=======================================================================
     if lay_rear_tot:
         lay_graph.append({"label":"Rearing ","data":flt(lay_rear_tot,2)})
     if egg_pck_tot:
         lay_graph.append({"label":"Packing","data":flt(egg_pck_tot,2)})
-   
-    return {'rear':rear_html,'lay':lay_html,'budget':'','lay_graph':lay_graph,'rear_graph':rear_graph}
+
+    #Layer Budget
+    budget=frappe.db.get_value("Layer Budget",layer.name,['doc','feed','medicine','vaccine','wages','others','l_feed','l_medicine','l_vaccine','l_wages','l_others','production','sales'],as_dict=1)
+    r_doc=0
+    r_feed=0
+    r_medicine=0
+    r_vaccine=0
+    r_wages=0
+    r_others=0
+    l_feed=0
+    l_medicine=0
+    l_vaccine=0
+    l_wages=0
+    l_others=0
+    l_production=0
+    l_sales=0
+    if budget:
+       
+        r_doc=budget.doc
+        r_feed=budget.feed
+        r_medicine=budget.medicine
+        r_vaccine=budget.vaccine
+        r_wages=budget.wages
+        r_others=budget.others
+        l_feed=budget.l_feed
+        l_medicine=budget.docl_medicine
+        l_vaccine=budget.l_vaccine
+        l_wages=budget.l_wages
+        l_others=budget.l_others
+        l_production=budget.production
+        l_sales=budget.sales
+    budget_html=''
+
+    budget_html+='<tr><th>Rearing</th><td></td></tr>'
+    budget_html+='<tr><th>Doc</th><td>'+str(r_doc)+'</td></tr>'
+    budget_html+='<tr><th>Feed</th><td>'+str(r_feed)+'</td></tr>'
+    budget_html+='<tr><th>vaccineh><td>'+str(r_vaccine)+'</td></tr>'
+    budget_html+='<tr><th>Medicine</th><td>'+str(r_medicine)+'</td></tr>'
+    budget_html+='<tr><th>Wages</th><td>'+str(r_wages)+'</td></tr>'
+    budget_html+='<tr><th>Other</th><td>'+str(r_others)+'</td></tr>'
+
+    budget_html+='<tr><th></th><td></td></tr>'
+    budget_html+='<tr><th>Laying</th><td></td></tr>'
+    budget_html+='<tr><th>Feed</th><td>'+str(l_feed)+'</td></tr>'
+    budget_html+='<tr><th>vaccineh><td>'+str(l_vaccine)+'</td></tr>'
+    budget_html+='<tr><th>Medicine</th><td>'+str(l_medicine)+'</td></tr>'
+    budget_html+='<tr><th>Wages</th><td>'+str(l_wages)+'</td></tr>'
+    budget_html+='<tr><th>Other</th><td>'+str(l_others)+'</td></tr>'
+    budget_html+='<tr><th>Production</th><td>'+str(l_production)+'</td></tr>'
+    budget_html+='<tr><th>Sales</th><td>'+str(l_sales)+'</td></tr>'
+
+    return {'rear':rear_html,'lay':lay_html,'budget':budget_html,'lay_graph':lay_graph,'rear_graph':rear_graph}
 
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
