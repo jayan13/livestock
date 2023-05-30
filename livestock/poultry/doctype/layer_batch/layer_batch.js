@@ -255,11 +255,29 @@ frappe.ui.form.on('Layer Batch', {
                         
                         frappe.prompt(
                             [
+                            {  fieldtype: "Link",
+                                label: __("Item"),
+                                fieldname: "item",
+                                options:"Item",
+                                reqd:'1',
+                                get_query() {
+                                    return {
+                                        filters: { item_code:['in',['LY00001','LY00002','MAN001']] }
+                                    }
+                                },                                
+                            },
                             {  fieldtype: "Int",
                                 label: __("Sales Quantity"),
                                 fieldname: "transfer_qty",
                                 reqd:'1'                                
-                            },{  fieldtype: "Date",
+                            },
+                            /*{  fieldtype: "Link",
+                                label: __("UOM"),
+                                fieldname: "uom",
+                                options:"UOM",
+                                reqd:'1',                              
+                            },*/
+                            {  fieldtype: "Date",
                             label: __("Invoice Date"),
                             fieldname: "transfer_date",
                             reqd:'1'                                
@@ -272,6 +290,7 @@ frappe.ui.form.on('Layer Batch', {
                                         method: "livestock.poultry.doctype.layer_batch.layer_batch.sales_entry",
                                         args: {
                                             batch:frm.doc.name,
+                                            item:data.item,                                            
                                             transfer_qty:data.transfer_qty,
                                             transfer_date:data.transfer_date,                                            
                                         },

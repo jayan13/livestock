@@ -37,7 +37,7 @@ class LayerBatch(Document):
 		if pjt.status!=self.status:
 			pjt.status=	self.status
 			if self.status=='Completed':
-				pjt.expected_end_date=nowdate()
+				pjt.expected_end_date=self.completed_date
 			pjt.save()
 
 		if self.status=='Completed':
@@ -1813,17 +1813,16 @@ def laying_material_issue(batch,parentfield,items):
 	return items
 
 @frappe.whitelist()
-def sales_entry(batch,transfer_qty,transfer_date):
+def sales_entry(batch,item,transfer_qty,transfer_date):
 	lbatch=frappe.get_doc('Layer Batch',batch)
+	
 	
 	if lbatch.item_processed=='0':
 		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
-		item=sett.base_row_material
 		warehouse=sett.row_material_target_warehouse
 		batch_no=''	
 	else:
 		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
-		item=sett.base_row_material
 		warehouse=sett.row_material_target_warehouse
 		rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
 	d.item_code='{0}' and s.stock_entry_type='Manufacture' and s.manufacturing_type='Layer Chicken' and 
@@ -1833,6 +1832,9 @@ def sales_entry(batch,transfer_qty,transfer_date):
 			batch_no=rearbatch[0].batch_no
 			warehouse=rearbatch[0].t_warehouse or sett.row_material_target_warehouse
 
+	if item=='MAN001':
+		warehouse=''
+		batch_no=''
 	
 	transfer_qty=float(transfer_qty)
 
@@ -1842,20 +1844,27 @@ def sales_entry(batch,transfer_qty,transfer_date):
 	sales.project=lbatch.project
 	sales.cost_center=sett.cost_center
 	sales.set_posting_time='1'
+	if item!='MAN001':
+		sales.update_stock='1'
+		sales.set_warehouse=warehouse
 
 	item_account_details = get_item_defaults(item, sett.company)
 	stock_uom = item_account_details.stock_uom
 	conversion_factor = get_conversion_factor(item, stock_uom).get("conversion_factor")
 	cost_center=sett.cost_center or item_account_details.get("buying_cost_center")
 	expense_account=item_account_details.get("expense_account")
-	base_row_rate = get_incoming_rate({
-						"item_code": item,
-						"warehouse": warehouse,
-						"posting_date": sales.posting_date,
-						"posting_time": sales.posting_time,
-						"qty": -1 * transfer_qty,
-                        'company':sett.company
-					})
+	if item!='MAN001':
+		base_row_rate = get_incoming_rate({
+							"item_code": item,
+							"warehouse": warehouse,
+							"posting_date": sales.posting_date,
+							"posting_time": sales.posting_time,
+							"qty": -1 * transfer_qty,
+							'company':sett.company
+						})
+	else:
+		base_row_rate=0
+
 	if warehouse:
 		validate_stock_qty(item,transfer_qty,warehouse,stock_uom,stock_uom)
 

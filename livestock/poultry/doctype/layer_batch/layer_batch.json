@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:batch_name",
  "creation": "2023-03-13 08:52:18.669499",
@@ -25,6 +26,7 @@
   "flock_transfer_date",
   "project",
   "status",
+  "completed_date",
   "batch_type",
   "layer_status",
   "rearing_period_section",
@@ -415,6 +417,12 @@
    "fieldtype": "Link",
    "label": "Batch Type",
    "options": "Batch Type"
+  },
+  {
+   "fieldname": "completed_date",
+   "fieldtype": "Date",
+   "label": "Completed Date",
+   "mandatory_depends_on": "eval:(doc.status==\"Completed\")"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -432,7 +440,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-05-11 10:06:51.919517",
+ "modified": "2023-05-29 11:21:05.231931",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",
