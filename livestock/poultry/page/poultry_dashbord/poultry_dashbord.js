@@ -178,6 +178,8 @@ MyPage =Class.extend({
 		}
 		//chart_page();
 		//var reqsnd=0
+		var rear_xl=[];
+		var lay_xl=[];
 		function get_report()
 		{
 			//console.log('rs='+reqsnd);
@@ -199,6 +201,8 @@ MyPage =Class.extend({
 						 $('#rer_exp').html(r.message.rear);
 						 $('#lay_exp').html(r.message.lay);
 						 $('#budgets').html(r.message.budget);
+						 rear_xl=r.message.rear_xl
+						 lay_xl=r.message.lay_xl
 						 let l_lbl=[]
 						 let l_dta=[]
 						 let r_lbl=[]
@@ -230,8 +234,30 @@ MyPage =Class.extend({
 			}
 			
 		}
-		
-		
+		//---------------------------------------------------
+		function download_rep()
+		{
+			
+			frappe.call({
+				method: "livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_report",
+				args: {
+					company: field.get_value(),
+					batch: field1.get_value(),
+					period: field2.get_value(),
+					rearing:JSON.stringify(rear_xl),
+					laying:JSON.stringify(lay_xl)	
+				},
+				callback: function(response) {
+				  var files = response.message;
+				  //window.open("/api/method/livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_file");
+				  let url='/api/method/livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_file';
+				  open_url_post(url, {file: files}); 
+				}
+			  }); 
+
+			  
+		}
+		//--------------------------------------------------------
 		
 	}
 })
@@ -250,19 +276,3 @@ function print_rep()
 		  
 				}
 
-function download_rep()
-{
-	frappe.call({
-		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_report',
-		args: {
-		  company: field.get_value(),
-		  batch: field1.get_value(),
-		  period: field2.get_value(),					  
-		},
-		callback: function (r) {
-		  if (r.message) {
-			
-		  }
-		},
-	  }); 
-}
