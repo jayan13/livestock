@@ -1436,55 +1436,140 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
 
-import pandas as pd
+
 import os
-import tempfile
-from openpyxl import Workbook
-from openpyxl.chart import (
-    PieChart,
-    ProjectedPieChart,
-    Reference
-)
-from openpyxl.utils.dataframe import dataframe_to_rows
+#import tempfile
+
+
 #from frappe.utils.response import download_file
 @frappe.whitelist()
-def down_report(company,batch,rearing=None,laying=None):
+def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp=None):
     import json
+    import pandas as pd
+    from openpyxl.utils.dataframe import dataframe_to_rows
+    from openpyxl import Workbook
+    from openpyxl.chart import (
+        PieChart,
+        ProjectedPieChart,
+        Reference
+    )
+    from openpyxl.styles import Font
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    ft = Font(bold=True)
+
     rearingary=json.loads(rearing)
     layingary=json.loads(laying)
-    data = [
-    ['Pie', 'Sold'],
-    ['Apple', 50],
-    ['Cherry', 30],
-    ['Pumpkin', 10],
-    ['Chocolate', 40],
-    ]
+    gp_rear=json.loads(rearing_gp)
+    gp_lay=json.loads(laying_gp)
+    rrowlen=len(rearingary)
+    rcollen=len(rearingary[0])
+    lrowlen=len(layingary)
+    lcollen=len(layingary[0])
+
+    #frappe.throw(str(gp_rear))
+    #frappe.throw(str(rrowlen))
+
+    df = pd.DataFrame(gp_rear)
+    df2 = pd.DataFrame(gp_lay)
+   
     wb = Workbook()
     ws = wb.active
     ws.title = "Rearing"
     ws2 = wb.create_sheet("Production")
+    ws3 = wb.create_sheet("RearGP")
+    ws4 = wb.create_sheet("LayGP")
 
     for row in rearingary:
-        ws.append(row)
+       ws.append(row)
 
     for row in layingary:
-        ws2.append(row)
+       ws2.append(row)
 
-    """
-    pie = PieChart()
-    labels = Reference(ws, min_col=1, min_row=2, max_row=5)
-    data = Reference(ws, min_col=2, min_row=1, max_row=5)
-    pie.add_data(data, titles_from_data=True)
-    pie.set_categories(labels)
-    pie.title = "Pies sold by category"
-    ws.add_chart(pie, "D1")
-    """
+    for row in dataframe_to_rows(df, index=False, header=True):
+        ws3.append(row)
+
+    for row in dataframe_to_rows(df2, index=False, header=True):
+        ws4.append(row)
+        
+    rlbl=getColumnName(rcollen)
+    rhd="A1:"+str(rlbl)+str(1)
+    for row in ws[rhd]:
+        for cell in row:
+            cell.font = ft
+
+    
+    rhd="A1:A"+str(rrowlen)
+    for row in ws[rhd]:
+        for cell in row:
+            cell.font = ft
+
+    rlbl=getColumnName(lcollen)
+    rhd="A1:"+str(rlbl)+str(1)
+    for row in ws2[rhd]:
+        for cell in row:
+            cell.font = ft
+    
+    rhd="A1:A"+str(lrowlen)
+    for row in ws2[rhd]:
+        for cell in row:
+            cell.font = ft
+
+    #rtab="A1:"+str(getColumnName(rcollen))+str(rrowlen)
+    #ltab="A1:"+str(getColumnName(lcollen))+str(lrowlen)
+    #frappe.throw(str(ltab))
+    #tab1 = Table(displayName="Table1", ref=rtab)
+    #tab2 = Table(displayName="Table2", ref=ltab)
+    #style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,showLastColumn=False, showRowStripes=True, showColumnStripes=True)
+    #tab1.tableStyleInfo = style
+    #tab2.tableStyleInfo = style
+    #ws.add_table(tab1)
+    #ws2.add_table(tab2)
+    #frappe.throw(str(len(gp_lay)))
+    if len(gp_rear):
+        maxr=len(gp_rear)+1
+        rhd="B"+str(rrowlen+2)
+        pie = PieChart()
+        labels = Reference(ws3, min_col=1, min_row=2, max_row=maxr)
+        data = Reference(ws3, min_col=2, min_row=1, max_row=5)
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Rearing"
+        ws.add_chart(pie, rhd)
+        
+    if len(gp_lay):
+        maxr=len(gp_lay)+1
+        rhd="B"+str(lrowlen+2)
+        pie = PieChart()
+        labels = Reference(ws4, min_col=1, min_row=2, max_row=maxr)
+        data = Reference(ws4, min_col=2, min_row=1, max_row=6)
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Laying"
+        ws2.add_chart(pie, rhd)
+    
 
     file_name = 'poultry_dash.xlsx'    
     temp_file=os.path.join(frappe.utils.get_bench_path(), "logs", file_name)
     wb.save(temp_file)
     return temp_file
 
+def getColumnName(n):
+ 
+    # initialize output string as empty
+    result = ''
+ 
+    while n > 0:
+ 
+        # find the index of the next letter and concatenate the letter
+        # to the solution
+ 
+        # here index 0 corresponds to 'A', and 25 corresponds to 'Z'
+        index = (n - 1) % 26
+        result += chr(index + ord('A'))
+        n = (n - 1) // 26
+ 
+    return result[::-1]
 
 
 @frappe.whitelist()
