@@ -1413,7 +1413,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         l_sales=budget.sales
     budget_html=''
 
-    budget_html+='<tr><th>Rearing</th><td></td></tr>'
+    budget_html+='<tr><th style="width:150px;">Rearing</th><td ></td></tr>'
     budget_html+='<tr><th>Doc</th><td>'+str(r_doc)+'</td></tr>'
     budget_html+='<tr><th>Feed</th><td>'+str(r_feed)+'</td></tr>'
     budget_html+='<tr><th>vaccineh><td>'+str(r_vaccine)+'</td></tr>'
