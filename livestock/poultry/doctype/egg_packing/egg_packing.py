@@ -45,6 +45,11 @@ class EggPacking(Document):
 		stock_adjustment_account=frappe.db.get_value('Company',self.company,'stock_adjustment_account')
 		if pcmaterials:
 			for pcitem in pcmaterials.packing_item:
+				if self.raw_egg_item==pcitem.item:
+					packing_warehouse=self.raw_egg_warehouse
+				else:
+					packing_warehouse=self.packing_warehouse
+
 				pack_item_details = get_item_defaults(pcitem.item, self.company)
 				stock_uom = pack_item_details.stock_uom
 				conversion_factor = get_conversion_factor(pcitem.item, pcitem.uom).get("conversion_factor")
@@ -55,7 +60,7 @@ class EggPacking(Document):
 				packed_qty=float(pcitem.qty)*float(self.qty)
 				pck_rate = get_incoming_rate({
 									"item_code": pcitem.item,
-									"warehouse": self.packing_warehouse,
+									"warehouse": packing_warehouse,
 									"posting_date": posting_date,
 									"posting_time": posting_time,
 									"qty": -1 * packed_qty,
@@ -67,7 +72,7 @@ class EggPacking(Document):
 				itemscost+=transfer_qty * pck_rate
 					#pcitems.append({
 				stock_entry.append('items', {
-								's_warehouse': self.packing_warehouse,
+								's_warehouse': packing_warehouse,
 								'item_code': pcitem.item,
 								'qty': packed_qty,
 								'actual_qty':packed_qty,
@@ -140,16 +145,17 @@ class EggPacking(Document):
 			stock_entry.append('items',pc)
 
 		stock_entry.insert()
+		#stock_entry.save()
 		stock_entry.submit()
 		#stock_entry.docstatus=1
-		stock_entry.save()
+		#stock_entry.save()
 
 		self.stock_entry=stock_entry.name
 
 	def on_cancel(self):
 		doc=frappe.get_doc('Stock Entry',self.stock_entry)
 		doc.cancel()
-		doc.save()
+		#doc.save()
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs

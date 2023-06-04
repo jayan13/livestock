@@ -13,6 +13,13 @@ frappe.ui.form.on('Egg Packing', {
 			};
 		});
 		
+		frm.set_query('raw_egg_item', function(doc, cdt, cdn) {
+			return {
+			   "filters": {
+			"item_group": 'EGGS',
+		}
+			};
+		});
 		frm.set_query('bom', function(doc, cdt, cdn) {
 			return {
 			   "filters": {

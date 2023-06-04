@@ -12,7 +12,9 @@
   "uom",
   "qty",
   "bom",
-  "source_warehouse",
+  "column_break_7",
+  "raw_egg_item",
+  "raw_egg_warehouse",
   "packing_warehouse",
   "target_warehouse",
   "purchase_order",
@@ -66,13 +68,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "source_warehouse",
-   "fieldtype": "Link",
-   "label": "Source Warehouse",
-   "options": "Warehouse",
-   "reqd": 1
-  },
-  {
    "fieldname": "target_warehouse",
    "fieldtype": "Link",
    "label": "Target Warehouse",
@@ -108,12 +103,30 @@
    "label": "Packing Material Warehouse",
    "options": "Warehouse",
    "reqd": 1
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "raw_egg_item",
+   "fieldtype": "Link",
+   "label": "Raw Egg Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "raw_egg_warehouse",
+   "fieldtype": "Link",
+   "label": "Raw Egg Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-06-03 17:38:58.027589",
+ "modified": "2023-06-04 13:28:09.824181",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Egg Packing",
