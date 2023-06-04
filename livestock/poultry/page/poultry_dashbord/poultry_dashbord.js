@@ -98,7 +98,6 @@ MyPage =Class.extend({
 		field3.set_value(frappe.datetime.get_today());
 */
 		
-		
 		//this.page.add_inner_button('Get  Report', () => get_report());
 		//this.page.add_inner_button('Print', () => print_rep());
 		let data='';
