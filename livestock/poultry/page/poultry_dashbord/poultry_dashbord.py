@@ -19,8 +19,8 @@ def get_sale_item_list():
 @frappe.whitelist()
 def get_report(company,batch,period=None):
     layer=frappe.get_doc('Layer Batch',batch)
-     
-    period=period or 'Start Date Of Project'
+    default_currency=frappe.get_value('Company',layer.company,'default_currency') 
+    period=period or 'Accounting Period'
     pjt=frappe.db.get_value('Project',layer.project,['expected_start_date','expected_end_date'], as_dict=1)
     project_end=layer.completed_date
     if pjt:
@@ -392,7 +392,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     #rear_data.append(rear_doc)
     rear_xl_data=[]
     xl_rer_row=[]
-    rear_html+='<tr>'
+    rear_html+='<tr class="table-secondary">'
     for lbl in rear_lbl:
         rear_html+='<th scope="col">'+lbl+'</th>'
         xl_rer_row.append(lbl)
@@ -487,7 +487,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     rear_xl_data.append(xl_rer_row)
     xl_rer_row=[]
     #---------------------------------------------------
-    rear_html+='<tr>'
+    rear_html+='<tr class="table-secondary">'
     i=0
     for doc in reat_tot:
         xl_rer_row.append(doc)
@@ -618,7 +618,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         #frappe.msgprint(str(dept))
         start=layin.get('start')
         end=layin.get('end')
-        sal=frappe.db.get_list('Salary Slip',filters={'status':'Submitted','company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
+        sal=frappe.db.get_list('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
         salary=0
         salary_expanse=0
         if sal:
@@ -875,7 +875,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     #-----------------------------------------
     lay_xl_data=[]
     lay_xl_row=[]
-    lay_html+='<tr>'
+    lay_html+='<tr class="table-secondary">'
     for lbl in lay_lbl:
         lay_html+='<th scope="col">'+lbl+'</th>'
         lay_xl_row.append(lbl)
@@ -954,7 +954,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_xl_data.append(lay_xl_row)
     lay_xl_row=[]
      #---------------------------------------------------
-    lay_html+='<tr>'
+    lay_html+='<tr class="table-secondary">'
     i=0
     for doc in lay_tot:
         lay_xl_row.append(doc)
@@ -996,7 +996,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_xl_data.append(lay_xl_row)
     lay_xl_row=[]
     #---------------------------------------------------
-    lay_html+='<tr>'
+    lay_html+='<tr class="table-secondary">'
     i=0
     for doc in lay_oper:
         lay_xl_row.append(doc)
@@ -1052,7 +1052,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             lay_html+='</tr>'
    #------------------------------------
     lay_xl_row=[]
-    lay_html+='<tr><th>Total Production </th>'
+    lay_html+='<tr class="table-secondary"><th>Total Production </th>'
     lay_xl_row.append('Total Production')
     i=0
     for doc in egg_prod:
@@ -1101,14 +1101,14 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                     lay_html+='<td class="text-right">0</td>'
                     lay_xl_row.append(0)
 
-            lay_html+='<td class="text-right">'+str(row_sum)+'</td>'
+            lay_html+='<td class="text-right">'+str(flt(row_sum,2))+'</td>'
             lay_xl_row.append(row_sum)
             lay_xl_data.append(lay_xl_row)        
             lay_html+='</tr>'
 
  #------------------------------------
     lay_xl_row=[]
-    lay_html+='<tr><th> Packing Total </th>'
+    lay_html+='<tr class="table-secondary"><th> Packing Total </th>'
     lay_xl_row.append('Packing Total')
     i=0
     for doc in egg_packing:
@@ -1134,15 +1134,15 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     exp_tot=[]
     #-------------------------------------------------------
     
-    lay_html+='<tr><th> Total Expenses</th>'
+    lay_html+='<tr class="table-secondary"><th> Total Expenses</th>'
     lay_xl_row.append('Total Expenses')
     i=0
     lay_oper.remove(lay_oper[0])
 
     for doc in egg_packing:
         cost=0
-        if egg_prod[i]:
-            cost=float(lay_oper[i])+float(egg_packing[i])
+        #if egg_prod[i]:
+        cost=float(lay_oper[i])+float(egg_packing[i])
         exp_tot.append(cost)
         lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
         lay_xl_row.append(flt(cost,2))
@@ -1152,7 +1152,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_xl_data.append(lay_xl_row)
     lay_xl_row=[]
 #-------------------------------------------------------
-    lay_html+='<tr><th>Total Egg Qty </th>'
+    lay_html+='<tr class="table-secondary"><th>Total Egg Qty </th>'
     lay_xl_row.append('Total Egg Qty')
     i=0
     for doc in egg_prod:
@@ -1345,7 +1345,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     t=0
     tc_tot=0
     tc_s=[]
-    lay_html+='<tr><th>Total Sales</th>'
+    lay_html+='<tr class="table-secondary"><th>Total Sales</th>'
     lay_xl_row.append('Total Sales')
     for la in eggp_lbl:
         tc=float(sale[t])+float(ret[t])+float(disc[t])+float(prom[t])+float(manu[t])+float(flock[t])
@@ -1362,8 +1362,8 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_xl_row=[]
     t=0
     rev_tot=0
-    lay_html+='<tr><th>Revenue</th>'
-    lay_xl_row.append('Revenue')
+    lay_html+='<tr class="table-secondary"><th>Net Profit</th>'
+    lay_xl_row.append('Net Profit')
     for la in eggp_lbl:
         tc=float(tc_s[t])-float(exp_tot[t])
         rev_tot+=tc
@@ -1416,7 +1416,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     budget_html+='<tr><th style="width:150px;">Rearing</th><td ></td></tr>'
     budget_html+='<tr><th>Doc</th><td>'+str(r_doc)+'</td></tr>'
     budget_html+='<tr><th>Feed</th><td>'+str(r_feed)+'</td></tr>'
-    budget_html+='<tr><th>vaccineh><td>'+str(r_vaccine)+'</td></tr>'
+    budget_html+='<tr><th>vaccine<td>'+str(r_vaccine)+'</td></tr>'
     budget_html+='<tr><th>Medicine</th><td>'+str(r_medicine)+'</td></tr>'
     budget_html+='<tr><th>Wages</th><td>'+str(r_wages)+'</td></tr>'
     budget_html+='<tr><th>Other</th><td>'+str(r_others)+'</td></tr>'
@@ -1424,7 +1424,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     budget_html+='<tr><th></th><td></td></tr>'
     budget_html+='<tr><th>Laying</th><td></td></tr>'
     budget_html+='<tr><th>Feed</th><td>'+str(l_feed)+'</td></tr>'
-    budget_html+='<tr><th>vaccineh><td>'+str(l_vaccine)+'</td></tr>'
+    budget_html+='<tr><th>vaccine<td>'+str(l_vaccine)+'</td></tr>'
     budget_html+='<tr><th>Medicine</th><td>'+str(l_medicine)+'</td></tr>'
     budget_html+='<tr><th>Wages</th><td>'+str(l_wages)+'</td></tr>'
     budget_html+='<tr><th>Other</th><td>'+str(l_others)+'</td></tr>'
@@ -1454,7 +1454,9 @@ def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp
         Reference
     )
     from openpyxl.styles import Font
-    from openpyxl.worksheet.table import Table, TableStyleInfo
+    #from openpyxl.worksheet.table import Table, TableStyleInfo
+    from openpyxl.styles import PatternFill
+    from openpyxl.styles import Border, Side
 
     ft = Font(bold=True)
 
@@ -1491,29 +1493,59 @@ def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp
 
     for row in dataframe_to_rows(df2, index=False, header=True):
         ws4.append(row)
-        
+    
+    yellow = "00D5D7D9"
+    black="00000000"
+    thin = Side(border_style="thin", color=black)
+    double = Side(border_style="double", color=black)
     rlbl=getColumnName(rcollen)
     rhd="A1:"+str(rlbl)+str(1)
+    
     for row in ws[rhd]:
         for cell in row:
             cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
-    
+    rhd="A1:"+str(rlbl)+str(rrowlen)
+    for row in ws[rhd]:
+        rowhed=0
+        for cell in row:
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+            if "Total" in str(cell.value):
+                rowhed=1
+            if rowhed==1:
+                cell.font = ft
+                cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+
     rhd="A1:A"+str(rrowlen)
     for row in ws[rhd]:
         for cell in row:
             cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
     rlbl=getColumnName(lcollen)
     rhd="A1:"+str(rlbl)+str(1)
     for row in ws2[rhd]:
         for cell in row:
             cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+
+    rhd="A1:"+str(rlbl)+str(lrowlen)
+    for row in ws2[rhd]:
+        rowhed=0
+        for cell in row:
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+            if "Total" in str(cell.value) or 'Net Profit' in str(cell.value) or 'Operational Cost' in str(cell.value):
+                rowhed=1
+            if rowhed==1:
+                cell.font = ft
+                cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
     
     rhd="A1:A"+str(lrowlen)
     for row in ws2[rhd]:
         for cell in row:
             cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
     #rtab="A1:"+str(getColumnName(rcollen))+str(rrowlen)
     #ltab="A1:"+str(getColumnName(lcollen))+str(lrowlen)
