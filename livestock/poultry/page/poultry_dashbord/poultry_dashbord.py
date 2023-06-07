@@ -117,6 +117,7 @@ def get_report(company,batch,period=None):
     reat_tot_tot=0
     rear_ind_expanse=[]
     rear_ind_expanse_tot=0
+    rear_ind_itm_cnt=0
     
     
     rear_html=''
@@ -351,13 +352,66 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         else:
             rear_wages.append(0)
         #========================================================================
-        
+        rearind=frappe.db.get_all('Rearing Indirect Expenses',filters={'company':layer.company},fields=['title','name'])
+        if rearind:
+            rear_ind_expanse_item=[]
+            rear_ind_itm_cnt=len(rearind)
+            for re in rearind:
+                rear_ind_expanse_data={}
+                acc=[]
+                accs=''
+                exp=0
+                ind_expanse=0
+                accsre=frappe.db.sql("""select account from `tabExpense Accounts` where parenttype='Rearing Indirect Expenses' and parent='{0}' """.format(re.name),as_dict=1)
+                if accsre:
+                    for ac in accsre:
+                        acc.append(ac.account)
+                    accs='","'.join(acc)
+                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
+                if exppjt:
+                    ind_expanse+=float(exppjt[0].debit)-float(exppjt[0].credit)
+
+                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
+                if expwpjt:
+                    exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
+                    if exp != 0:
+                        if wageper:
+                            ind_expanse+=(float(exp)/100)*float(wageper)                
+                        else:
+                            batchcount=frappe.db.sql(""" select count(name) as cnt from `tabLayer Batch` where  status='Open' """,as_dict=1,debug=0)
+                            if batchcount:
+                                ind_expanse+=float(exp)/float(batchcount[0].cnt)
+
+                rear_ind_expanse_tot+=ind_expanse
+                col_tot+=ind_expanse
+                rear_ind_expanse_data.update({'title':re.title,'amt':ind_expanse})
+                rear_ind_expanse_item.append(rear_ind_expanse_data)
+            rear_ind_expanse.append(rear_ind_expanse_item)
      
     #----------------------------------
         reat_tot.append(col_tot)
     #------------------------------
-    #frappe.msgprint(str(rear_ind_expanse))
-    reat_tot_tot=float(rear_doc_tot)+float(rear_feed_tot)+float(rear_vaccine_tot)+float(rear_medicine_tot)+float(rear_bio_tot)+float(rear_miscel_tot)+float(rear_other_tot)+float(rear_wages_tot)
+    rearing_ind_array=[]
+    if rear_ind_itm_cnt:
+        for num in range(0,rear_ind_itm_cnt):
+            i=0
+            row_tot=0
+            row_ind=[]
+            for indx in rear_ind_expanse:                
+                if i==0:
+                    row_ind.append(indx[num].get('title'))
+                    row_ind.append(indx[num].get('amt'))
+                    row_tot+=float(indx[num].get('amt'))
+                else:
+                    row_ind.append(indx[num].get('amt'))
+                    row_tot+=float(indx[num].get('amt'))
+                i+=1
+            row_ind.append(row_tot)
+            rearing_ind_array.append(row_ind)
+            
+    
+    
+    reat_tot_tot=float(rear_doc_tot)+float(rear_feed_tot)+float(rear_vaccine_tot)+float(rear_medicine_tot)+float(rear_bio_tot)+float(rear_miscel_tot)+float(rear_other_tot)+float(rear_wages_tot)+float(rear_ind_expanse_tot)
     rear_lbl.append('Total')
     rear_doc.append(rear_doc_tot)
     rear_feed.append(rear_feed_tot)
@@ -456,6 +510,30 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
+    #-------------------------------------------------
+    if len(rearing_ind_array):
+        rear_html+='<tr class="table-secondary">'
+        i=0
+        for lbl in rear_lbl:
+            if i==0:
+                rear_html+='<th scope="col">Indirect Expense</th>'
+            else:
+                rear_html+='<td class="text-right"></td>'
+            i+=1
+        rear_html+='</tr>'
+        
+        
+        for redind in rearing_ind_array:
+            rear_html+='<tr >'
+            i=0
+            for reind in redind:
+                if i==0:
+                    rear_html+='<th scope="col">'+str(reind)+'</th>'
+                else:
+                    rear_html+='<td class="text-right">'+str(flt(reind,2))+'</td>'
+                i+=1
+            rear_html+='</tr>'
+
     #---------------------------------------------------
     rear_html+='<tr class="table-secondary">'
     i=0
@@ -491,6 +569,9 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     lay_tot_tot=0
     lay_rear_tot=0
     lay_oper_tot=0
+    lay_ind_expanse=[]
+    lay_ind_expanse_tot=0
+    lay_ind_itm_cnt=0
     
     lay_html=''
     for layin in lay_perod:
@@ -591,58 +672,58 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         if sal:
             salary+=sum(c for c in sal)
 
-        if salary:
-            #wage lay_end_date layer.doc_placed laying_mortality
-            mtotsrt=0
-            mtotend=0
-            mortmonthavg=0
-            live=0
-            mtotsrt=0
-            mtotend=0
-            mortmonthavg=0
-            live=0
-            if layer.rearing_daily_mortality:
-                for mor in layer.rearing_daily_mortality:
-                    mtotsrt+=float(mor.total)
+        mtotsrt=0
+        mtotend=0
+        mortmonthavg=0
+        live=0
+        mtotsrt=0
+        mtotend=0
+        mortmonthavg=0
+        live=0
+        if layer.rearing_daily_mortality:
+            for mor in layer.rearing_daily_mortality:
+                mtotsrt+=float(mor.total)
                     
 
-            if layer.laying_mortality:
-                for mor in layer.laying_mortality:
-                    if getdate(mor.date)< getdate(start):
-                        mtotsrt+=float(mor.total)
-                    if getdate(start) <= getdate(mor.date)<=getdate(end):
-                        mtotend+=float(mor.total)
+        if layer.laying_mortality:
+            for mor in layer.laying_mortality:
+                if getdate(mor.date)< getdate(start):
+                    mtotsrt+=float(mor.total)
+                if getdate(start) <= getdate(mor.date)<=getdate(end):
+                    mtotend+=float(mor.total)
 
-                if mtotend:
-                    mortmonthavg=float(mtotend)/2
-            live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
-            mort_to=add_days(getdate(start),15)
-            #totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}' where
-            #b.company='{0}'  group by b.name""".format(layer.company,start),as_dict=1,debug=1)
-
-            totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
+            if mtotend:
+                mortmonthavg=float(mtotend)/2
+        live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
+        mort_to=add_days(getdate(start),15)
+            
+        totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
             left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}'
             where b.company='{0}' 
             and ((b.doc_placed_date < '{2}' and (b.completed_date is NULL or b.completed_date='')) 
             or (b.doc_placed_date < '{2}' and b.completed_date >'{1}')) and b.name<>'{3}'
             group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
 
-            totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
+        totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
             b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
-            crr={}
-            if totcurrent:
-                for cr in totcurrent:
-                    crr.update({cr.name:cr.tot})
-            totlive=0
-            if totbfor:
-                for bf in totbfor:
-                    totavg=0
-                    if crr.get(bf.name):
-                        totavg=float(crr.get(bf.name))/2
+        crr={}
+        if totcurrent:
+            for cr in totcurrent:
+                crr.update({cr.name:cr.tot})
+        totlive=0
+        if totbfor:
+            for bf in totbfor:
+                totavg=0
+                if crr.get(bf.name):
+                    totavg=float(crr.get(bf.name))/2
 
-                    totlive+=bf.doc_placed-bf.tot-totavg
+                totlive+=bf.doc_placed-bf.tot-totavg
             
-            wageper=(float(live)*100)/float(totlive)
+        wageper=(float(live)*100)/float(totlive)
+
+        if salary:
+            #wage lay_end_date layer.doc_placed laying_mortality
+            
            
             if wageper:
                 salary_expanse=(float(salary)/100)*float(wageper)                
@@ -656,9 +737,72 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             col_tot+=salary_expanse
         else:
             lay_wages.append(0)
+
+        #========================================================================
+        layind=frappe.db.get_all('Laying Indirect Expenses',filters={'company':layer.company},fields=['title','name'])
+        if layind:
+            lay_ind_expanse_item=[]
+            lay_ind_itm_cnt=len(layind)
+            for re in layind:
+                lay_ind_expanse_data={}
+                acc=[]
+                accs=''
+                exp=0
+                ind_expanse=0
+                accsre=frappe.db.sql("""select account from `tabExpense Accounts` where parenttype='Laying Indirect Expenses' and parent='{0}' """.format(re.name),as_dict=1)
+                if accsre:
+                    for ac in accsre:
+                        acc.append(ac.account)
+                    accs='","'.join(acc)
+                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
+                if exppjt:
+                    ind_expanse+=float(exppjt[0].debit)-float(exppjt[0].credit)
+
+                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
+                if expwpjt:
+                    exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
+                    if exp != 0:
+                        if wageper:
+                            ind_expanse+=(float(exp)/100)*float(wageper)                
+                        else:
+                            batchcount=frappe.db.sql(""" select count(name) as cnt from `tabLayer Batch` where  status='Open' """,as_dict=1,debug=0)
+                            if batchcount:
+                                ind_expanse+=float(exp)/float(batchcount[0].cnt)
+
+                lay_ind_expanse_tot+=ind_expanse
+                #col_tot+=ind_expanse
+                lay_ind_expanse_data.update({'title':re.title,'amt':ind_expanse})
+                lay_ind_expanse_item.append(lay_ind_expanse_data)
+            lay_ind_expanse.append(lay_ind_expanse_item)
 #----------------------------------
         lay_tot.append(col_tot)
-    
+    #----------indirect exp--------
+    laying_ind_array=[]
+    if lay_ind_itm_cnt:
+        for num in range(0,lay_ind_itm_cnt):
+            i=0
+            row_tot=0
+            row_ind=[]
+            for indx in lay_ind_expanse:                
+                if i==0:
+                    row_ind.append(indx[num].get('title'))
+                    row_ind.append(indx[num].get('amt'))
+                    row_tot+=float(indx[num].get('amt'))
+                else:
+                    row_ind.append(indx[num].get('amt'))
+                    row_tot+=float(indx[num].get('amt'))
+                i+=1
+            row_ind.append(row_tot)
+            laying_ind_array.append(row_ind)
+
+        row_ind=['Total']
+        for indx in lay_ind_expanse:
+            colid_tot=0
+            for idx in indx:
+                colid_tot+=float(idx.get('amt'))
+            row_ind.append(colid_tot)
+        row_ind.append(lay_ind_expanse_tot)
+        laying_ind_array.append(row_ind)
     #-----------------------------
     lay_tot_tot=float(lay_doc_tot)+float(lay_feed_tot)+float(lay_vaccine_tot)+float(lay_medicine_tot)+float(lay_other_tot)+float(lay_wages_tot)
     lay_lbl.append('Total')
@@ -894,6 +1038,29 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
+    #---------------------- Indirect Expense -----------------
+    if len(laying_ind_array):
+        lay_html+='<tr>'
+        i=0
+        for lbl in lay_lbl:
+            if i==0:
+                lay_html+='<th scope="col">Indirect Expense</th>'
+            else:
+                lay_html+='<td class="text-right"></td>'
+            i+=1
+        lay_html+='</tr>'
+        
+        
+        for redind in laying_ind_array:
+            lay_html+='<tr >'
+            i=0
+            for reind in redind:
+                if i==0:
+                    lay_html+='<th scope="col">'+str(reind)+'</th>'
+                else:
+                    lay_html+='<td class="text-right">'+str(flt(reind,2))+'</td>'
+                i+=1
+            lay_html+='</tr>'
     #------------------------blank ---------------------------
     lay_html+='<tr>'
     i=0
@@ -1139,6 +1306,8 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     rcollen=len(rearingary[0])
     lrowlen=len(layingary)
     lcollen=len(layingary[0])
+    browlen=len(budgetary)
+    bcollen=len(budgetary[0])
 
     #frappe.throw(str(gp_rear))
     #frappe.throw(str(rrowlen))
@@ -1173,6 +1342,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     black="00000000"
     thin = Side(border_style="thin", color=black)
     double = Side(border_style="double", color=black)
+    #=====================================================
     rlbl=getColumnName(rcollen)
     rhd="A1:"+str(rlbl)+str(1)
     
@@ -1197,7 +1367,32 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         for cell in row:
             cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+    #---------------------------------------------------------------------------------
+    rlbl=getColumnName(bcollen)
+    rhd="A1:"+str(rlbl)+str(1)
+    
+    for row in ws1[rhd]:
+        for cell in row:
+            cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
+    rhd="A1:"+str(rlbl)+str(browlen)
+    for row in ws1[rhd]:
+        rowhed=0
+        for cell in row:
+            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
+            if "Total" in str(cell.value):
+                rowhed=1
+            if rowhed==1:
+                cell.font = ft
+                cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+
+    rhd="A1:A"+str(browlen)
+    for row in ws1[rhd]:
+        for cell in row:
+            cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+    #----------------------------------------------------------------------------------------------
     rlbl=getColumnName(lcollen)
     rhd="A1:"+str(rlbl)+str(1)
     for row in ws2[rhd]:

@@ -179,8 +179,9 @@ MyPage =Class.extend({
 		//var reqsnd=0
 		var rear_xl=[];
 		var lay_xl=[];
-		var rear_xl=[];
-		var lay_xl=[];
+		var budget_xl=[];
+		var reargp_xl=[];
+		var laygp_xl=[];
 		function get_report()
 		{
 			//console.log('rs='+reqsnd);
@@ -202,8 +203,7 @@ MyPage =Class.extend({
 						 $('#rer_exp').html(r.message.rear);
 						 $('#lay_exp').html(r.message.lay);
 						 $('#budgets').html(r.message.budget);
-						 rear_xl=r.message.rear_xl
-						 lay_xl=r.message.lay_xl
+
 						 reargp_xl=r.message.rear_graph
 						 laygp_xl=r.message.lay_graph
 						 let l_lbl=[]
@@ -240,7 +240,9 @@ MyPage =Class.extend({
 		//---------------------------------------------------
 		function download_rep()
 		{
-			
+			budget_xl=get_table_data('#budgets tr');
+			rear_xl=get_table_data('#rer_exp tr');
+			lay_xl=get_table_data('#lay_exp tr');
 			frappe.call({
 				method: "livestock.poultry.page.poultry_dashbord.poultry_dashbord.down_report",
 				args: {
@@ -248,6 +250,7 @@ MyPage =Class.extend({
 					batch: field1.get_value(),					
 					rearing:JSON.stringify(rear_xl),
 					laying:JSON.stringify(lay_xl),
+					budget:JSON.stringify(budget_xl),
 					rearing_gp:JSON.stringify(reargp_xl),
 					laying_gp:JSON.stringify(laygp_xl),	
 				},
@@ -262,6 +265,36 @@ MyPage =Class.extend({
 			  
 		}
 		//--------------------------------------------------------
+		
+		function get_table_data(id)
+		{
+			const trs = document.querySelectorAll(id);
+
+			const result = [];
+			
+			for(let tr of trs) {
+				let th_array=[];
+				let td_array=[];
+				let th_td_array=[];
+				let th = tr.getElementsByTagName('th');
+				if (th.length > 0) {
+					th_array = Array.from(th);
+					th_array = th_array.map(tag => tag.innerText);
+					
+				}
+
+				let td = tr.getElementsByTagName('td');
+				if (td.length > 0) {
+					td_array = Array.from(td);
+					td_array = td_array.map(tag => tag.innerText);
+					
+				}
+				
+				th_td_array = th_td_array.concat(th_array,td_array); // get the text of each element
+				result.push(th_td_array);
+			}
+			return result;
+		}
 		
 	}
 })
