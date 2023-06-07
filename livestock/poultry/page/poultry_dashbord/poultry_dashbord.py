@@ -9,12 +9,12 @@ def get_company_list():
 @frappe.whitelist()
 def get_batch_list(company=None):
     data = {}
-    data["batchs"] = frappe.get_list("Layer Batch",filters={'docstatus':['!=','2'],'company':company,'status':'Open'},fields=['name'],limit_page_length=0, order_by="name",debug=0)
+    data["batchs"] = frappe.get_all("Layer Batch",filters={'docstatus':['!=','2'],'company':company,'status':'Open'},fields=['name'],limit_page_length=0, order_by="name",debug=0)
     return data
 
 @frappe.whitelist()
 def get_sale_item_list():
-    return frappe.db.get_list('Item',filters={'item_group':['in',['LIVE STOCK','MANURE']]},fields=['item_code'],pluck='item_code')
+    return frappe.db.get_all('Item',filters={'item_group':['in',['LIVE STOCK','MANURE']]},fields=['item_code'],pluck='item_code')
 
 @frappe.whitelist()
 def get_report(company,batch,period=None):
@@ -94,9 +94,6 @@ def get_report(company,batch,period=None):
                 lstart=add_days(rend,1)
 
             lay_perod.append(rear)
-    
-    rear_data=[]
-    lay_data=[]
 
     #----- rearing 
     rear_lbl=['Expense']
@@ -118,13 +115,16 @@ def get_report(company,batch,period=None):
     rear_other_tot=0
     rear_wages_tot=0
     reat_tot_tot=0
+    rear_ind_expanse=[]
+    rear_ind_expanse_tot=0
+    
     
     rear_html=''
 
     vaccine_list=[]
-    itmgroup=frappe.db.get_list('Vaccine Item Group',fields=['item_group'],pluck='item_group')
+    itmgroup=frappe.db.get_all('Vaccine Item Group',fields=['item_group'],pluck='item_group')
     for gp in itmgroup:
-        itms=frappe.db.get_list('Item',filters={'item_group':gp},fields=['item_code'],pluck='item_code')
+        itms=frappe.db.get_all('Item',filters={'item_group':gp},fields=['item_code'],pluck='item_code')
         for it in itms:
             vaccine_list.append(it)
     
@@ -285,59 +285,58 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             else:
                 rear_other.append(0)
 
-            #rear_feed.append(0)
-            #rear_vaccine.append(0)
-            #rear_medicine.append(0)
-            #rear_other.append(0)
         #-----------------------------------------
         start=rear.get('start')
         end=rear.get('end')
-        sal=frappe.db.get_list('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]]},fields=['net_pay'],pluck='net_pay')
+        sal=frappe.db.get_all('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]]},fields=['net_pay'],pluck='net_pay')
         salary=0
         salary_expanse=0
         if sal:
             salary+=sum(c for c in sal)
 
-        if salary:
-            #wage rear_end_date layer.doc_placed rearing_daily_mortality
-            mtotsrt=0
-            mtotend=0
-            mortmonthavg=0
-            live=0
-            if layer.rearing_daily_mortality:
-                for mor in layer.rearing_daily_mortality:
-                    if getdate(mor.date)< getdate(start):
-                        mtotsrt+=float(mor.total)
-                    if getdate(start) <= getdate(mor.date)<=getdate(end):
-                        mtotend+=float(mor.total)
+        wageper=0
+        mtotsrt=0
+        mtotend=0
+        mortmonthavg=0
+        live=0
+        if layer.rearing_daily_mortality:
+            for mor in layer.rearing_daily_mortality:
+                if getdate(mor.date)< getdate(start):
+                    mtotsrt+=float(mor.total)
+                if getdate(start) <= getdate(mor.date)<=getdate(end):
+                    mtotend+=float(mor.total)
 
-                if mtotend:
-                    mortmonthavg=float(mtotend)/2
-            live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
-            mort_to=add_days(getdate(start),15)
-            totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
+            if mtotend:
+                mortmonthavg=float(mtotend)/2
+        live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
+        mort_to=add_days(getdate(start),15)
+        totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabLayer Batch` b 
             left join  `tabLayer Mortality` m on b.name=m.parent and m.date < '{1}'            
             where b.company='{0}' 
             and ((b.doc_placed_date < '{2}' and (b.completed_date is NULL or b.completed_date='')) 
             or (b.doc_placed_date < '{2}' and b.completed_date >'{1}')) and b.name<>'{3}'
             group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
             
-            totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
+        totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
             b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
-            crr={}
-            if totcurrent:
-                for cr in totcurrent:
-                    crr.update({cr.name:cr.tot})
-            totlive=0
-            if totbfor:
-                for bf in totbfor:
-                    totavg=0
-                    if crr.get(bf.name):
-                        totavg=float(crr.get(bf.name))/2
+        crr={}
+        if totcurrent:
+            for cr in totcurrent:
+                crr.update({cr.name:cr.tot})
+        totlive=0
+        if totbfor:
+            for bf in totbfor:
+                totavg=0
+                if crr.get(bf.name):
+                    totavg=float(crr.get(bf.name))/2
 
-                    totlive+=bf.doc_placed-bf.tot-totavg
+                totlive+=bf.doc_placed-bf.tot-totavg
             
-            wageper=(float(live)*100)/float(totlive)
+        wageper=(float(live)*100)/float(totlive)
+
+        if salary:
+            #wage rear_end_date layer.doc_placed rearing_daily_mortality
+            
            
             if wageper:
                 salary_expanse=(float(salary)/100)*float(wageper)                
@@ -351,16 +350,13 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             col_tot+=salary_expanse
         else:
             rear_wages.append(0)
-        #frappe.msgprint(str(salary))
-        #rear_vaccine.append(0)
-        #rear_medicine.append(0)
-        #rear_bio.append(0)
-        #rear_miscel.append(0)
-        #rear_other.append(0)
-        #rear_wages.append(0)
+        #========================================================================
+        
+     
     #----------------------------------
         reat_tot.append(col_tot)
     #------------------------------
+    #frappe.msgprint(str(rear_ind_expanse))
     reat_tot_tot=float(rear_doc_tot)+float(rear_feed_tot)+float(rear_vaccine_tot)+float(rear_medicine_tot)+float(rear_bio_tot)+float(rear_miscel_tot)+float(rear_other_tot)+float(rear_wages_tot)
     rear_lbl.append('Total')
     rear_doc.append(rear_doc_tot)
@@ -388,23 +384,14 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 
 #======================================
 
-    #rear_data.append(rear_lbl)
-    #rear_data.append(rear_doc)
-    rear_xl_data=[]
-    xl_rer_row=[]
     rear_html+='<tr class="table-secondary">'
     for lbl in rear_lbl:
         rear_html+='<th scope="col">'+lbl+'</th>'
-        xl_rer_row.append(lbl)
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    #rear_html+='<tr>'
-    xl_rer_row=[]
     #--------------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_doc:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -412,13 +399,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #-----------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_feed:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -426,13 +410,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #-----------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_vaccine:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -440,13 +421,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #---------------------------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_medicine:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -454,15 +432,12 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #---------------------------------------------------
     
     #---------------------------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_other:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -470,13 +445,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #---------------------------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_wages:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -484,13 +456,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #---------------------------------------------------
     rear_html+='<tr class="table-secondary">'
     i=0
     for doc in reat_tot:
-        xl_rer_row.append(doc)
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -498,8 +467,6 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     rear_html+='</tr>'
-    rear_xl_data.append(xl_rer_row)
-    xl_rer_row=[]
     #---------------------------------------------------
     #Batch Type
     #break_even_period
@@ -618,7 +585,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         #frappe.msgprint(str(dept))
         start=layin.get('start')
         end=layin.get('end')
-        sal=frappe.db.get_list('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
+        sal=frappe.db.get_all('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
         salary=0
         salary_expanse=0
         if sal:
@@ -811,57 +778,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         else:
             sales_data.append('')
             sales.append(0)
-
-        egg_sale_ret_sql=frappe.db.sql("""select i.item_code,sum(i.amount) as amount,sum(i.stock_qty) as qty from `tabSales Invoice Item` i 
-        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='EGGS'
-        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}' group by i.item_code """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
-        if egg_sale_ret_sql:
-            sales_ret_data.append(egg_sale_ret_sql)
-            for s in egg_sale_ret_sql:
-                sale_col_ret_tot+=s.amount
-                sale_ret_tot+=s.amount
-            sales_ret.append(sale_col_ret_tot)
-        else:
-            sales_ret_data.append('')
-            sales_ret.append(0)
-
-        egg_sale_manu_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
-        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='MAN001'
-        and  s.company='{0}' and s.posting_date between '{1}' and '{2}' and s.project='{3}'  """.format(layer.company,layin.get('start'),layin.get('end'),layer.name),as_dict=1,debug=0)
-        if egg_sale_manu_sql:
-            for m in egg_sale_manu_sql:
-                manu.append(m.amount)
-                manu_tot+=m.amount
-        else:
-            manu.append(0)
-
-        egg_sale_flock_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
-        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_group='LIVE STOCK'
-        and s.company='{0}' and s.posting_date between '{1}' and '{2}' and s.project='{3}'  """.format(layer.company,layin.get('start'),layin.get('end'),layer.name),as_dict=1,debug=0)
-        if egg_sale_flock_sql:
-            for m in egg_sale_flock_sql:
-                flock.append(m.amount)
-                flock_tot+=m.amount
-        else:
-            flock.append(0)
-
-        egg_sale_dis_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
-        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='DISCOUNT'
-        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}'  """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
-        if egg_sale_dis_sql:
-            for m in egg_sale_dis_sql:
-                dis.append(m.amount)
-        else:
-            dis.append(0)
-
-        egg_sale_pro_sql=frappe.db.sql("""select IFNULL(sum(i.amount), 0) as amount,IFNULL(sum(i.stock_qty), 0) as qty from `tabSales Invoice Item` i 
-        left join `tabSales Invoice` s on i.parent=s.name where s.docstatus=1 and i.item_code='BUSINESS PROMOTION'
-        and s.is_return='1' and s.company='{0}' and s.posting_date between '{1}' and '{2}'  """.format(layer.company,layin.get('start'),layin.get('end')),as_dict=1,debug=0)
-        if egg_sale_pro_sql:
-            for m in egg_sale_pro_sql:
-                pro.append(m.amount)
-        else:
-            pro.append(0)
+        
     
 
     #-----------------------------
@@ -870,24 +787,18 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     #sales.append(sale_tot)
     lay_rear.append(lay_rear_tot)
     lay_oper.append(lay_oper_tot)
-    manu.append(manu_tot)
-    flock.append(flock_tot)
+    #manu.append(manu_tot)
+    #flock.append(flock_tot)
     #-----------------------------------------
-    lay_xl_data=[]
-    lay_xl_row=[]
+
     lay_html+='<tr class="table-secondary">'
     for lbl in lay_lbl:
         lay_html+='<th scope="col">'+lbl+'</th>'
-        lay_xl_row.append(lbl)
     lay_html+='</tr>'
-
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #-----------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_feed:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -895,13 +806,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #-----------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_vaccine:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -909,13 +817,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #---------------------------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_medicine:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -923,13 +828,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #---------------------------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_other:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -937,13 +839,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #---------------------------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_wages:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -951,13 +850,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
      #---------------------------------------------------
     lay_html+='<tr class="table-secondary">'
     i=0
     for doc in lay_tot:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -965,13 +861,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #------------------------- blank row --------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_tot:
-        lay_xl_row.append('')
         if i==0:
             lay_html+='<th scope="row"></th>'
         else:
@@ -979,13 +872,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #---------------------------------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_rear:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -993,13 +883,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #---------------------------------------------------
     lay_html+='<tr class="table-secondary">'
     i=0
     for doc in lay_oper:
-        lay_xl_row.append(doc)
         if i==0:
             lay_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -1007,13 +894,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #------------------------blank ---------------------------
     lay_html+='<tr>'
     i=0
     for doc in lay_tot:
-        lay_xl_row.append('')
         if i==0:
             lay_html+='<th scope="row">Production Qty</th>'
         else:
@@ -1021,19 +905,15 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     #-------------------------egg production -------------------
     
     if egg_prod_data:
         egg_prod_item=list(dict.fromkeys(egg_prod_item))
         
         for item in egg_prod_item:
-            lay_xl_row=[]
             row_sum=0
             lay_html+='<tr>'
             lay_html+='<th scope="row">'+str(getitem_name(item))+'</th>'
-            lay_xl_row.append(getitem_name(item))
             for egg_dt in egg_prod_data:
                 if egg_dt:
                     for egg_dta in egg_dt:
@@ -1041,27 +921,18 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                         if item==egg_dta.item_code:
                             row_sum+=egg_dta.qty/360
                             lay_html+='<td class="text-right">'+str(flt(egg_dta.qty/360,3))+' Ctn</td>'
-                            lay_xl_row.append(flt(egg_dta.qty/360,3))
                 else:
                     lay_html+='<td class="text-right">0</td>'
-                    lay_xl_row.append(0)
 
             lay_html+='<td class="text-right">'+str(flt(row_sum,3))+' Ctn</td>'
-            lay_xl_row.append(flt(row_sum,3))
-            lay_xl_data.append(lay_xl_row)        
             lay_html+='</tr>'
    #------------------------------------
-    lay_xl_row=[]
     lay_html+='<tr class="table-secondary"><th>Total Production </th>'
-    lay_xl_row.append('Total Production')
     i=0
     for doc in egg_prod:
         lay_html+='<td class="text-right">'+str(flt(doc/360,3))+' Ctn</td>'
-        lay_xl_row.append(flt(doc/360,3))
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 #---------------------------------------------------
     #------------------------blank ---------------------------
     lay_html+='<tr>'
@@ -1069,26 +940,20 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     for doc in lay_tot:
         if i==0:
             lay_html+='<th scope="row">Packing Cost</th>'
-            lay_xl_row.append('Packing Cost')
         else:
             lay_html+='<td class="text-right"></td>'
-            lay_xl_row.append('')
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 #-------------------------egg packing cost -------------------
     
     if egg_prod_data:
         egg_prod_item=list(dict.fromkeys(egg_prod_item))
         
         for item in egg_prod_item:
-            lay_xl_row=[]
             row_sum=0
             lay_html+='<tr>'
             lay_html+='<th scope="row">'+str(getitem_name(item))+'</th>'
-            lay_xl_row.append(getitem_name(item))
             for egg_dt in egg_prod_data:
                 if egg_dt:
                     for egg_dta in egg_dt:
@@ -1096,32 +961,22 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                         if item==egg_dta.item_code:
                             row_sum+=egg_dta.amount
                             lay_html+='<td class="text-right">'+str(flt(egg_dta.amount,2))+'</td>'
-                            lay_xl_row.append(flt(egg_dta.amount,2))
                 else:
                     lay_html+='<td class="text-right">0</td>'
-                    lay_xl_row.append(0)
 
             lay_html+='<td class="text-right">'+str(flt(row_sum,2))+'</td>'
-            lay_xl_row.append(row_sum)
-            lay_xl_data.append(lay_xl_row)        
             lay_html+='</tr>'
 
  #------------------------------------
-    lay_xl_row=[]
     lay_html+='<tr class="table-secondary"><th> Packing Total </th>'
-    lay_xl_row.append('Packing Total')
     i=0
     for doc in egg_packing:
         lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
-        lay_xl_row.append(flt(doc,2))
-    lay_xl_data.append(lay_xl_row)
     lay_html+='</tr>'
 #------------------------blank ---------------------------
-    lay_xl_row=[]
     lay_html+='<tr>'
     i=0
-    for doc in lay_tot:
-        lay_xl_row.append('')        
+    for doc in lay_tot:    
         if i==0:
             lay_html+='<th scope="row"></th>'
         else:
@@ -1129,13 +984,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
     exp_tot=[]
     #-------------------------------------------------------
     
     lay_html+='<tr class="table-secondary"><th> Total Expenses</th>'
-    lay_xl_row.append('Total Expenses')
     i=0
     lay_oper.remove(lay_oper[0])
 
@@ -1145,26 +997,18 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         cost=float(lay_oper[i])+float(egg_packing[i])
         exp_tot.append(cost)
         lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
-        lay_xl_row.append(flt(cost,2))
         i+=1
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 #-------------------------------------------------------
     lay_html+='<tr class="table-secondary"><th>Total Egg Qty </th>'
-    lay_xl_row.append('Total Egg Qty')
     i=0
     for doc in egg_prod:
         lay_html+='<td class="text-right">'+str(flt(doc,2))+'</td>'
-        lay_xl_row.append(flt(cost,2))
 
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 #-------------------------------------------------------
     lay_html+='<tr><th> Cost/Egg </th>'
-    lay_xl_row.append('Cost/Egg')
     i=0
     for doc in egg_packing:
         cost=0
@@ -1175,15 +1019,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         if len(egg_packing)==i:
             continue
         lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
-        lay_xl_row.append(flt(cost,2))
     lay_html+='<td class="text-right"></td>'
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 #-------------------------------------------------------
 
     lay_html+='<tr><th> Egg Price </th>'
-    lay_xl_row.append('Cost/Egg')
     for sal in sales_data:
         price=0
         tamt=0
@@ -1197,183 +1037,12 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             price=float(tamt)/float(tqty)
 
         lay_html+='<td class="text-right">'+str(flt(price,2))+'</td>'
-        lay_xl_row.append(flt(price,2))
     lay_html+='<td class="text-right"></td>'
     lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
 
     #------------------------blank ---------------------------
-    lay_html+='<tr>'
-    i=0
-    for doc in lay_tot:
-        lay_xl_row.append('')
-        if i==0:
-            lay_html+='<th scope="row"></th>'
-        else:
-            lay_html+='<td class="text-right"></td>'
-        i+=1
-
-    lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
-  #------------------------ sale ------------------------
-    sale=[]
-    ret=[]
-    if sales:
-        sale_totol=0
-        lay_html+='<tr><th>Egg Sales Value</th>'
-        lay_xl_row.append('Egg Sales Value')
-        j=0
-        for s in sales:
-            #frappe.msgprint(str(egg_prod[j]))
-            if egg_prod[j] and j < len(egg_prod):
-                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
-                a=(float(s)/100)*float(p)
-                sale_totol+=a
-                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
-                lay_xl_row.append(flt(a,2))
-                sale.append(a)
-            else:
-                lay_html+='<td class="text-right">0</td>'
-                lay_xl_row.append(0)
-                sale.append(0)
-            j+=1
-        sale.append(sale_totol)
-        lay_html+='<td class="text-right">'+str(flt(sale_totol,2))+'</td>'
-        lay_xl_row.append(flt(sale_totol,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-    if sales_ret:
-        sale_totol=0
-        lay_html+='<tr><th>Sales Return</th>'
-        lay_xl_row.append('Sales Return')
-        j=0
-        for s in sales_ret:
-            #frappe.msgprint(str(egg_prod[j]))
-            if egg_prod[j] and j < len(egg_prod):
-                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
-                a=(float(s)/100)*float(p)
-                sale_totol+=a
-                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
-                lay_xl_row.append(flt(a,2))
-                ret.append(a)
-            else:
-                lay_html+='<td class="text-right">0</td>'
-                lay_xl_row.append(0)
-                ret.append(0)
-            j+=1
-        ret.append(sale_totol)
-        lay_html+='<td class="text-right">'+str(flt(sale_totol,2))+'</td>'
-        lay_xl_row.append(flt(sale_totol,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-    if manu:
-        lay_html+='<tr><th>Manure Sales</th>'
-        lay_xl_row.append('Manure Sales')
-        for m in manu:
-            lay_html+='<td class="text-right">'+str(flt(m,2))+'</td>'
-            lay_xl_row.append(flt(m,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-    if flock:
-        lay_html+='<tr><th>Flock Sales</th>'
-        lay_xl_row.append('Flock Sales')
-        for f in flock:
-            lay_html+='<td class="text-right">'+str(flt(f,2))+'</td>'
-            lay_xl_row.append(flt(f,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-    disc=[]
-    prom=[]
+      
     
-    if dis:
-        dis_totol=0
-        lay_html+='<tr><th>Discount</th>'
-        lay_xl_row.append('Discount')
-        j=0
-        for s in dis:
-           
-            if egg_prod[j] and j < len(egg_prod):
-                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
-                a=(float(s)/100)*float(p)
-                dis_totol+=a
-                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
-                lay_xl_row.append(flt(a,2))
-                disc.append(a)
-            else:
-                lay_html+='<td class="text-right">0</td>'
-                lay_xl_row.append(0)
-                disc.append(0)
-            j+=1
-        disc.append(dis_totol)
-        lay_html+='<td class="text-right">'+str(flt(dis_totol,2))+'</td>'
-        lay_xl_row.append(flt(dis_totol,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-    if pro:
-        pro_totol=0
-        lay_html+='<tr><th>Business Promotion</th>'
-        lay_xl_row.append('Business Promotion')
-        j=0
-        for s in pro:
-           
-            if egg_prod[j] and j < len(egg_prod):
-                p=(float(egg_prod[j])*100)/float(egg_tot_prod[j])
-                a=(float(s)/100)*float(p)
-                pro_totol+=a
-                lay_html+='<td class="text-right">'+str(flt(a,2))+'</td>'
-                lay_xl_row.append(flt(a,2))
-                prom.append(a)
-            else:
-                lay_html+='<td class="text-right">0</td>'
-                lay_xl_row.append(0)
-                prom.append(0)
-            j+=1
-        prom.append(pro_totol)
-        lay_html+='<td class="text-right">'+str(flt(pro_totol,2))+'</td>'
-        lay_xl_row.append(flt(pro_totol,2))
-        lay_html+='</tr>'
-        lay_xl_data.append(lay_xl_row)
-        lay_xl_row=[]
-
-    t=0
-    tc_tot=0
-    tc_s=[]
-    lay_html+='<tr class="table-secondary"><th>Total Sales</th>'
-    lay_xl_row.append('Total Sales')
-    for la in eggp_lbl:
-        tc=float(sale[t])+float(ret[t])+float(disc[t])+float(prom[t])+float(manu[t])+float(flock[t])
-        tc_s.append(tc)
-        tc_tot+=tc
-        lay_html+='<td class="text-right">'+str(flt(tc,2))+'</td>'
-        lay_xl_row.append(flt(tc,2))
-        t+=1
-    tc_s.append(tc_tot)
-    lay_html+='<td class="text-right">'+str(flt(tc_tot,2))+'</td>'
-    lay_xl_row.append(flt(tc_tot,2))
-    lay_html+='</tr>'
-    lay_xl_data.append(lay_xl_row)
-    lay_xl_row=[]
-    t=0
-    rev_tot=0
-    lay_html+='<tr class="table-secondary"><th>Net Profit</th>'
-    lay_xl_row.append('Net Profit')
-    for la in eggp_lbl:
-        tc=float(tc_s[t])-float(exp_tot[t])
-        rev_tot+=tc
-        lay_html+='<td class="text-right">'+str(flt(tc,2))+'</td>'
-        lay_xl_row.append(flt(tc,2))
-        t+=1
-    lay_html+='<td class="text-right">'+str(flt(rev_tot,2))+'</td>'
-    lay_xl_row.append(flt(rev_tot,2))
-    lay_html+='</tr>'   
-    lay_xl_data.append(lay_xl_row)
 
 #=======================================================================
     if lay_rear_tot:
@@ -1412,26 +1081,27 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         l_production=budget.production
         l_sales=budget.sales
     budget_html=''
+    
+    budget_html+='<tr><th style="width:150px;">Rearing</th><td ></td></tr>'    
+    budget_html+='<tr><th>Doc</th><td>'+str(r_doc)+'</td></tr>'    
+    budget_html+='<tr><th>Feed</th><td>'+str(r_feed)+'</td></tr>'    
+    budget_html+='<tr><th>vaccine<td>'+str(r_vaccine)+'</td></tr>'    
+    budget_html+='<tr><th>Medicine</th><td>'+str(r_medicine)+'</td></tr>'    
+    budget_html+='<tr><th>Wages</th><td>'+str(r_wages)+'</td></tr>'    
+    budget_html+='<tr><th>Other</th><td>'+str(r_others)+'</td></tr>'    
 
-    budget_html+='<tr><th style="width:150px;">Rearing</th><td ></td></tr>'
-    budget_html+='<tr><th>Doc</th><td>'+str(r_doc)+'</td></tr>'
-    budget_html+='<tr><th>Feed</th><td>'+str(r_feed)+'</td></tr>'
-    budget_html+='<tr><th>vaccine<td>'+str(r_vaccine)+'</td></tr>'
-    budget_html+='<tr><th>Medicine</th><td>'+str(r_medicine)+'</td></tr>'
-    budget_html+='<tr><th>Wages</th><td>'+str(r_wages)+'</td></tr>'
-    budget_html+='<tr><th>Other</th><td>'+str(r_others)+'</td></tr>'
-
-    budget_html+='<tr><th></th><td></td></tr>'
-    budget_html+='<tr><th>Laying</th><td></td></tr>'
-    budget_html+='<tr><th>Feed</th><td>'+str(l_feed)+'</td></tr>'
-    budget_html+='<tr><th>vaccine<td>'+str(l_vaccine)+'</td></tr>'
-    budget_html+='<tr><th>Medicine</th><td>'+str(l_medicine)+'</td></tr>'
-    budget_html+='<tr><th>Wages</th><td>'+str(l_wages)+'</td></tr>'
-    budget_html+='<tr><th>Other</th><td>'+str(l_others)+'</td></tr>'
-    budget_html+='<tr><th>Production</th><td>'+str(l_production)+'</td></tr>'
+    budget_html+='<tr><th></th><td></td></tr>'    
+    budget_html+='<tr><th>Laying</th><td></td></tr>'    
+    budget_html+='<tr><th>Feed</th><td>'+str(l_feed)+'</td></tr>'    
+    budget_html+='<tr><th>vaccine<td>'+str(l_vaccine)+'</td></tr>'    
+    budget_html+='<tr><th>Medicine</th><td>'+str(l_medicine)+'</td></tr>'    
+    budget_html+='<tr><th>Wages</th><td>'+str(l_wages)+'</td></tr>'    
+    budget_html+='<tr><th>Other</th><td>'+str(l_others)+'</td></tr>'    
+    budget_html+='<tr><th>Production</th><td>'+str(l_production)+'</td></tr>'    
     budget_html+='<tr><th>Sales</th><td>'+str(l_sales)+'</td></tr>'
+    
 
-    return {'rear':rear_html,'lay':lay_html,'budget':budget_html,'lay_graph':lay_graph,'rear_graph':rear_graph,'rear_xl':rear_xl_data,'lay_xl':lay_xl_data}
+    return {'rear':rear_html,'lay':lay_html,'budget':budget_html,'lay_graph':lay_graph,'rear_graph':rear_graph}
 
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
@@ -1443,7 +1113,7 @@ import os
 
 #from frappe.utils.response import download_file
 @frappe.whitelist()
-def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp=None):
+def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=None,laying_gp=None):
     import json
     import pandas as pd
     from openpyxl.utils.dataframe import dataframe_to_rows
@@ -1462,6 +1132,7 @@ def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp
 
     rearingary=json.loads(rearing)
     layingary=json.loads(laying)
+    budgetary=json.loads(budget)
     gp_rear=json.loads(rearing_gp)
     gp_lay=json.loads(laying_gp)
     rrowlen=len(rearingary)
@@ -1478,12 +1149,16 @@ def down_report(company,batch,rearing=None,laying=None,rearing_gp=None,laying_gp
     wb = Workbook()
     ws = wb.active
     ws.title = "Rearing"
+    ws1 = wb.create_sheet("Budget")
     ws2 = wb.create_sheet("Production")
     ws3 = wb.create_sheet("RearGP")
     ws4 = wb.create_sheet("LayGP")
 
     for row in rearingary:
        ws.append(row)
+
+    for row in budgetary:
+       ws1.append(row)
 
     for row in layingary:
        ws2.append(row)
