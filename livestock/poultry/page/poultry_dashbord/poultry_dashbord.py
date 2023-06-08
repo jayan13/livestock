@@ -367,11 +367,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                     for ac in accsre:
                         acc.append(ac.account)
                     accs='","'.join(acc)
-                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
+                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
                 if exppjt:
                     ind_expanse+=float(exppjt[0].debit)-float(exppjt[0].credit)
 
-                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
+                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
                 if expwpjt:
                     exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
                     if exp != 0:
@@ -754,11 +754,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                     for ac in accsre:
                         acc.append(ac.account)
                     accs='","'.join(acc)
-                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
+                exppjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and  project='{3}' """.format(accs,start,end,layer.name),as_dict=1,debug=0)
                 if exppjt:
                     ind_expanse+=float(exppjt[0].debit)-float(exppjt[0].credit)
 
-                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
+                expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
                 if expwpjt:
                     exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
                     if exp != 0:
