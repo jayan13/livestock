@@ -789,7 +789,7 @@ def create_production_stock_entry(fitemdata,batch,posting_date,posting_time):
 def added_feed_rearing(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(batch,item_code,qty,uom,'rear','Feed',date='',time='')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
 	
@@ -810,7 +810,7 @@ def update_feed_rearing(idx,parent,parentfield,name,date,item_code,qty,uom):
 	if 'new-' in name:
 		name=frappe.db.get_value('Layer Feed', {'parent': parent,'idx':idx,'parentfield':parentfield}, ['name'])
 	
-	itemdet=get_item_rate(parent,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(parent,item_code,qty,uom,'rear','Feed',date='',time='')
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
@@ -836,7 +836,7 @@ def delete_feed_rearing(name):
 def added_medicine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(batch,item_code,qty,uom,'rear','Med',date='',time='')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
 	
@@ -857,7 +857,7 @@ def update_medicine_rearing(idx,parent,parentfield,name,date,item_code,qty,uom,r
 		name=frappe.db.get_value('Layer Medicine', {'parent': parent,'idx':idx,'parentfield':parentfield}, ['name'])
 
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(parent,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(parent,item_code,qty,uom,'rear','Med',date='',time='')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
 	doc = frappe.get_doc('Layer Medicine', name)
@@ -926,7 +926,7 @@ def delete_vaccine_rearing(name):
 def add_rearing_items(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
 	
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(batch,item_code,qty,uom,'rear','oth',date='',time='')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
 	
@@ -946,7 +946,7 @@ def update_items_rearing(idx,parent,parentfield,name,date,item_code,qty,uom):
 	if 'new-' in name:
 		name=frappe.db.get_value('Layer Other Items', {'parent': parent,'idx':idx,'parentfield':parentfield}, ['name'])
 	
-	itemdet=get_item_rate(parent,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(parent,item_code,qty,uom,'rear','oth',date='',time='')
 	item_name=frappe.db.get_value('Item',item_code,'item_name')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
@@ -1112,7 +1112,7 @@ def add_eggs_production(batch,parentfield,items,production_date,production_time)
 		bom=lst.get('bom')
 		#date=lst.get('date')
 		item_name=frappe.db.get_value('Item',item_code,'item_name')
-		itemdet=get_item_rate(batch,item_code,qty,uom,date,time)
+		itemdet=get_item_rate(batch,item_code,qty,uom,'lay','Pd',date,time)
 		rate=itemdet.rate
 		conversion_factor=itemdet.conversion_factor
 		
@@ -1135,7 +1135,7 @@ def update_egg_production(idx,parent,parentfield,name,date,item_code,qty,uom):
 	if 'new-' in name:
 		name=frappe.db.get_value('Egg Production', {'parent': parent,'idx':idx,'parentfield':parentfield}, ['name'])
 	
-	itemdet=get_item_rate(parent,item_code,qty,uom,date='',time='')
+	itemdet=get_item_rate(parent,item_code,qty,uom,'lay','Pd',date='',time='')
 	rate=itemdet.rate
 	conversion_factor=itemdet.conversion_factor
 
@@ -1154,9 +1154,25 @@ def update_egg_production(idx,parent,parentfield,name,date,item_code,qty,uom):
 def delete_egg_production(name):
 	frappe.db.delete('Egg Production', {"name": name })
 
-def get_item_rate(batch,item,qty,uom,date='',time=''):
+def get_item_rate(batch,item,qty,uom,typ='lay',item_typ='',date='',time=''):
 	res={}
-	shed=frappe.get_value('Layer Batch',{'batch_name':batch},'layer_shed')
+
+	if typ=='lay':
+		shed=frappe.get_value('Layer Batch',{'batch_name':batch},'layer_shed')
+		sett = frappe.get_doc('Laying Shed',shed)
+	else:
+		shed=frappe.get_value('Layer Batch',{'batch_name':batch},'rearing_shed')
+		sett = frappe.get_doc('Rearing Shed',shed)
+
+	if item_typ=='Feed':
+		warehouse=sett.feed_warehouse
+	elif item_typ=='Med':
+		warehouse=sett.medicine_warehouse
+	elif item_typ=='Pd':
+		warehouse=sett.product_target_warehouse
+	else:
+		warehouse=sett.row_material_target_warehouse
+
 	if time:
 		time=get_datetime(time)
 	else:
@@ -1164,14 +1180,13 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 	if date:
 		date=getdate(date)
 
-	sett = frappe.get_doc('Laying Shed',shed)
 	posting_date=date or nowdate() 
 	time=time or get_datetime()
 	posting_time=time.strftime("%H:%M:%S")
 	#posting_time='23:59:00'
 	base_row_rate = get_incoming_rate({
 										"item_code": item,
-										"warehouse": sett.row_material_target_warehouse,
+										"warehouse": warehouse,
 										"posting_date": posting_date,
 										"posting_time": posting_time,
 										"qty": -1 * qty,
@@ -1181,6 +1196,7 @@ def get_item_rate(batch,item,qty,uom,date='',time=''):
 	rate=base_row_rate * float(conversion_factor)
 	res.update({'rate':base_row_rate,'conversion_factor':conversion_factor})
 	return frappe._dict(res)
+
 
 @frappe.whitelist()
 def get_egg_products(cat):
