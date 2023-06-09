@@ -770,7 +770,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                                 ind_expanse+=float(exp)/float(batchcount[0].cnt)
 
                 lay_ind_expanse_tot+=ind_expanse
-                #col_tot+=ind_expanse
+                col_tot+=ind_expanse
                 lay_ind_expanse_data.update({'title':re.title,'amt':ind_expanse})
                 lay_ind_expanse_item.append(lay_ind_expanse_data)
             lay_ind_expanse.append(lay_ind_expanse_item)
@@ -795,7 +795,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             row_ind.append(row_tot)
             laying_ind_array.append(row_ind)
 
-        row_ind=['Total']
+        row_ind=['Total Indirect Exp']
         for indx in lay_ind_expanse:
             colid_tot=0
             for idx in indx:
@@ -1051,8 +1051,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
         lay_html+='</tr>'
         
         
-        for redind in laying_ind_array:
-            lay_html+='<tr >'
+        for idx,redind in enumerate(laying_ind_array):
+            if idx+1==len(laying_ind_array):
+                lay_html+='<tr class="table-secondary">'
+            else:
+                lay_html+='<tr >'
             i=0
             for reind in redind:
                 if i==0:
@@ -1161,12 +1164,17 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     for doc in egg_packing:
         cost=0
         #if egg_prod[i]:
-        cost=float(lay_oper[i])+float(egg_packing[i])
+        if len(laying_ind_array):
+            laying_ind_array[-1][i+1]
+            cost=float(laying_ind_array[-1][i+1])+float(lay_oper[i])+float(egg_packing[i])
+        else:
+            cost=float(lay_oper[i])+float(egg_packing[i])
         exp_tot.append(cost)
         lay_html+='<td class="text-right">'+str(flt(cost,2))+'</td>'
         i+=1
 
     lay_html+='</tr>'
+    #frappe.msgprint(str(exp_tot))
 #-------------------------------------------------------
     lay_html+='<tr class="table-secondary"><th>Total Egg Qty </th>'
     i=0
@@ -1179,8 +1187,15 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
     i=0
     for doc in egg_packing:
         cost=0
+        tcost=0
         if egg_prod[i]:
-            cost=(float(lay_oper[i])+float(egg_packing[i]))/float(egg_prod[i])
+            if len(laying_ind_array):
+                laying_ind_array[-1][i+1]
+                tcost=float(laying_ind_array[-1][i+1])+float(lay_oper[i])+float(egg_packing[i])
+            else:
+                tcost=float(lay_oper[i])+float(egg_packing[i])
+
+            cost=float(tcost)/float(egg_prod[i])
         
         i+=1
         if len(egg_packing)==i:
@@ -1365,7 +1380,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     rhd="A1:A"+str(rrowlen)
     for row in ws[rhd]:
         for cell in row:
-            cell.font = ft
+            #cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
     #---------------------------------------------------------------------------------
     rlbl=getColumnName(bcollen)
@@ -1414,7 +1429,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     rhd="A1:A"+str(lrowlen)
     for row in ws2[rhd]:
         for cell in row:
-            cell.font = ft
+            #cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
     #rtab="A1:"+str(getColumnName(rcollen))+str(rrowlen)
