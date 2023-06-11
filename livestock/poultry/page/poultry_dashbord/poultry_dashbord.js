@@ -134,7 +134,7 @@ MyPage =Class.extend({
 			
 				title: "Rearing",
 				type: 'pie', // or 'bar', 'line', 'pie', 'percentage'
-				height: 300,
+				height: 600,
 				colors: ['purple', '#ffa3ef', 'light-blue'],
 			
 				tooltipOptions: {
@@ -166,7 +166,7 @@ MyPage =Class.extend({
 			
 				title: "Laying",
 				type: 'pie', // or 'bar', 'line', 'pie', 'percentage'
-				height: 300,
+				height: 600,				
 				colors: ['purple', '#ffa3ef', 'light-blue'],
 			
 				tooltipOptions: {
@@ -203,6 +203,8 @@ MyPage =Class.extend({
 						 $('#rer_exp').html(r.message.rear);
 						 $('#lay_exp').html(r.message.lay);
 						 $('#budgets').html(r.message.budget);
+						 $("#layer-chart").html('');
+						 $("#rear-chart").html('');
 
 						 reargp_xl=r.message.rear_graph
 						 laygp_xl=r.message.lay_graph

@@ -1455,7 +1455,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         rhd="B"+str(rrowlen+2)
         pie = PieChart()
         labels = Reference(ws3, min_col=1, min_row=2, max_row=maxr)
-        data = Reference(ws3, min_col=2, min_row=1, max_row=5)
+        data = Reference(ws3, min_col=2, min_row=1, max_row=maxr)
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
         pie.title = "Rearing"
@@ -1466,7 +1466,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         rhd="B"+str(lrowlen+2)
         pie = PieChart()
         labels = Reference(ws4, min_col=1, min_row=2, max_row=maxr)
-        data = Reference(ws4, min_col=2, min_row=1, max_row=6)
+        data = Reference(ws4, min_col=2, min_row=1, max_row=maxr)
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
         pie.title = "Laying"
