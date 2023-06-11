@@ -318,7 +318,8 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             or (b.doc_placed_date < '{2}' and b.completed_date >'{1}')) and b.name<>'{3}'
             group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
             
-        totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
+        totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabLayer Batch` b 
+        left join `tabLayer Mortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
             b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
         crr={}
         if totcurrent:
@@ -332,8 +333,11 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                     totavg=float(crr.get(bf.name))/2
 
                 totlive+=bf.doc_placed-bf.tot-totavg
-            
-        wageper=(float(live)*100)/float(totlive)
+
+        if totlive:
+            wageper=(float(live)*100)/float(totlive)
+        else:
+            wageper=100
 
         if salary:
             #wage rear_end_date layer.doc_placed rearing_daily_mortality
@@ -719,7 +723,10 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
 
                 totlive+=bf.doc_placed-bf.tot-totavg
             
-        wageper=(float(live)*100)/float(totlive)
+        if totlive:
+            wageper=(float(live)*100)/float(totlive)
+        else:
+            wageper=100
 
         if salary:
             #wage lay_end_date layer.doc_placed laying_mortality
