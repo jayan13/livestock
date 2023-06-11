@@ -134,7 +134,7 @@ MyPage =Class.extend({
 			
 				title: "Rearing",
 				type: 'pie', // or 'bar', 'line', 'pie', 'percentage'
-				height: 600,
+				height: 500,
 				colors: ['purple', '#ffa3ef', 'light-blue'],
 			
 				tooltipOptions: {
@@ -166,7 +166,7 @@ MyPage =Class.extend({
 			
 				title: "Laying",
 				type: 'pie', // or 'bar', 'line', 'pie', 'percentage'
-				height: 600,				
+				height: 500,				
 				colors: ['purple', '#ffa3ef', 'light-blue'],
 			
 				tooltipOptions: {
