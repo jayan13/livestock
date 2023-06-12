@@ -100,11 +100,8 @@ class EggPacking(Document):
 		batch_no=''
 		if item_account_details.has_batch_no:
 			manufacture_date=posting_date
-			itemname=str(self.item)
-			itemname=itemname[0:2]
-			cat='Layer Eggs'
-			pre_fix=frappe.db.get_value('Egg Finished Item Production Settings',{'item_code':self.item,'category':cat},'batch_prefix')
-			pre_fix= pre_fix or itemname
+			pre_fix=str(self.item)
+			#itemname=itemname[0:2]
 			batch_no=str(pre_fix)+'-'+str(manufacture_date)		
 			if not frappe.db.exists("Batch", {"name": batch_no}):
 				batch = frappe.new_doc("Batch")
