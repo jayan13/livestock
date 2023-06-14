@@ -1920,46 +1920,46 @@ def sales_submit(doc,event):
 	
 	lbatch=frappe.db.sql(""" select * from `tabLayer Batch` where name='{0}' """.format(doc.project),as_dict=1)
 	if lbatch:
-		if lbatch.rearing_shed:
-			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+		if lbatch[0].rearing_shed:
+			sett=frappe.get_doc('Rearing Shed',lbatch[0].rearing_shed)
 			reare_item=sett.base_row_material
 			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,reare_item),as_dict=1)
 			if rs:
-				sales_qty=float(lbatch.sales_qty)+float(rs[0].qty)
-				current_alive_chicks=float(lbatch.current_alive_chicks)-float(rs[0].qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+				sales_qty=float(lbatch[0].sales_qty)+float(rs[0].qty)
+				current_alive_chicks=float(lbatch[0].current_alive_chicks)-float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'current_alive_chicks',current_alive_chicks)
 			
-		if lbatch.layer_shed:
-			sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+		if lbatch[0].layer_shed:
+			sett=frappe.get_doc('Laying Shed',lbatch[0].layer_shed)
 			layer_item=sett.base_row_material
 			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,layer_item),as_dict=1)
 			if rs:
-				sales_qty=float(lbatch.sales_qty)+float(rs[0].qty)
-				current_alive_chicks=float(lbatch.current_alive_chicks)-float(rs[0].qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+				sales_qty=float(lbatch[0].sales_qty)+float(rs[0].qty)
+				current_alive_chicks=float(lbatch[0].current_alive_chicks)-float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'current_alive_chicks',current_alive_chicks)
 		
 
 @frappe.whitelist()
 def sales_cancel(doc,event):
 	lbatch=frappe.db.sql(""" select * from `tabLayer Batch` where name='{0}' """.format(doc.project),as_dict=1)
 	if lbatch:
-		if lbatch.rearing_shed:
-			sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+		if lbatch[0].rearing_shed:
+			sett=frappe.get_doc('Rearing Shed',lbatch[0].rearing_shed)
 			reare_item=sett.base_row_material
 			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,reare_item),as_dict=1)
 			if rs:
-				sales_qty=float(lbatch.sales_qty)-float(rs[0].qty)
-				current_alive_chicks=float(lbatch.current_alive_chicks)+float(rs[0].qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
-		if lbatch.layer_shed:
-			sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+				sales_qty=float(lbatch[0].sales_qty)-float(rs[0].qty)
+				current_alive_chicks=float(lbatch[0].current_alive_chicks)+float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'current_alive_chicks',current_alive_chicks)
+		if lbatch[0].layer_shed:
+			sett=frappe.get_doc('Laying Shed',lbatch[0].layer_shed)
 			layer_item=sett.base_row_material
 			rs=frappe.db.sql(""" select i.qty as qty from `tabSales Invoice Item` i  where i.parent='{0}' and i.item_code='{1}'""".format(doc.name,layer_item),as_dict=1)
 			if rs:
-				sales_qty=float(lbatch.sales_qty)-float(rs[0].qty)
-				current_alive_chicks=float(lbatch.current_alive_chicks)+float(rs[0].qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'sales_qty',sales_qty)
-				frappe.db.set_value('Layer Batch',lbatch.name,'current_alive_chicks',current_alive_chicks)
+				sales_qty=float(lbatch[0].sales_qty)-float(rs[0].qty)
+				current_alive_chicks=float(lbatch[0].current_alive_chicks)+float(rs[0].qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'sales_qty',sales_qty)
+				frappe.db.set_value('Layer Batch',lbatch[0].name,'current_alive_chicks',current_alive_chicks)
