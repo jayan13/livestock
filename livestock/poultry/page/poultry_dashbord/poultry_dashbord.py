@@ -1302,17 +1302,18 @@ import os
 
 #from frappe.utils.response import download_file
 @frappe.whitelist()
-def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=None,laying_gp=None):
+def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=None,laying_gp=None,rearing_mor_gp=None,laying_mor_gp=None):
     import json
     import pandas as pd
     from openpyxl.utils.dataframe import dataframe_to_rows
     from openpyxl import Workbook
     from openpyxl.chart import (
-        PieChart,
+        PieChart, LineChart,
         ProjectedPieChart,
         Reference
     )
     from openpyxl.styles import Font
+    from openpyxl.chart.axis import DateAxis
     #from openpyxl.worksheet.table import Table, TableStyleInfo
     from openpyxl.styles import PatternFill
     from openpyxl.styles import Border, Side
@@ -1324,6 +1325,8 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     budgetary=json.loads(budget)
     gp_rear=json.loads(rearing_gp)
     gp_lay=json.loads(laying_gp)
+    gp_rear_mor=json.loads(rearing_mor_gp)
+    gp_lay_mor=json.loads(laying_mor_gp)
     rrowlen=len(rearingary)
     rcollen=len(rearingary[0])
     lrowlen=len(layingary)
@@ -1336,12 +1339,17 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
 
     df = pd.DataFrame(gp_rear)
     df2 = pd.DataFrame(gp_lay)
+
+    df3 = pd.DataFrame(gp_rear_mor)
+    df4 = pd.DataFrame(gp_lay_mor)
    
     wb = Workbook()
     ws = wb.active
     ws.title = "Rearing"
     ws1 = wb.create_sheet("Budget")
     ws2 = wb.create_sheet("Production")
+    ws5 = wb.create_sheet("Rear. Mor. GPH")
+    ws6 = wb.create_sheet("Lay. Mor. GPH")
     ws3 = wb.create_sheet("RearGP")
     ws4 = wb.create_sheet("LayGP")
 
@@ -1359,6 +1367,12 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
 
     for row in dataframe_to_rows(df2, index=False, header=True):
         ws4.append(row)
+
+    for row in dataframe_to_rows(df3, index=False, header=True):
+        ws5.append(row)
+
+    for row in dataframe_to_rows(df4, index=False, header=True):
+        ws6.append(row)
     
     yellow = "00D5D7D9"
     black="00000000"
@@ -1439,17 +1453,7 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
             #cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
-    #rtab="A1:"+str(getColumnName(rcollen))+str(rrowlen)
-    #ltab="A1:"+str(getColumnName(lcollen))+str(lrowlen)
-    #frappe.throw(str(ltab))
-    #tab1 = Table(displayName="Table1", ref=rtab)
-    #tab2 = Table(displayName="Table2", ref=ltab)
-    #style = TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False,showLastColumn=False, showRowStripes=True, showColumnStripes=True)
-    #tab1.tableStyleInfo = style
-    #tab2.tableStyleInfo = style
-    #ws.add_table(tab1)
-    #ws2.add_table(tab2)
-    #frappe.throw(str(len(gp_lay)))
+
     if len(gp_rear):
         maxr=len(gp_rear)+1
         rhd="B"+str(rrowlen+2)
@@ -1472,6 +1476,48 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         pie.title = "Laying"
         ws2.add_chart(pie, rhd)
     
+    if len(gp_rear_mor):
+        maxr=len(gp_rear_mor)+1
+        """rhd="A1"
+        pie = LineChart()
+        labels = Reference(ws5, min_col=1, min_row=1, max_row=maxr)
+        data = Reference(ws5, min_col=3, min_row=2, max_row=maxr)
+        pie.add_data(data,  from_rows=True, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Rearing Mortality"
+        ws5.add_chart(pie, rhd) """
+
+        #=========================
+        
+        
+
+        c2 = LineChart()
+        c2.title = "Date Axis"
+        #c2.style = 12
+        c2.y_axis.title = "Size"
+        #c2.y_axis.crossAx = 500
+
+        #c2.x_axis = DateAxis(crossAx=100)
+        #c2.x_axis.number_format = 'd-mmm'
+        c2.x_axis.majorTimeUnit = "days"
+        #c2.x_axis.title = "Date"
+        data = Reference(ws5, min_col=2, min_row=1, max_col=3, max_row=maxr)
+        c2.add_data(data, titles_from_data=True)
+        dates = Reference(ws5, min_col=1, min_row=2, max_row=maxr)
+        c2.set_categories(dates)
+
+        ws5.add_chart(c2, "A2")
+        
+    if len(gp_lay_mor):
+        maxr=len(gp_lay_mor)+1
+        rhd="A1"
+        pie = LineChart()
+        labels = Reference(ws6, min_col=1, min_row=1, max_row=maxr)
+        data = Reference(ws6, min_col=3, min_row=2, max_row=maxr)
+        pie.add_data(data,  from_rows=True, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Laying Mortality"
+        ws6.add_chart(pie, rhd)
 
     file_name = 'poultry_dash.xlsx'    
     temp_file=os.path.join(frappe.utils.get_bench_path(), "logs", file_name)
@@ -1507,5 +1553,62 @@ def down_file(file=None):
     frappe.local.response.filename = file_name
     frappe.local.response.filecontent = filedata
     frappe.local.response.type = "download"
+
+@frappe.whitelist()
+def get_rear_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.doc_placed_date)
+    actmort=frappe.db.get_all('Rearing Period Performance',filters={'parent':strain},fields=['age','mortality'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,sum(total) as mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='rearing_daily_mortality' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+   
+    date2=date
+    for ly in actmort:
+    
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        mortp=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                mortp=(float(ac.mort)*100)/doc_placed
+        ly.update({'act_mortality':mortp})
+
+    return {'ideal':actmort}
+
+@frappe.whitelist()
+def get_lay_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.flock_transfer_date)
+    actmort=frappe.db.get_all('Laying Period Performance',filters={'parent':strain},fields=['age','mortality'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,sum(total) as mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='laying_mortality' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+   
+    mortidel=[]
+    date2=date
+    maxweek=0
+    if actqry:
+        maxweek=actqry[-1].wk
+
+    for ly in actmort:
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        if maxweek < wkd:
+            break
+        
+        mortp=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                mortp=(float(ac.mort)*100)/doc_placed
+                               
+        ly.update({'act_mortality':mortp})
+        mortidel.append(ly)
+    
+    return {'ideal':mortidel}
     
     

@@ -1,0 +1,147 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:batch",
+ "creation": "2023-05-30 08:43:58.867635",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch",
+  "rearing_section",
+  "doc",
+  "feed",
+  "medicine",
+  "vaccine",
+  "wages",
+  "others",
+  "laying_section",
+  "l_feed",
+  "l_medicine",
+  "l_vaccine",
+  "l_wages",
+  "l_others",
+  "production",
+  "sales"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "label": "Batch",
+   "options": "Layer Batch",
+   "unique": 1
+  },
+  {
+   "fieldname": "rearing_section",
+   "fieldtype": "Section Break",
+   "label": "Rearing"
+  },
+  {
+   "default": "0",
+   "fieldname": "doc",
+   "fieldtype": "Float",
+   "label": "DOC"
+  },
+  {
+   "default": "0",
+   "fieldname": "feed",
+   "fieldtype": "Float",
+   "label": "Feed"
+  },
+  {
+   "default": "0",
+   "fieldname": "medicine",
+   "fieldtype": "Float",
+   "label": "Medicine"
+  },
+  {
+   "default": "0",
+   "fieldname": "vaccine",
+   "fieldtype": "Float",
+   "label": "Vaccine"
+  },
+  {
+   "default": "0",
+   "fieldname": "wages",
+   "fieldtype": "Float",
+   "label": "Wages"
+  },
+  {
+   "default": "0",
+   "fieldname": "others",
+   "fieldtype": "Float",
+   "label": "Others"
+  },
+  {
+   "fieldname": "laying_section",
+   "fieldtype": "Section Break",
+   "label": "Laying"
+  },
+  {
+   "default": "0",
+   "fieldname": "l_feed",
+   "fieldtype": "Float",
+   "label": "Feed"
+  },
+  {
+   "default": "0",
+   "fieldname": "l_medicine",
+   "fieldtype": "Float",
+   "label": "Medicine"
+  },
+  {
+   "default": "0",
+   "fieldname": "l_vaccine",
+   "fieldtype": "Float",
+   "label": "Vaccine"
+  },
+  {
+   "default": "0",
+   "fieldname": "l_wages",
+   "fieldtype": "Float",
+   "label": "Wages"
+  },
+  {
+   "default": "0",
+   "fieldname": "l_others",
+   "fieldtype": "Float",
+   "label": "Others"
+  },
+  {
+   "default": "0",
+   "fieldname": "production",
+   "fieldtype": "Float",
+   "label": "Production"
+  },
+  {
+   "default": "0",
+   "fieldname": "sales",
+   "fieldtype": "Float",
+   "label": "Sales"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-05-30 08:43:58.867635",
+ "modified_by": "Administrator",
+ "module": "Poultry",
+ "name": "Layer Budget",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -39,6 +39,8 @@
   "total_mortaliy",
   "section_break_20",
   "temperature",
+  "weight_section",
+  "weight",
   "item_processed"
  ],
  "fields": [
@@ -240,6 +242,17 @@
    "fieldname": "create_doc_material_receipt",
    "fieldtype": "Button",
    "label": "Add Extra DOC"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Table",
+   "label": "Weight",
+   "options": "Weight"
+  },
+  {
+   "fieldname": "weight_section",
+   "fieldtype": "Section Break",
+   "label": "Weight"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -257,7 +270,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2022-11-15 19:03:28.951129",
+ "modified": "2023-03-10 14:09:46.740793",
  "modified_by": "Administrator",
  "module": "Broiler",
  "name": "Broiler Batch",

@@ -15,10 +15,10 @@
  "fields": [
   {
    "fieldname": "category",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Layer Eggs\nOrganic Eggs\nBreeder Eggs"
+   "options": "Batch Type"
   },
   {
    "fieldname": "batch_prefix",
@@ -51,7 +51,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-03 18:41:19.259680",
+ "modified": "2023-05-11 11:27:35.474681",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Egg Finished Item Production Settings",

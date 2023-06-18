@@ -1,44 +1,37 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:item",
- "creation": "2022-05-30 09:55:17.822948",
+ "autoname": "field:layer_batch",
+ "creation": "2023-05-17 08:55:36.553490",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "item",
-  "description",
-  "packing_item"
+  "layer_batch",
+  "expense"
  ],
  "fields": [
   {
-   "fieldname": "item",
+   "fieldname": "layer_batch",
    "fieldtype": "Link",
-   "label": "Parent Item",
-   "options": "Item",
+   "in_list_view": 1,
+   "label": "Layer Batch",
+   "options": "Layer Batch",
    "unique": 1
   },
   {
-   "fetch_from": "item.item_name",
-   "fieldname": "description",
-   "fieldtype": "Data",
+   "fieldname": "expense",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Description"
-  },
-  {
-   "fieldname": "packing_item",
-   "fieldtype": "Table",
-   "label": "Packing Item",
-   "options": "Packing Items"
+   "label": "Expense %"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-15 19:15:09.010298",
+ "modified": "2023-05-17 08:56:00.161292",
  "modified_by": "Administrator",
- "module": "Slaughtering",
- "name": "Packing Materials",
+ "module": "Poultry",
+ "name": "Batch Wage Expense",
  "owner": "Administrator",
  "permissions": [
   {

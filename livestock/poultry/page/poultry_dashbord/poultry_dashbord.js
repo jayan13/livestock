@@ -182,6 +182,9 @@ MyPage =Class.extend({
 		var budget_xl=[];
 		var reargp_xl=[];
 		var laygp_xl=[];
+		var reargp_mor_xl=[];
+		var laygp_mor_xl=[];
+
 		function get_report()
 		{
 			//console.log('rs='+reqsnd);
@@ -229,7 +232,8 @@ MyPage =Class.extend({
 							
 							chart_rear(r_lbl,r_dta);
 						}
-						
+						rearing_graph(field1.get_value(),field2.get_value());
+						laying_graph(field1.get_value(),field2.get_value());
 							//let data2=r.message;
 							
 							//$(frappe.render_template("daily_eggs_report_data",data2)).appendTo("#report_egg");
@@ -254,7 +258,9 @@ MyPage =Class.extend({
 					laying:JSON.stringify(lay_xl),
 					budget:JSON.stringify(budget_xl),
 					rearing_gp:JSON.stringify(reargp_xl),
-					laying_gp:JSON.stringify(laygp_xl),	
+					laying_gp:JSON.stringify(laygp_xl),
+					rearing_mor_gp:JSON.stringify(reargp_mor_xl),
+					laying_mor_gp:JSON.stringify(laygp_mor_xl),	
 				},
 				callback: function(response) {
 				  var files = response.message;
@@ -297,6 +303,138 @@ MyPage =Class.extend({
 			}
 			return result;
 		}
+
+		function rearing_graph(batch,period)
+{
+	$("#rear-mortality").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_rear_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+		  batch: batch,
+		  period: period,					  
+		},
+		callback: function (r) {
+		  if (r.message) {
+			reargp_mor_xl=r.message.ideal
+			let l_lbl=[]
+			let l_dta=[]
+			let act_dta=[]			 
+			$.each( r.message.ideal, function( key, value ) {					
+				l_lbl.push(value.age);
+				l_dta.push(value.mortality);
+				act_dta.push(value.act_mortality);
+				});
+
+				
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#rear-mortality", { 
+				 // or DOM element ref: https://frappe.io/charts
+				data: {
+					labels: l_lbl,
+				
+					datasets: [
+						{							
+							chartType: 'line',
+							name: "Ideal",
+							values: l_dta
+						},
+						{							
+							chartType: 'line',
+							name: "Actual",
+							values: act_dta
+						},
+						
+					],
+				},
+				title: "Rearing Mortality",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['light-blue','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Mor. Cum. '+d+' %',
+				}
+				
+			  });
+
+			 //--------------------------------------------------
+		  }
+		},
+	  }); 
+}
+
+function laying_graph(batch,period)
+{
+	
+	$("#layer-mortality").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			laygp_mor_xl=r.message.ideal
+			let ly_lbl=[]
+			let ly_dta=[]
+			let lyact_dta=[]
+						 
+			$.each( r.message.ideal, function( key, value ) {					
+				ly_lbl.push(value.age);
+				ly_dta.push(value.mortality);
+				lyact_dta.push(value.act_mortality);
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#layer-mortality", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Ideal",
+							values: ly_dta
+						},
+						{							
+							chartType: 'line',
+							name: "Actual",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Laying Mortality",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['light-blue','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Mor. Cum. '+d+' %',
+				}
+				
+			  });
+
+			 //--------------------------------------------------
+			 
+		  }
+		},
+	  });
+}
 		
 	}
 })
@@ -306,10 +444,11 @@ function print_rep()
 					
 					var divrear=document.getElementById('rearing');
 					var divlay=document.getElementById('production');
-					
+					var divbud=document.getElementById('budget');
+					var divmorgp=document.getElementById('mortality');
 					  var newWin=window.open('','Print-Window');
 					  newWin.document.open();
-					  newWin.document.write('<html><style>table, th, td {border: 1px solid;border-collapse: collapse; } table{ width:100%;} table td{ text-align:right;} #rear-chart{display:none;}#layer-chart{display:none;} .table-secondary td,.table-secondary th {background-color: #d5d7d9;font-weight: bold;}  @media print { #prod{overflow-x:unset !important;} #rer{overflow-x:unset !important;} } </style><body onload="window.print()">'+divrear.innerHTML+divlay.innerHTML+'</body></html>');
+					  newWin.document.write('<html><style>table, th, td {border: 1px solid;border-collapse: collapse; } table{ width:100%;} table td{ text-align:right;} #rear-chart{display:none;}#layer-chart{display:none;} .table-secondary td,.table-secondary th {background-color: #d5d7d9;font-weight: bold;}  @media print { #prod{overflow-x:unset !important;} #rer{overflow-x:unset !important;} } </style><body onload="window.print()">'+divbud.innerHTML+divrear.innerHTML+divlay.innerHTML+divmorgp.innerHTML+'</body></html>');
 					  newWin.document.close();
 					  setTimeout(function(){newWin.close();},10);
 		  

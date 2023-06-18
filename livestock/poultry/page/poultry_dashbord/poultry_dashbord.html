@@ -23,6 +23,9 @@
     <li class="nav-item" role="presentation">
       <a class="nav-link" id="production-tab" data-toggle="tab" href="#production" role="tab" aria-controls="production" aria-selected="false">Production Costs</a>
     </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="mortality-tab" data-toggle="tab" href="#mortality" role="tab" aria-controls="mortality" aria-selected="false">Mortality Graph</a>
+    </li>
   </ul>
   <div class="tab-content" id="myTabContent">
     <div class="tab-pane fade" id="budget" role="tabpanel" aria-labelledby="budget-tab">
@@ -43,6 +46,7 @@
         </table>
       </div>
       <div id="rear-chart" > </div>
+      
     </div>
     <div class="tab-pane fade" id="production" role="tabpanel" aria-labelledby="production-tab">
       <div style="min-height:100px;width:100%;padding:4px;overflow-x: auto;" id="prod">
@@ -52,6 +56,12 @@
         </table>
       </div>
       <div id="layer-chart" > </div>
+      
+    </div>
+    <div class="tab-pane fade" id="mortality" role="tabpanel" aria-labelledby="mortality-tab">
+      <span style="padding:25px; display: block;font-size: 16px;"><b>Accumulated Mortality</b></span>
+      <div id="rear-mortality" > </div>
+      <div id="layer-mortality" > </div>
     </div>
     
   </div>
