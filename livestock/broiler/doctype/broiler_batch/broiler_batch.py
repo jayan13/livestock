@@ -17,6 +17,14 @@ class BroilerBatch(Document):
 		project.cost_center=shed.cost_center
 		project.insert(ignore_permissions=True)
 		self.project=project.name
+		if len(self.feed)>0:
+			stot=0
+			ftot=0
+			for f in self.feed:
+				stot+=float(f.starter_qty or 0)
+				ftot+=float(f.finisher_qty or 0)
+			self.total_starter_qty=stot
+			self.total_finisher_qty=ftot
 
 	def after_insert(self):
 		pjt=frappe.get_doc("Project", self.project)
@@ -24,6 +32,15 @@ class BroilerBatch(Document):
 		pjt.save()
 
 	def on_update(self):
+		if len(self.feed)>0:
+			stot=0
+			ftot=0
+			for f in self.feed:
+				stot+=float(f.starter_qty or 0)
+				ftot+=float(f.finisher_qty or 0)
+			self.total_starter_qty=stot
+			self.total_finisher_qty=ftot
+
 		pjt=frappe.get_doc("Project", self.project)
 		
 		if pjt.status!=self.status:
