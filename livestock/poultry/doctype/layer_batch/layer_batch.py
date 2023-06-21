@@ -46,7 +46,7 @@ class LayerBatch(Document):
 @frappe.whitelist()
 def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=''):
 	lbatch=frappe.get_doc('Layer Batch',batch)
-	
+	transfer_qty=float(transfer_qty)
 	if int(transfer_qty) <= 0 :
 		frappe.throw(_("Please set Transfer Quantity "))
 	if lbatch.rearing_shed:
@@ -126,7 +126,19 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		expense_account=sett.expense_account or item_account_details.get("expense_account")                                
 		precision = cint(frappe.db.get_default("float_precision")) or 3		
 		amount=flt(int(transfer_qty) * flt(base_row_rate), precision)
-			
+		batch_no=''
+		if item_account_details.has_batch_no:
+			manufacture_date=posting_date.strftime("%d-%m-%Y")
+			batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
+			if not frappe.db.exists("Batch", {"name": batch_no}):
+				ibatch = frappe.new_doc("Batch")
+				ibatch.batch_id=batch_no
+				ibatch.item=sett.finished_product
+				ibatch.item_name=item_account_details.name
+				ibatch.batch_qty=transfer_qty
+				ibatch.manufacturing_date=posting_date
+				ibatch.stock_uom=stock_uom
+				ibatch.insert()	
 		stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
 							'item_code': sett.finished_product,
@@ -143,6 +155,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 							"amount":amount,  
 							"transfer_qty":transfer_qty,
 							'conversion_factor': flt(conversion_factor),
+							'batch_no':batch_no,
 							
 			               
         })
