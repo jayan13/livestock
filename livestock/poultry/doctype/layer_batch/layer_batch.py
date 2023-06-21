@@ -295,14 +295,14 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 				manufacture_date=posting_date.strftime("%d-%m-%Y")
 				batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
 				if not frappe.db.exists("Batch", {"name": batch_no}):
-					batch = frappe.new_doc("Batch")
-					batch.batch_id=batch_no
-					batch.item=sett.finished_product
-					batch.item_name=item_account_details.name
-					batch.batch_qty=transfer_qty
-					batch.manufacturing_date=posting_date
-					batch.stock_uom=stock_uom
-					batch.insert()
+					ibatch = frappe.new_doc("Batch")
+					ibatch.batch_id=batch_no
+					ibatch.item=sett.finished_product
+					ibatch.item_name=item_account_details.name
+					ibatch.batch_qty=transfer_qty
+					ibatch.manufacturing_date=posting_date
+					ibatch.stock_uom=stock_uom
+					ibatch.insert()
 
 			stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
@@ -729,14 +729,14 @@ def create_production_stock_entry(fitemdata,batch,posting_date,posting_time):
 			pre_fix= pre_fix or itemname
 			batch_no=str(pre_fix)+'-'+str(manufacture_date)		
 			if not frappe.db.exists("Batch", {"name": batch_no}):
-				batch = frappe.new_doc("Batch")
-				batch.batch_id=batch_no
-				batch.item=fitem.item_code
-				batch.item_name=item_name
-				batch.batch_qty=fitem.qty
-				batch.manufacturing_date=posting_date
-				batch.stock_uom=stock_uom
-				batch.insert()
+				ibatch = frappe.new_doc("Batch")
+				ibatch.batch_id=batch_no
+				ibatch.item=fitem.item_code
+				ibatch.item_name=item_name
+				ibatch.batch_qty=fitem.qty
+				ibatch.manufacturing_date=posting_date
+				ibatch.stock_uom=stock_uom
+				ibatch.insert()
 		stock_uom_rate=0
 		if itemscost:
 			base_rate=itemscost/float(fitem.qty)
