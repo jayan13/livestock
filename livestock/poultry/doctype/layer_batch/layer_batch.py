@@ -47,42 +47,41 @@ class LayerBatch(Document):
 def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=''):
 	lbatch=frappe.get_doc('Layer Batch',batch)
 	
-
+	if int(transfer_qty) <= 0 :
+		frappe.throw(_("Please set Transfer Quantity "))
 	if lbatch.rearing_shed:
 		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
-	toto_mort=0
-	if lbatch.rearing_daily_mortality:
-		for mor in lbatch.rearing_daily_mortality:
-			toto_mort+=mor.total
-
-	live_chk=lbatch.doc_placed-toto_mort
+	
 	lbatch.flock_transferred_to_layer=transfer_qty
+	#current_alive_chicks
 	time=''
 	date=''
 	if time:
 		time=get_datetime(time)
 	if transfer_date:
 		date=getdate(transfer_date)
-	sett.expense_account
+	
 	posting_date=date or nowdate() 
 	#time=time or get_datetime()
 	#posting_time=time.strftime("%H:%M:%S")
 	posting_time='23:59:00'
-	total_add_cost=0
-
+	
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
 	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'
-	stock_entry.purpose = "Manufacture"
-	stock_entry.stock_entry_type = "Manufacture"
-	stock_entry.manufacturing_type = "Layer Chicken"
+	if sett.base_row_material==sett.finished_product:
+		stock_entry.stock_entry_type = "Material Transfer"
+	else:
+		stock_entry.stock_entry_type = "Repack"
+
+	stock_entry.manufacturing_type='Layer Chicken'
 	stock_entry.project = lbatch.project
 	stock_entry.posting_date=posting_date
 	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 
+	
 	if sett.base_row_material:
-		itmqty=lbatch.doc_placed+lbatch.mortality
 		item_account_details = get_item_defaults(sett.base_row_material, sett.company)
 		stock_uom = item_account_details.stock_uom
 		conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
@@ -93,16 +92,16 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 						"warehouse": sett.row_material_target_warehouse,
 						"posting_date": posting_date,
 						"posting_time": posting_time,
-						"qty": -1 * itmqty,
+						"qty": -1 * transfer_qty,
                         'company':sett.company
 					})
 		precision = cint(frappe.db.get_default("float_precision")) or 3    
-		amount=flt(itmqty * flt(base_row_rate), precision)
+		amount=flt(transfer_qty * flt(base_row_rate), precision)
 		stock_entry.append('items', {
                         's_warehouse': sett.row_material_target_warehouse,
                         'item_code': sett.base_row_material,
-                        'qty': itmqty,
-                        'actual_qty':itmqty,
+                        'qty': transfer_qty,
+                        'actual_qty':transfer_qty,
                         'uom': stock_uom,
                         'cost_center':cost_center,					
                         'ste_detail': item_account_details.name,
@@ -112,199 +111,23 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
                         "basic_rate":base_row_rate, 	
                         "basic_amount":amount,  
                         "amount":amount,  
-                        "transfer_qty":itmqty,
+                        "transfer_qty":transfer_qty,
                         'conversion_factor': flt(conversion_factor),
                                   
         })
 	else:
 		frappe.throw(_("Please set base Rowmaterial in Layer Shed settings for {0} ").format(sett.company))
 
-	feeds=frappe.db.get_list('Layer Feed',filters={'parent':batch,'parentfield':'rearing_feed'},
-    fields=['item_code,sum(qty) as qty'],group_by='item_code')
-	if feeds:
-		for itm in feeds:
-			itmqty=itm.qty
-			item_account_details = get_item_defaults(itm.item_code, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")
-			rate = get_incoming_rate({
-							"item_code": itm.item_code,
-							"warehouse": sett.feed_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * itmqty,
-							'company':sett.company
-						})
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(itmqty * flt(rate), precision)
-			stock_entry.append('items', {
-							's_warehouse': sett.feed_warehouse,
-							'item_code': itm.item_code,
-							'qty': itmqty,
-							'actual_qty':itmqty,
-							'uom': stock_uom,
-							'cost_center':cost_center,					
-							'ste_detail': item_account_details.name,
-							'stock_uom': stock_uom,
-							'expense_account':expense_account,
-							'valuation_rate': rate,
-							"basic_rate":rate, 	
-							"basic_amount":amount,  
-							"amount":amount,  
-							"transfer_qty":itmqty,
-							'conversion_factor': flt(conversion_factor),
-									
-			})
-			total_add_cost=total_add_cost+amount
-	
-	medicines=frappe.db.get_list('Layer Medicine',filters={'parent':batch,'parentfield':'rearing_medicine'},
-    fields=['item_code,sum(qty) as qty'],group_by='item_code')
-	if medicines:
-		for itm in medicines:
-			itmqty=itm.qty
-			item_account_details = get_item_defaults(itm.item_code, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")
-			rate = get_incoming_rate({
-							"item_code": itm.item_code,
-							"warehouse": sett.medicine_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * itmqty,
-							'company':sett.company
-						})
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(itmqty * flt(rate), precision)
-			stock_entry.append('items', {
-							's_warehouse': sett.medicine_warehouse,
-							'item_code': itm.item_code,
-							'qty': itmqty,
-							'actual_qty':itmqty,
-							'uom': stock_uom,
-							'cost_center':cost_center,					
-							'ste_detail': item_account_details.name,
-							'stock_uom': stock_uom,
-							'expense_account':expense_account,
-							'valuation_rate': rate,
-							"basic_rate":rate, 	
-							"basic_amount":amount,  
-							"amount":amount,  
-							"transfer_qty":itmqty,
-							'conversion_factor': flt(conversion_factor),
-									
-			})
-			total_add_cost=total_add_cost+amount
-	'''
-	vaccines=frappe.db.get_list('Layer Vaccine',filters={'parent':batch,'parentfield':'rearing_vaccine'},
-    fields=['item_code,sum(qty) as qty'],group_by='item_code')
-	if vaccines:
-		for itm in vaccines:
-			itmqty=itm.qty
-			item_account_details = get_item_defaults(itm.item_code, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")
-			rate = get_incoming_rate({
-							"item_code": itm.item_code,
-							"warehouse": sett.vaccine_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * itmqty,
-							'company':sett.company
-						})
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(itmqty * flt(rate), precision)
-			stock_entry.append('items', {
-							's_warehouse': sett.vaccine_warehouse,
-							'item_code': itm.item_code,
-							'qty': itmqty,
-							'actual_qty':itmqty,
-							'uom': stock_uom,
-							'cost_center':cost_center,					
-							'ste_detail': item_account_details.name,
-							'stock_uom': stock_uom,
-							'expense_account':expense_account,
-							'valuation_rate': rate,
-							"basic_rate":rate, 	
-							"basic_amount":amount,  
-							"amount":amount,  
-							"transfer_qty":itmqty,
-							'conversion_factor': flt(conversion_factor),
-									
-			})
-			total_add_cost=total_add_cost+amount
-	'''
-	items=frappe.db.get_list('Layer Other Items',filters={'parent':batch,'parentfield':'rearing_items'},
-    fields=['item_code,sum(qty) as qty'],group_by='item_code')
-	if items:
-		for itm in items:
-			itmqty=itm.qty
-			item_account_details = get_item_defaults(itm.item_code, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(itm.item_code, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")
-			rate = get_incoming_rate({
-							"item_code": itm.item_code,
-							"warehouse": sett.other_item_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * itmqty,
-							'company':sett.company
-						})
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(itmqty * flt(rate), precision)
-			stock_entry.append('items', {
-							's_warehouse': sett.other_item_warehouse,
-							'item_code': itm.item_code,
-							'qty': itmqty,
-							'actual_qty':itmqty,
-							'uom': stock_uom,
-							'cost_center':cost_center,					
-							'ste_detail': item_account_details.name,
-							'stock_uom': stock_uom,
-							'expense_account':expense_account,
-							'valuation_rate': rate,
-							"basic_rate":rate, 	
-							"basic_amount":amount,  
-							"amount":amount,  
-							"transfer_qty":itmqty,
-							'conversion_factor': flt(conversion_factor),
-									
-			})
-			total_add_cost=total_add_cost+amount
-
-	if int(transfer_qty) > 0 :
-		#live_chk transfer_warehouse
-		if sett.finished_product:
-			item_account_details = get_item_defaults(sett.finished_product, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(sett.finished_product, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")                                
-			precision = cint(frappe.db.get_default("float_precision")) or 3
-			cost=((int(transfer_qty)*base_row_rate) + total_add_cost) / int(transfer_qty)
-			amount=flt(int(transfer_qty) * flt(cost), precision)
-			batch_no=''
-			if item_account_details.has_batch_no:
-				manufacture_date=posting_date.strftime("%d-%m-%Y")
-				batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
-				if not frappe.db.exists("Batch", {"name": batch_no}):
-					ibatch = frappe.new_doc("Batch")
-					ibatch.batch_id=batch_no
-					ibatch.item=sett.finished_product
-					ibatch.item_name=item_account_details.name
-					ibatch.batch_qty=transfer_qty
-					ibatch.manufacturing_date=posting_date
-					ibatch.stock_uom=stock_uom
-					ibatch.insert()
-
-			stock_entry.append('items', {
+	if sett.finished_product:
+		item_account_details = get_item_defaults(sett.finished_product, sett.company)
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(sett.finished_product, stock_uom).get("conversion_factor")
+		cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
+		expense_account=sett.expense_account or item_account_details.get("expense_account")                                
+		precision = cint(frappe.db.get_default("float_precision")) or 3		
+		amount=flt(int(transfer_qty) * flt(base_row_rate), precision)
+			
+		stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
 							'item_code': sett.finished_product,
 							'qty': transfer_qty,
@@ -314,123 +137,41 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 							'ste_detail': item_account_details.name,
 							'stock_uom': stock_uom,
 							'expense_account':expense_account,
-							'valuation_rate': cost,
-							"basic_rate":cost, 	
-							"basic_amount":amount,  
-							"amount":amount,  
-							"transfer_qty":transfer_qty,
-							'conversion_factor': flt(conversion_factor),
-							'is_finished_item':1,
-							'batch_no':batch_no,
-			               
-        	})
-		else:
-			frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
-
-	if int(toto_mort) > 0:
-		if sett.cull:
-			item_account_details = get_item_defaults(sett.cull, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(sett.cull, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")                                
-			precision = cint(frappe.db.get_default("float_precision")) or 3
-			base_row_rate = get_incoming_rate({
-							"item_code": sett.base_row_material,
-							"warehouse": sett.cull_target_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * toto_mort,
-							'company':sett.company
-						})    
-			amount=flt(flt(toto_mort) * base_row_rate, precision)
-			stock_entry.append('items', {
-							't_warehouse': sett.cull_target_warehouse,
-							'item_code': sett.cull,
-							'qty': toto_mort,
-							'actual_qty':toto_mort,
-							'uom': stock_uom,
-							'cost_center':cost_center,					
-							'ste_detail': item_account_details.name,
-							'stock_uom': stock_uom,
-							'expense_account':expense_account,
 							'valuation_rate': base_row_rate,
 							"basic_rate":base_row_rate, 	
 							"basic_amount":amount,  
 							"amount":amount,  
-							"transfer_qty":toto_mort,
+							"transfer_qty":transfer_qty,
 							'conversion_factor': flt(conversion_factor),
-							'is_scrap_item':1,          
-			})
+							
+			               
+        })
+	else:
+		frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
 
-		else:
-			frappe.throw(_("Please set Cull Item in Layer Shed settings for {0} ").format(sett.company))
+	
 
 	#stock_entry.save()
 	stock_entry.insert()
 	stock_entry.docstatus=1
 	stock_entry.save()
+
 	lbatch.rooster_qty=rooster_qty
 	lbatch.item_processed=1
 	lbatch.layer_status='Laying'
 	lbatch.flock_transfer_date=posting_date
 	lbatch.save()
-	items=frappe.db.get_all('Layer Other Items',filters={'parentfield':'rearing_items','parent':batch},fields=['name'])
-	if items:
-		for itm in items:
-			litem=frappe.get_doc('Layer Other Items',itm.name)
-			litem.docstatus=1
-			litem.issue='Yes'
-			litem.stock_entry=stock_entry.name
-			litem.save()
-			frappe.db.set_value('Layer Other Items',itm.name, 'docstatus', 1)
-	'''
-	vaccines=frappe.db.get_all('Layer Vaccine',filters={'parentfield':'rearing_vaccine','parent':batch},fields=['name'])
-	if vaccines:
-		for itm in vaccines:
-			litem=frappe.get_doc('Layer Vaccine',itm.name)
-			litem.docstatus=1
-			litem.issue='Yes'
-			litem.stock_entry=stock_entry.name
-			litem.save()
-			frappe.db.set_value('Layer Vaccine',itm.name, 'docstatus', 1)
-	'''
-	medicines=frappe.db.get_all('Layer Medicine',filters={'parentfield':'rearing_medicine','parent':batch},fields=['name'])
-	if medicines:
-		for itm in medicines:
-			litem=frappe.get_doc('Layer Medicine',itm.name)
-			litem.docstatus=1
-			litem.issue='Yes'
-			litem.stock_entry=stock_entry.name
-			litem.save()
-			frappe.db.set_value('Layer Medicine',itm.name, 'docstatus', 1)
-
-	feeds=frappe.db.get_all('Layer Feed',filters={'parentfield':'rearing_feed','parent':batch},fields=['name'])
-	if feeds:
-		for itm in feeds:
-			litem=frappe.get_doc('Layer Feed',itm.name)
-			litem.docstatus=1
-			litem.issue='Yes'
-			litem.stock_entry=stock_entry.name
-			litem.save()
-			frappe.db.set_value('Layer Feed',itm.name, 'docstatus', 1)
-			 
-
-	mortalitys=frappe.db.get_all('Layer Mortality',filters={'parentfield':'rearing_daily_mortality','parent':batch},fields=['name'])
-	if mortalitys:
-		for itm in mortalitys:
-			litem=frappe.get_doc('Layer Mortality',itm.name)
-			litem.docstatus=1
-			litem.stock_entry=stock_entry.name
-			litem.save()
-			frappe.db.set_value('Layer Mortality',itm.name, 'docstatus', 1)
+	
 	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
 	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
 	return stock_entry.as_dict()
 
 def create_stock_entry_mortality(item,parent_field=''):
-	lbatch=frappe.get_doc('Layer Batch',item.parent)	
-	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	lbatch=frappe.get_doc('Layer Batch',item.parent)
+	if parent_field=='laying_mortality':	
+		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	else:
+		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
 	time=''
 	date=''
 	if item.date:
@@ -509,6 +250,7 @@ def create_stock_entry_mortality(item,parent_field=''):
 	litem=frappe.get_doc('Layer Mortality',item.name)
 	litem.docstatus=1
 	litem.stock_entry=stock_entry.name
+	litem.issue='Yes'
 	litem.save()
 	frappe.db.set_value('Layer Mortality',item.name, 'docstatus', 1)
 	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
@@ -517,7 +259,11 @@ def create_stock_entry_mortality(item,parent_field=''):
 
 def create_stock_entry(item,parent_field=''):
 	lbatch=frappe.get_doc('Layer Batch',item.parent)	
-	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	
+	if lbatch.layer_status=='Laying':	
+		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	else:
+		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
 	time=''
 	date=''
 	if item.date:
@@ -547,22 +293,16 @@ def create_stock_entry(item,parent_field=''):
 	item_code=item.item_code
 	row_material_target_warehouse=sett.row_material_target_warehouse
 	expense_account=item_account_details.get("expense_account")
-	if parent_field=='laying_items':
+	if parent_field in ['laying_items','rearing_items']:
 		expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
 		row_material_target_warehouse=sett.other_item_warehouse
-	elif parent_field=='laying_medicine':
+	elif parent_field in ['laying_medicine','rearing_medicine'] :
 		expense_account=sett.medicine_expense_account or item_account_details.get("expense_account")
 		row_material_target_warehouse=sett.medicine_warehouse
-	elif parent_field=='laying_vaccine':
-		expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")
-		row_material_target_warehouse=sett.vaccine_warehouse
-	elif parent_field=='laying_feed':
+	elif parent_field in ['laying_feed','rearing_feed'] :
 		expense_account=sett.feed_expense_account or item_account_details.get("expense_account")
 		row_material_target_warehouse=sett.feed_warehouse
-	elif parent_field=='laying_mortality':
-		expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
-		item_code=sett.base_row_material
-		row_material_target_warehouse=sett.row_material_target_warehouse
+	
 
 		
 	
@@ -601,22 +341,19 @@ def create_stock_entry(item,parent_field=''):
 	stock_entry.save()
 
 	tbl=''
-	if parent_field=='laying_items':
+	if parent_field in ['laying_items','rearing_items']:
 		tbl='Layer Other Items'
-	elif parent_field=='laying_medicine':
+	elif parent_field in ['laying_medicine','rearing_medicine']:
 		tbl='Layer Medicine'
-	elif parent_field=='laying_vaccine':
-		tbl='Layer Vaccine'
-	elif parent_field=='laying_feed':
+	elif parent_field in ['laying_feed','rearing_feed']:
 		tbl='Layer Feed'
-	elif parent_field=='laying_mortality':
-		tbl='Layer Mortality'
+	
 		
 	if tbl:
 		litem=frappe.get_doc(tbl,item.name)
 		litem.docstatus=1
-		if parent_field in ['laying_items','laying_medicine','laying_vaccine','laying_feed']:
-			litem.issue='Yes'
+		#if parent_field in ['laying_items','laying_medicine','laying_vaccine','laying_feed']:
+		litem.issue='Yes'
 		litem.stock_entry=stock_entry.name
 		litem.save()
 		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
@@ -800,8 +537,8 @@ def added_feed_rearing(batch,parentfield,date,item_code,qty,uom,material_transfe
 	childtbl = frappe.new_doc("Layer Feed")
 	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
-	if parentfield=='laying_feed':
-		create_stock_entry(childtbl,parentfield)
+	#if parentfield=='laying_feed':
+	create_stock_entry(childtbl,parentfield)
 
 	return childtbl.as_dict()
 
@@ -847,8 +584,8 @@ def added_medicine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',ma
 	childtbl = frappe.new_doc("Layer Medicine")
 	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
-	if parentfield=='laying_medicine':
-		create_stock_entry(childtbl,parentfield)
+	#if parentfield=='laying_medicine':
+	create_stock_entry(childtbl,parentfield)
 	return childtbl.as_dict()
 	
 @frappe.whitelist()
@@ -876,51 +613,7 @@ def update_medicine_rearing(idx,parent,parentfield,name,date,item_code,qty,uom,r
 @frappe.whitelist()
 def delete_medicine_rearing(name):
 	frappe.db.delete('Layer Medicine', {"name": name })
-'''
-@frappe.whitelist()
-def add_vaccine_rearing(batch,parentfield,date,item_code,qty,uom,remark='',material_transfer=''):
-	
-	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
-	rate=itemdet.rate
-	conversion_factor=itemdet.conversion_factor
-	midx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='{0}' and parent='{1}' """.format(parentfield,batch))
-	curidx=1
-	if midx and midx[0][0] is not None:
-		curidx = cint(midx[0][0])+1
-	childtbl = frappe.new_doc("Layer Vaccine")
-	childtbl.update({'idx':curidx,'date':date,'rate':rate,'material_transfer':material_transfer,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
-	childtbl.save()
-	if parentfield=='laying_vaccine':
-		create_stock_entry(childtbl,parentfield)
-	return childtbl.as_dict()
 
-@frappe.whitelist()
-def update_vaccine_rearing(idx,parent,parentfield,name,date,item_code,qty,uom,remark=''):
-	if 'new-' in name:
-		name=frappe.db.get_value('Layer Vaccine', {'parent': parent,'idx':idx,'parentfield':parentfield}, ['name'])
-	
-	itemdet=get_item_rate(parent,item_code,qty,uom,date='',time='')
-	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	rate=itemdet.rate
-	conversion_factor=itemdet.conversion_factor
-	doc = frappe.get_doc('Layer Vaccine', name)
-	doc.date = date
-	doc.item_code = item_code
-	doc.item_name=item_name
-	doc.qty = qty
-	doc.uom = uom
-	doc.remark=remark
-	doc.rate=rate
-	doc.conversion_factor=conversion_factor
-	#doc.docstatus=1
-	doc.save()
-	return doc.as_dict()
-
-@frappe.whitelist()
-def delete_vaccine_rearing(name):
-	frappe.db.delete('Layer Vaccine', {"name": name })
-'''
 
 @frappe.whitelist()
 def add_rearing_items(batch,parentfield,date,item_code,qty,uom,material_transfer=''):
@@ -937,8 +630,8 @@ def add_rearing_items(batch,parentfield,date,item_code,qty,uom,material_transfer
 	childtbl = frappe.new_doc("Layer Other Items")
 	childtbl.update({'idx':curidx,'date':date,'item_code':item_code,'material_transfer':material_transfer,'rate':rate,'conversion_factor':conversion_factor,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
-	if parentfield=='laying_items':
-		create_stock_entry(childtbl,parentfield)
+	#if parentfield=='laying_items':
+	create_stock_entry(childtbl,parentfield)
 	return childtbl.as_dict()
 
 @frappe.whitelist()
@@ -980,8 +673,8 @@ def add_rearing_mortality(batch,parentfield,date,age,evening=0,morning=0,remark=
 	childtbl = frappe.new_doc("Layer Mortality")
 	childtbl.update({'idx':curidx,'date':date,'age':age,'morning':morning,'evening':evening,'total':total,'remark':remark,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
 	childtbl.save()
-	if parentfield=='laying_mortality':
-		create_stock_entry_mortality(childtbl,parentfield)
+	#if parentfield=='laying_mortality':
+	create_stock_entry_mortality(childtbl,parentfield)
 	return childtbl.as_dict()
 
 @frappe.whitelist()
@@ -1062,27 +755,7 @@ def update_weight_rearing(idx,parent,parentfield,name,date,week=0,weight=0):
 @frappe.whitelist()
 def delete_weight_rearing(name):
 	frappe.db.delete('Layer Weight', {"name": name })
-'''
-@frappe.whitelist()
-def add_egg_production(batch,parentfield,date,item_code,qty,uom):
-	
-	item_name=frappe.db.get_value('Item',item_code,'item_name')
-	itemdet=get_item_rate(batch,item_code,qty,uom,date='',time='')
-	rate=itemdet.rate
-	conversion_factor=itemdet.conversion_factor
-	
-	midx=frappe.db.sql("""select max(idx) from `tabEgg Production` where parentfield='{0}' and parent='{1}' """.format(parentfield,batch))
-	curidx=1
-	if midx and midx[0][0] is not None:
-		curidx = cint(midx[0][0])+1
-	childtbl = frappe.new_doc("Egg Production")
-	childtbl.update({'idx':curidx,'date':date,'rate':rate,'conversion_factor':conversion_factor,'item_code':item_code,'item_name':item_name,'qty':qty,'uom':uom,'parent': batch,'parenttype': 'Layer Batch','parentfield': parentfield})
-	childtbl.save()
 
-	create_production_stock_entry(childtbl)
-
-	return childtbl.as_dict()
-'''
 
 @frappe.whitelist()
 def add_eggs_production(batch,parentfield,items,production_date,production_time):
@@ -1275,23 +948,7 @@ def get_material_transfer(material_transfer,project,shed):
 			
 			issuedqty=0
 			tranqty=0
-			'''
-			if sett.vaccine_warehouse==dt.t_warehouse:
-				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
-				if chk:
-					issuedqty=chk[0].qty or 0
-				if float(issuedqty) < float(dt.qty):
-					if issuedqty > 0:
-						tranqty=float(dt.qty)-float(issuedqty)
-					else:
-						tranqty=float(dt.qty)
-				if tranqty>0:
-					dt.update({'qty':tranqty,'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
-					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'rearing_vaccine'})
-					vidx+=1
-					retdata.append(dt)
-			'''
+			
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
@@ -1341,11 +998,7 @@ def get_material_transfer(material_transfer,project,shed):
 					fidx+=1
 					retdata.append(dt)
 		
-		#if len(vacc):
-			#for vc in vacc:
-				#childtbl = frappe.new_doc("Layer Vaccine")
-				#childtbl.update(vc)
-				#childtbl.save()
+		
 
 		if len(med):
 			for vc in med:
@@ -1376,12 +1029,7 @@ def get_material_transfer_lay(material_transfer,project,shed):
 	data = frappe.db.sql(""" SELECT item_code,item_name,qty,uom,t_warehouse,basic_rate,conversion_factor       
     FROM `tabStock Entry Detail`  WHERE parent = %(parent)s  """, values=values, as_dict=1,debug=0)
 
-	vacc=[]
-	'''medidx=frappe.db.sql("""select max(idx) from `tabLayer Vaccine` where parentfield='laying_vaccine' and parent='{0}' """.format(project))
-	vidx=1
-	if medidx and medidx[0][0] is not None:
-		vidx = cint(medidx[0][0])+1'''
-
+	
 	med=[]
 	medidx=frappe.db.sql("""select max(idx) from `tabLayer Medicine` where parentfield='laying_medicine' and parent='{0}' """.format(project))
 	midx=1
@@ -1407,23 +1055,6 @@ def get_material_transfer_lay(material_transfer,project,shed):
 			issuedqty=0
 			tranqty=0
 				
-			'''if sett.vaccine_warehouse==dt.t_warehouse:
-				#if not frappe.db.exists("Layer Vaccine", {"material_transfer": material_transfer}):
-				
-				chk=frappe.db.sql("""select sum(qty) as qty from `tabLayer Vaccine` where material_transfer='{0}' and item_code='{1}' """.format(material_transfer,dt.item_code),as_dict=1)
-				if chk:
-					issuedqty=chk[0].qty or 0
-				if float(issuedqty) < float(dt.qty):
-					if issuedqty > 0:
-						tranqty=float(dt.qty)-float(issuedqty)
-					else:
-						tranqty=float(dt.qty)
-				if tranqty>0:
-					dt.update({'qty':tranqty,'date':posting_date,'tbl':'vaccine','material_transfer':material_transfer})
-					vacc.append({'idx':vidx,'date':posting_date,'rate':dt.basic_rate,'material_transfer':material_transfer,'conversion_factor':dt.conversion_factor,'item_code':dt.item_code,'item_name':dt.item_name,'qty':dt.qty,'uom':dt.uom,'parent': project,'parenttype': 'Layer Batch','parentfield': 'laying_vaccine'})
-					vidx+=1
-					retdata.append(dt)'''
-
 
 			if sett.medicine_warehouse==dt.t_warehouse:
 				#if not frappe.db.exists("Layer Medicine", {"material_transfer": material_transfer}):
@@ -1473,11 +1104,6 @@ def get_material_transfer_lay(material_transfer,project,shed):
 					fidx+=1
 					retdata.append(dt)
 		
-		'''if len(vacc):
-			for vc in vacc:
-				childtbl = frappe.new_doc("Layer Vaccine")
-				childtbl.update(vc)
-				childtbl.save()'''
 
 		if len(med):
 			for vc in med:
@@ -1499,239 +1125,17 @@ def get_material_transfer_lay(material_transfer,project,shed):
 			
 		
 	return retdata
-	
-@frappe.whitelist()
-def laying_materials_issue(batch,parentfield,items):
-	import json
-	aList = json.loads(items)
-	itemkeys=[]
-	for itm in aList:
-		itemkeys.append(itm.get('name'))
-
-	itemstr="','".join(itemkeys)
-
-	lbatch=frappe.get_doc('Layer Batch',batch)	
-	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
-	time=''
-	date=''
-	if date:
-		date=getdate(date)
-	
-	posting_date=date or nowdate() 
-	time=time or get_datetime()
-	#posting_time=time.strftime("%H:%M:%S")
-	posting_time='23:59:00'
-
-	stock_entry = frappe.new_doc("Stock Entry")    
-	stock_entry.company = lbatch.company
-	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'
-	stock_entry.stock_entry_type = "Material Issue"	
-	stock_entry.project = lbatch.project
-	stock_entry.posting_date=posting_date
-	stock_entry.set_posting_time='1'
-	stock_entry.posting_time=posting_time
-	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-
-	items=[]
-	'''
-	if parentfield=='laying_vaccine':
-		vaccine=frappe.db.sql("""select * from `tabLayer Vaccine` where docstatus=0 and parentfield='laying_vaccine' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
-		for item in vaccine:
-			items.append(item)
-			item_account_details = get_item_defaults(item.item_code, sett.company)
-			expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")		
-			row_material_target_warehouse=sett.vaccine_warehouse
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
-			item_code=item.item_code
-
-			rate = get_incoming_rate({
-									"item_code": item_code,
-									"warehouse": row_material_target_warehouse,
-									"posting_date": posting_date,
-									"posting_time": posting_time,
-									"qty": -1 * item.qty,
-									'company':sett.company
-								}) or 0
-
-
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(float(item.qty) * float(rate), precision)
-			stock_entry.append('items', {
-										's_warehouse': row_material_target_warehouse,
-										'item_code': item_code,
-										'qty': item.qty,
-										'actual_qty':item.qty,
-										'uom': item.uom,
-										'cost_center':cost_center,					
-										'ste_detail': item_account_details.name,
-										'stock_uom': stock_uom,
-										'expense_account':expense_account,
-										'valuation_rate': rate,
-										"basic_rate":rate, 	
-										"basic_amount":amount,  
-										"amount":amount,  
-										"transfer_qty":item.qty,
-										'conversion_factor': flt(conversion_factor),
-												
-						})
-						'''
-	if parentfield=='laying_medicine':
-		medicine=frappe.db.sql("""select * from `tabLayer Medicine` where docstatus=0 and parentfield='laying_medicine' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
-		for item in medicine:
-			items.append(item)
-			item_account_details = get_item_defaults(item.item_code, sett.company)
-			expense_account=sett.medicine_expense_account or item_account_details.get("expense_account")
-			row_material_target_warehouse=sett.medicine_warehouse
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
-			item_code=item.item_code
-			rate = get_incoming_rate({
-									"item_code": item_code,
-									"warehouse": row_material_target_warehouse,
-									"posting_date": posting_date,
-									"posting_time": posting_time,
-									"qty": -1 * item.qty,
-									'company':sett.company
-								}) or 0
-
-
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(float(item.qty) * float(rate), precision)
-			stock_entry.append('items', {
-										's_warehouse': row_material_target_warehouse,
-										'item_code': item_code,
-										'qty': item.qty,
-										'actual_qty':item.qty,
-										'uom': item.uom,
-										'cost_center':cost_center,					
-										'ste_detail': item_account_details.name,
-										'stock_uom': stock_uom,
-										'expense_account':expense_account,
-										'valuation_rate': rate,
-										"basic_rate":rate, 	
-										"basic_amount":amount,  
-										"amount":amount,  
-										"transfer_qty":item.qty,
-										'conversion_factor': flt(conversion_factor),
-												
-						})
-	if parentfield=='laying_feed':
-		feed=frappe.db.sql("""select * from `tabLayer Feed` where docstatus=0 and parentfield='laying_feed' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
-		for item in feed:
-			items.append(item)
-			item_account_details = get_item_defaults(item.item_code, sett.company)
-			expense_account=sett.feed_expense_account or item_account_details.get("expense_account")
-			row_material_target_warehouse=sett.feed_warehouse
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
-			item_code=item.item_code
-			rate = get_incoming_rate({
-									"item_code": item_code,
-									"warehouse": row_material_target_warehouse,
-									"posting_date": posting_date,
-									"posting_time": posting_time,
-									"qty": -1 * item.qty,
-									'company':sett.company
-								}) or 0
-
-
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(float(item.qty) * float(rate), precision)
-			stock_entry.append('items', {
-										's_warehouse': row_material_target_warehouse,
-										'item_code': item_code,
-										'qty': item.qty,
-										'actual_qty':item.qty,
-										'uom': item.uom,
-										'cost_center':cost_center,					
-										'ste_detail': item_account_details.name,
-										'stock_uom': stock_uom,
-										'expense_account':expense_account,
-										'valuation_rate': rate,
-										"basic_rate":rate, 	
-										"basic_amount":amount,  
-										"amount":amount,  
-										"transfer_qty":item.qty,
-										'conversion_factor': flt(conversion_factor),
-												
-						})
-	if parentfield=='laying_items':
-		items=frappe.db.sql("""select * from `tabLayer Other Items` where docstatus=0 and parentfield='laying_items' and parent='{0}' and name in ('{1}')""".format(batch,itemstr),as_dict=1)
-		for item in items:
-			items.append(item)
-			item_account_details = get_item_defaults(item.item_code, sett.company)
-			expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
-			row_material_target_warehouse=sett.other_item_warehouse
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
-			item_code=item.item_code
-			rate = get_incoming_rate({
-									"item_code": item_code,
-									"warehouse": row_material_target_warehouse,
-									"posting_date": posting_date,
-									"posting_time": posting_time,
-									"qty": -1 * item.qty,
-									'company':sett.company
-								}) or 0
-
-
-			precision = cint(frappe.db.get_default("float_precision")) or 3    
-			amount=flt(float(item.qty) * float(rate), precision)
-			stock_entry.append('items', {
-										's_warehouse': row_material_target_warehouse,
-										'item_code': item_code,
-										'qty': item.qty,
-										'actual_qty':item.qty,
-										'uom': item.uom,
-										'cost_center':cost_center,					
-										'ste_detail': item_account_details.name,
-										'stock_uom': stock_uom,
-										'expense_account':expense_account,
-										'valuation_rate': rate,
-										"basic_rate":rate, 	
-										"basic_amount":amount,  
-										"amount":amount,  
-										"transfer_qty":item.qty,
-										'conversion_factor': flt(conversion_factor),
-												
-						})
-
-	if len(items):
-		stock_entry.insert()
-		stock_entry.docstatus=1
-		stock_entry.save()
-
-	for item in items:
-		tbl=''
-		parent_field=item.parentfield
-		if parent_field=='laying_items':
-			tbl='Layer Other Items'
-			expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
-			row_material_target_warehouse=sett.other_item_warehouse
-		elif parent_field=='laying_medicine':
-			tbl='Layer Medicine'
-		elif parent_field=='laying_vaccine':
-			tbl='Layer Vaccine'
-		elif parent_field=='laying_feed':
-			tbl='Layer Feed'
-
-		litem=frappe.get_doc(tbl,item.name)
-		litem.docstatus=1
-		litem.issue='Yes'
-		litem.stock_entry=stock_entry.name
-		litem.save()
-		frappe.db.set_value(tbl, item.name, 'docstatus', 1)
-	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
-	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
-	return items
-	
+		
 @frappe.whitelist()
 def laying_material_issue(batch,parentfield,items):
 	import json
 	aList = json.loads(items)
 	lbatch=frappe.get_doc('Layer Batch',batch)	
-	sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	
+	if lbatch.layer_status=='Laying':	
+		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	else:
+		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
 	time=''
 	date=''
 	if date:
@@ -1748,27 +1152,27 @@ def laying_material_issue(batch,parentfield,items):
 	for itm in aList:
 		row_name=itm.get('name')
 
-		row_material_target_warehouse=''
-		if parentfield=='laying_vaccine':
-			item=frappe.get_doc('Layer Vaccine',row_name)
-			item_account_details = get_item_defaults(item.item_code, sett.company)
-			expense_account=sett.vaccine_expense_account or item_account_details.get("expense_account")
-			row_material_target_warehouse=sett.vaccine_warehouse
-		if parentfield=='laying_medicine':
+		if parentfield in ['laying_medicine','rearing_medicine']:
 			item=frappe.get_doc('Layer Medicine',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
 			expense_account=sett.medicine_expense_account or item_account_details.get("expense_account")
 			row_material_target_warehouse=sett.medicine_warehouse
-		if parentfield=='laying_feed':
+		if parentfield in ['laying_feed','rearing_feed']:
 			item=frappe.get_doc('Layer Feed',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
 			expense_account=sett.feed_expense_account or item_account_details.get("expense_account")
 			row_material_target_warehouse=sett.feed_warehouse
-		if parentfield=='laying_items':
+		if parentfield in ['laying_items','rearing_items']:
 			item=frappe.get_doc('Layer Other Items',row_name)
 			item_account_details = get_item_defaults(item.item_code, sett.company)
 			expense_account=sett.other_items_expense_account or item_account_details.get("expense_account")
 			row_material_target_warehouse=sett.other_item_warehouse
+		elif parentfield in ['laying_mortality','rearing_daily_mortality']:
+			item=frappe.get_doc('Layer Mortality',row_name)
+			item_account_details = get_item_defaults(item.item_code, sett.company)
+			expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
+			item_code=sett.base_row_material
+			row_material_target_warehouse=sett.row_material_target_warehouse
 
 		posting_date=getdate(item.date)
 		stock_uom = item_account_details.stock_uom
@@ -1811,6 +1215,97 @@ def laying_material_issue(batch,parentfield,items):
 										"basic_amount":amount,  
 										"amount":amount,  
 										"transfer_qty":item.qty,
+										'conversion_factor': flt(conversion_factor),
+												
+						})
+
+		stock_entry.insert()
+		stock_entry.docstatus=1
+		stock_entry.save()
+
+		item.docstatus=1
+		item.issue='Yes'
+		item.stock_entry=stock_entry.name
+		item.save()
+		frappe.db.set_value(item.doctype, item.name, 'docstatus', 1)
+		items.append(item)
+	frappe.msgprint('Stock Entrys created')
+	return items
+
+@frappe.whitelist()
+def mortality_material_issue(batch,parentfield,items):
+	import json
+	aList = json.loads(items)
+	lbatch=frappe.get_doc('Layer Batch',batch)	
+	
+	if lbatch.layer_status=='Laying':	
+		sett=frappe.get_doc('Laying Shed',lbatch.layer_shed)
+	else:
+		sett=frappe.get_doc('Rearing Shed',lbatch.rearing_shed)
+	time=''
+	date=''
+	if date:
+		date=getdate(date)
+	
+	posting_date=date or nowdate() 
+	#time=time or get_datetime()
+	#posting_time=time.strftime("%H:%M:%S")
+	posting_time='23:59:00'
+	
+	items=[]
+	item_code=sett.base_row_material
+	item_account_details = get_item_defaults(item_code, sett.company)
+	cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
+	row_material_target_warehouse=sett.row_material_target_warehouse
+	expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
+
+	for itm in aList:
+		row_name=itm.get('name')
+		qty=itm.get('total')
+		uom='Nos'
+		item=frappe.get_doc('Layer Mortality',row_name)
+		
+		posting_date=getdate(item.date)
+		stock_uom = item_account_details.stock_uom
+		conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor")
+		
+
+		stock_entry = frappe.new_doc("Stock Entry")    
+		stock_entry.company = lbatch.company
+		stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'	
+		stock_entry.stock_entry_type = "Material Issue"	
+		stock_entry.project = lbatch.project
+		stock_entry.posting_date=posting_date
+		stock_entry.set_posting_time='1'
+		stock_entry.posting_time=posting_time
+
+		rate = get_incoming_rate({
+									"item_code": item_code,
+									"warehouse": row_material_target_warehouse,
+									"posting_date": posting_date,
+									"posting_time": posting_time,
+									"qty": -1 * qty,
+									'company':sett.company
+								}) or 0
+
+
+		precision = cint(frappe.db.get_default("float_precision")) or 3    
+		amount=flt(float(qty) * float(rate), precision)
+		stock_entry.append('items', {
+										's_warehouse': row_material_target_warehouse,
+										'item_code': item_code,
+										'qty': qty,
+										'actual_qty':qty,
+										'uom': uom,
+										'cost_center':cost_center,					
+										'ste_detail': item_account_details.name,
+										'stock_uom': stock_uom,
+										'expense_account':expense_account,
+										'valuation_rate': rate,
+										"basic_rate":rate, 	
+										"basic_amount":amount,  
+										"amount":amount,  
+										"transfer_qty":qty,
 										'conversion_factor': flt(conversion_factor),
 												
 						})

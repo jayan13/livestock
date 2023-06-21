@@ -61,6 +61,11 @@ frappe.ui.form.on('Layer Batch', {
         $('body').find('[data-fieldname="issue_laying_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
         //frm.fields_dict["rearing_feed"].grid.wrapper.find(".btn-open-row").hide();
 
+        $('body').find('[data-fieldname="issue_rearing_items"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_rearing_medicine"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_rearing_feed"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+        $('body').find('[data-fieldname="issue_rearing_mortality"]').find('[data-fieldtype="Button"]').css("background-color",'#98cafd');
+
         if(frm.doc.item_processed > 0 )
         {
             
@@ -226,13 +231,9 @@ frappe.ui.form.on('Layer Batch', {
                                         { 
                                             if(r.message) 
                                                 { 
-                                                    var doclist = frappe.model.sync(r.message);
+                                                   // var doclist = frappe.model.sync(r.message);
                                                     frm.doc.item_processed=1;
-                                                    frm.refresh_field('item_processed');
-                                                    frm.refresh_field('rearing_feed');
-                                                    frm.refresh_field('rearing_items');
-                                                    frm.refresh_field('rearing_medicine');
-                                                    //frm.refresh_field('rearing_vaccine');
+                                                    frm.refresh_field('item_processed');                                                    
                                                     frm.reload_doc(); 
                                                     //frappe.set_route("Form", doclist[0].doctype, doclist[0].name);
                                                 } 
@@ -368,15 +369,7 @@ frappe.ui.form.on('Layer Batch', {
              primary_action_label: 'Add Feed',
              primary_action(values) {                        
 
-                 let rw=frm.add_child("rearing_feed");
-                 rw.date=values.date;
-                 rw.item_code=values.item_code;
-                 rw.qty=values.qty;
-                 rw.uom=values.uom;
-                 frm.refresh_field('rearing_feed');
-                 d.hide();
-                 $(".grid-add-row").hide();
-                 frm.doc.__unsaved=0;
+                 
                  
                  frappe.call(
                      { 
@@ -393,12 +386,19 @@ frappe.ui.form.on('Layer Batch', {
                              { 
                                  if(r.message) 
                                      { 
-                                         //var doclist = frappe.model.sync(r.message);
-                                         //doclist[0].name
+                                        let rw=frm.add_child("rearing_feed");
+                                        rw.date=values.date;
+                                        rw.item_code=values.item_code;
+                                        rw.qty=values.qty;
+                                        rw.uom=values.uom;                                                
                                         rw.rate=r.message.rate;
                                         rw.conversion_factor=r.message.conversion_factor;
                                         rw.item_name=r.message.item_name;
+                                        rw.issue='Yes';
+                                        rw.docstatus=1; 
                                         frm.refresh_field('rearing_feed');
+                                        frm.doc.__unsaved=0;
+                                        d.hide();
                                         $(".grid-add-row").hide();
                                      } 
                              }
@@ -481,7 +481,8 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
-                                                rw.issue='Yes'; 
+                                                rw.issue='Yes';
+                                                rw.docstatus=1;
                                                 frm.refresh_field('laying_feed');
                                                 frm.doc.__unsaved=0;
                                                 d.hide();
@@ -549,17 +550,6 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Medicine',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("rearing_medicine");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						rw.remark=values.remark;
-						frm.refresh_field('rearing_medicine');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
-                        
 						frappe.call(
                             { 
                                 method: "livestock.poultry.doctype.layer_batch.layer_batch.added_medicine_rearing",
@@ -576,13 +566,21 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+                                                let rw=frm.add_child("rearing_medicine");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;
+                                                rw.remark=values.remark;                                                
                                                 rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('rearing_medicine');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                rw.conversion_factor=r.message.conversion_factor;
+                                                rw.item_name=r.message.item_name;
+                                                rw.issue='Yes';
+                                                rw.docstatus=1; 
+                                                frm.refresh_field('rearing_medicine');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
@@ -673,7 +671,8 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
-                                                rw.issue='Yes'; 
+                                                rw.issue='Yes';
+                                                rw.docstatus=1; 
                                                 frm.refresh_field('laying_medicine');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
@@ -701,197 +700,6 @@ frappe.ui.form.on('Layer Batch', {
                  });
                 
             },
-           /* add_rearing_vaccine:function(frm)
-            {
-                let d = new frappe.ui.Dialog({
-                    title: 'Add Vaccine',
-                    fields: [                        
-                        {
-                            label: 'Date',
-                            fieldname: 'date',
-                            fieldtype: 'Date',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Item',
-                            fieldname: 'item_code',
-                            fieldtype: 'Link',
-							options:'Item',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Qty',
-                            fieldname: 'qty',
-                            fieldtype: 'Float',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Uom',
-                            fieldname: 'uom',
-                            fieldtype: 'Link',
-							options:'UOM',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Remark',
-                            fieldname: 'remark',
-                            fieldtype: 'Text',							
-                            
-                        }
-                    ],
-                    primary_action_label: 'Add Vaccine',
-                    primary_action(values) {                        
-
-                        let rw=frm.add_child("rearing_vaccine");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;
-						rw.remark=values.remark;
-						frm.refresh_field('rearing_vaccine');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
-                        
-						frappe.call(
-                            { 
-                                method: "livestock.poultry.doctype.layer_batch.layer_batch.add_vaccine_rearing",
-                                args: {
-                                    batch:frm.doc.name,
-                                    parentfield:'rearing_vaccine',
-                                    date:values.date,
-									item_code:values.item_code,
-									qty:values.qty,
-									uom:values.uom,
-									remark:values.remark
-                                },
-                                callback: function(r) 
-                                    { 
-                                        if(r.message) 
-                                            { 
-                                                rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('rearing_vaccine');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
-                                            } 
-                                    }
-                            });
-
-                    }
-                });
-                
-                d.show();
-                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
-                    let v=$(this).val();                                            
-                     if (v){
-                     frappe.db.get_value('Item', v, 'stock_uom')
-                             .then(r => {
-                                 
-                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
-                                 
-                             });
-                         }
-                 });
-                
-            },
-            add_laying_vaccine:function(frm)
-            {
-                let d = new frappe.ui.Dialog({
-                    title: 'Add Vaccine',
-                    fields: [                        
-                        {
-                            label: 'Date',
-                            fieldname: 'date',
-                            fieldtype: 'Date',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Item',
-                            fieldname: 'item_code',
-                            fieldtype: 'Link',
-							options:'Item',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Qty',
-                            fieldname: 'qty',
-                            fieldtype: 'Float',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Uom',
-                            fieldname: 'uom',
-                            fieldtype: 'Link',
-							options:'UOM',
-                            reqd:'1'
-                        },
-						{
-                            label: 'Remark',
-                            fieldname: 'remark',
-                            fieldtype: 'Text',							
-                            
-                        }
-                    ],
-                    primary_action_label: 'Add Vaccine',
-                    primary_action(values) {                        
-
-                        
-                        
-						frappe.call(
-                            { 
-                                method: "livestock.poultry.doctype.layer_batch.layer_batch.add_vaccine_rearing",
-                                args: {
-                                    batch:frm.doc.name,
-                                    parentfield:'laying_vaccine',
-                                    date:values.date,
-									item_code:values.item_code,
-									qty:values.qty,
-									uom:values.uom,
-									remark:values.remark
-                                },
-                                callback: function(r) 
-                                    { 
-                                        if(r.message) 
-                                            { 
-                                                let rw=frm.add_child("laying_vaccine");
-                                                rw.date=values.date;
-                                                rw.item_code=values.item_code;
-                                                rw.qty=values.qty;
-                                                rw.uom=values.uom;
-                                                rw.remark=values.remark;                                                
-                                                rw.rate=r.message.rate;
-                                                rw.conversion_factor=r.message.conversion_factor;
-                                                rw.item_name=r.message.item_name;
-                                                rw.issue='Yes'; 
-                                                frm.refresh_field('laying_vaccine');
-                                                d.hide();
-                                                $(".grid-add-row").hide();
-                                                frm.doc.__unsaved=0;
-                                                //frm.reload_doc();
-                                            } 
-                                    }
-                            });
-
-                    }
-                });
-                
-                d.show();
-                d.$wrapper.find("[data-fieldname='item_code']").on('focusout',function(e) {
-                    let v=$(this).val();                                            
-                     if (v){
-                     frappe.db.get_value('Item', v, 'stock_uom')
-                             .then(r => {
-                                 
-                                 d.$wrapper.find("[data-fieldname='uom']").val(r.message.stock_uom); 
-                                 
-                             });
-                         }
-                 });
-                
-            },*/
             add_rearing_items:function(frm)
             {
                 let d = new frappe.ui.Dialog({
@@ -928,16 +736,6 @@ frappe.ui.form.on('Layer Batch', {
                     primary_action_label: 'Add Items',
                     primary_action(values) {                        
 
-                        let rw=frm.add_child("rearing_items");
-						rw.date=values.date;
-						rw.item_code=values.item_code;
-						rw.qty=values.qty;
-						rw.uom=values.uom;						
-						frm.refresh_field('rearing_items');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
-                        
 						frappe.call(
                             { 
                                 method: "livestock.poultry.doctype.layer_batch.layer_batch.add_rearing_items",
@@ -953,13 +751,21 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
+                                                let rw=frm.add_child("rearing_items");
+                                                rw.date=values.date;
+                                                rw.item_code=values.item_code;
+                                                rw.qty=values.qty;
+                                                rw.uom=values.uom;				
+                                               
                                                 rw.rate=r.message.rate;
-                                        rw.conversion_factor=r.message.conversion_factor;
-                                        rw.item_name=r.message.item_name;
-                                        frm.refresh_field('rearing_items');
-                                        $(".grid-add-row").hide();
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                rw.conversion_factor=r.message.conversion_factor;
+                                                rw.item_name=r.message.item_name;
+                                                rw.issue='Yes';
+                                                rw.docstatus=1; 
+                                                frm.refresh_field('rearing_items');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
@@ -1043,7 +849,8 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.rate=r.message.rate;
                                                 rw.conversion_factor=r.message.conversion_factor;
                                                 rw.item_name=r.message.item_name;
-                                                rw.issue='Yes'; 
+                                                rw.issue='Yes';
+                                                rw.docstatus=1; 
                                                 frm.refresh_field('laying_items');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
@@ -1109,18 +916,6 @@ frappe.ui.form.on('Layer Batch', {
                     ],
                     primary_action_label: 'Add Mortality',
                     primary_action(values) {                        
-
-                        let rw=frm.add_child("rearing_daily_mortality");
-						rw.date=values.date;
-						rw.age=values.age;
-						rw.evening=values.evening;
-						rw.morning=values.morning;
-						rw.total=values.evening+values.morning;
-                        rw.remark=values.remark;
-						frm.refresh_field('rearing_daily_mortality');
-						d.hide();
-						$(".grid-add-row").hide();
-                        frm.doc.__unsaved=0;
                         
 						frappe.call(
                             { 
@@ -1138,8 +933,19 @@ frappe.ui.form.on('Layer Batch', {
                                     { 
                                         if(r.message) 
                                             { 
-                                                //var doclist = frappe.model.sync(r.message);
-                                                //doclist[0].name
+                                                let rw=frm.add_child("rearing_daily_mortality");
+                                                rw.date=values.date;
+                                                rw.age=values.age;
+                                                rw.evening=values.evening;
+                                                rw.morning=values.morning;
+                                                rw.total=values.evening+values.morning;
+                                                rw.remark=values.remark;
+                                                rw.issue='Yes';
+                                                rw.docstatus=1;
+                                                frm.refresh_field('rearing_daily_mortality');
+                                                d.hide();
+                                                $(".grid-add-row").hide();
+                                                frm.doc.__unsaved=0;
                                             } 
                                     }
                             });
@@ -1232,6 +1038,8 @@ frappe.ui.form.on('Layer Batch', {
                                                 rw.morning=values.morning;
                                                 rw.total=values.evening+values.morning;
                                                 rw.remark=values.remark;
+                                                rw.issue='Yes';
+                                                rw.docstatus=1;
                                                 frm.refresh_field('laying_mortality');
                                                 d.hide();
                                                 $(".grid-add-row").hide();
@@ -1907,22 +1715,7 @@ frappe.ui.form.on('Layer Batch', {
                                             { 
                                                 d.hide();
                                                 $.each (r.message,function(i, dt){
-                                                   /* if(dt.tbl=='vaccine')
-                                                    {
-                                                        let rw=frm.add_child("laying_vaccine");
-                                                        rw.date=dt.date;
-                                                        rw.item_code=dt.item_code;
-                                                        rw.qty=dt.qty;
-                                                        rw.uom=dt.uom;
-                                                        rw.rate=dt.basic_rate;
-                                                        rw.conversion_factor=dt.conversion_factor;
-                                                        rw.item_name=dt.item_name;
-                                                        rw.material_transfer=dt.material_transfer;
-                                                        frm.refresh_field('laying_vaccine');                                                
-                                                        $(".grid-add-row").hide();
-                                                        frm.doc.__unsaved=0;
-                                                        flg=1;
-                                                    }*/
+                                                   
                                                     if(dt.tbl=='medicine')
                                                     {
                                                         let rw=frm.add_child("laying_medicine");
@@ -2090,51 +1883,7 @@ frappe.ui.form.on('Layer Batch', {
                     frappe.throw("Please select not issued items for Issuing");
                 }
             },
-	       /* issue_laying_vaccine:function(frm){
-                let items=[]
-                let selected = frm.get_selected();
-                    if(selected.laying_vaccine){
-                        selected.laying_vaccine.forEach(function(item, index, array) {
-                            let row = locals['Layer Vaccine'][item];
-                            if(row.issue!='Yes' && row.docstatus==0){
-                                items.push(row);
-                            }
-                        });
-                    }else{
-                        frappe.throw("Please select items to Issue");
-                    }
-                    
-               
-                if(items.length>0){
-                    let itemss=JSON.stringify(items);
-
-                    frappe.call(
-                        { 
-                                method: "livestock.poultry.doctype.layer_batch.layer_batch.laying_material_issue",
-                                args: {
-                                    batch:frm.doc.batch_name,
-                                    parentfield:'laying_vaccine',
-                                    items:itemss
-                                },
-                                callback: function(r) {  
-                                    if(r.message) 
-                                    {  
-                                        $.each(r.message, function(i, rows) {                                            
-                                            let row = locals[rows.doctype][rows.name];
-                                            row.docstatus=1;
-                                            row.issue='Yes';
-                                            row.stock_entry=rows.stock_entry
-                                        });
-                                        //frm.reload_doc();
-                                        frm.refresh_field('laying_vaccine');
-                                    }   
-                                }
-                        });
-
-                }else{
-                    frappe.throw("Please select not issued items for Issuing");
-                }
-            }, */
+	       
 	        issue_laying_items:function(frm){
                 let items=[]
                 let selected = frm.get_selected();
@@ -2180,6 +1929,189 @@ frappe.ui.form.on('Layer Batch', {
                     frappe.throw("Please select not issued items for Issuing");
                 }
             },
+            issue_rearing_feed:function(frm){
+                let items=[]
+                let selected = frm.get_selected();
+                    if(selected.rearing_feed){
+                        selected.rearing_feed.forEach(function(item, index, array) {
+                            let row = locals['Layer Feed'][item];
+                            if(row.issue!='Yes' && row.docstatus==0){
+                                items.push(row);
+                            }
+                        });
+                    }else{
+                        frappe.throw("Please select items to Issue");
+                    }
+                    
+               
+                if(items.length>0){
+                    let itemss=JSON.stringify(items);
+
+                    frappe.call(
+                        { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.laying_material_issue",
+                                args: {
+                                    batch:frm.doc.batch_name,
+                                    parentfield:'rearing_feed',
+                                    items:itemss
+                                },
+                                callback: function(r) {  
+                                    if(r.message) 
+                                    {  
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('rearing_feed');
+                                    }   
+                                }
+                        });
+
+                }else{
+                    frappe.throw("Please select not issued items for Issuing");
+                }
+                
+            },
+            issue_rearing_medicine:function(frm){
+                let items=[]
+                let selected = frm.get_selected();
+                    if(selected.rearing_medicine){
+                        selected.rearing_medicine.forEach(function(item, index, array) {
+                            let row = locals['Layer Medicine'][item];
+                            if(row.issue!='Yes' && row.docstatus==0){
+                                items.push(row);
+                            }
+                        });
+                    }else{
+                        frappe.throw("Please select items to Issue");
+                    }
+                    
+               
+                if(items.length>0){
+                    let itemss=JSON.stringify(items);
+
+                    frappe.call(
+                        { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.laying_material_issue",
+                                args: {
+                                    batch:frm.doc.batch_name,
+                                    parentfield:'rearing_medicine',
+                                    items:itemss
+                                },
+                                callback: function(r) {  
+                                    if(r.message) 
+                                    {  
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('rearing_medicine');
+                                    }   
+                                }
+                        });
+
+                }else{
+                    frappe.throw("Please select not issued items for Issuing");
+                }
+            },
+	       
+	        issue_rearing_items:function(frm){
+                let items=[]
+                let selected = frm.get_selected();
+                    if(selected.rearing_items){
+                        selected.rearing_items.forEach(function(item, index, array) {
+                            let row = locals['Layer Other Items'][item];
+                            if(row.issue!='Yes' && row.docstatus==0){
+                                items.push(row);
+                            }
+                        });
+                    }else{
+                        frappe.throw("Please select items to Issue");
+                    }
+                    
+               
+                if(items.length>0){
+                    let itemss=JSON.stringify(items);
+
+                    frappe.call(
+                        { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.laying_material_issue",
+                                args: {
+                                    batch:frm.doc.batch_name,
+                                    parentfield:'rearing_items',
+                                    items:itemss
+                                },
+                                callback: function(r) {  
+                                    if(r.message) 
+                                    {  
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('rearing_items');
+                                    }   
+                                }
+                        });
+
+                }else{
+                    frappe.throw("Please select not issued items for Issuing");
+                }
+            },
+            issue_rearing_mortality:function(frm){
+                let items=[]
+                let selected = frm.get_selected();
+                    if(selected.rearing_daily_mortality){
+                        selected.rearing_daily_mortality.forEach(function(item, index, array) {
+                            let row = locals['Layer Mortality'][item];
+                            if(row.issue!='Yes' && row.docstatus==0){
+                                items.push(row);
+                            }
+                        });
+                    }else{
+                        frappe.throw("Please select items to Issue");
+                    }
+                    
+               
+                if(items.length>0){
+                    let itemss=JSON.stringify(items);
+
+                    frappe.call(
+                        { 
+                                method: "livestock.poultry.doctype.layer_batch.layer_batch.mortality_material_issue",
+                                args: {
+                                    batch:frm.doc.batch_name,
+                                    parentfield:'rearing_daily_mortality',
+                                    items:itemss
+                                },
+                                callback: function(r) {  
+                                    if(r.message) 
+                                    {  
+                                        $.each(r.message, function(i, rows) {                                            
+                                            let row = locals[rows.doctype][rows.name];
+                                            row.docstatus=1;
+                                            row.issue='Yes';
+                                            row.stock_entry=rows.stock_entry
+                                        });
+                                        //frm.reload_doc();
+                                        frm.refresh_field('rearing_daily_mortality');
+                                    }   
+                                }
+                        });
+
+                }else{
+                    frappe.throw("Please select not issued items for Issuing");
+                }
+                
+            }
            
 });
 
@@ -2525,187 +2457,6 @@ frappe.ui.form.on('Layer Medicine', {
 
 //--------------------- end Medicine------------------------------
 
-//------------------ Vaccine --------------------------------
-/*
-frappe.ui.form.on('Layer Vaccine', {
-    refresh: function(frm, cdt, cdn) {
-        //console.log("ref");
-    },
-    qty:function(frm, cdt, cdn) {
-        var d = locals[cdt][cdn];
-            frappe.call(
-            { 
-                    method: "livestock.poultry.doctype.layer_batch.layer_batch.update_vaccine_rearing",
-                    args: {
-                        idx:d.idx,
-                        parent:d.parent,
-                        parentfield:d.parentfield,
-                        name:d.name,
-                        date:d.date,
-                        item_code:d.item_code,
-                        qty:d.qty,
-                        uom:d.uom,
-                        remark:d.remark
-                    },
-                    callback: function(r) {  if(r.message) 
-                        { 
-                            //var doclist = frappe.model.sync(r.message);
-                            //doclist[0].name
-                        }   }
-            });
-        frm.doc.__unsaved=0;
-        d.__unsaved=0;
-        
-    },
-    uom:function(frm, cdt, cdn) {
-        var d = locals[cdt][cdn];
-            frappe.call(
-            { 
-                    method: "livestock.poultry.doctype.layer_batch.layer_batch.update_vaccine_rearing",
-                    args: {
-                        idx:d.idx,
-                        parent:d.parent,
-                        parentfield:d.parentfield,
-                        name:d.name,
-                        date:d.date,
-                        item_code:d.item_code,
-                        qty:d.qty,
-                        uom:d.uom,
-                        remark:d.remark
-                    },
-                    callback: function(r) { if(r.message) 
-                        { 
-                            //var doclist = frappe.model.sync(r.message);
-                            //doclist[0].name
-                        }    }
-            });
-        frm.doc.__unsaved=0;
-        d.__unsaved=0;
-        
-    },
-    item_code:function(frm, cdt, cdn) {
-        var d = locals[cdt][cdn];
-            frappe.call(
-            { 
-                    method: "livestock.poultry.doctype.layer_batch.layer_batch.update_vaccine_rearing",
-                    args: {
-                        idx:d.idx,
-                        parent:d.parent,
-                        parentfield:d.parentfield,
-                        name:d.name,
-                        date:d.date,
-                        item_code:d.item_code,
-                        qty:d.qty,
-                        uom:d.uom,
-                        remark:d.remark
-                    },
-                    callback: function(r) {  if(r.message) 
-                        { 
-                            //var doclist = frappe.model.sync(r.message);
-                            //doclist[0].name
-                        }   }
-            });
-        frm.doc.__unsaved=0;
-        d.__unsaved=0;
-        
-    },
-    date:function(frm, cdt, cdn) {
-        var d = locals[cdt][cdn];
-            frappe.call(
-            { 
-                    method: "livestock.poultry.doctype.layer_batch.layer_batch.update_vaccine_rearing",
-                    args: {
-                        idx:d.idx,
-                        parent:d.parent,
-                        parentfield:d.parentfield,
-                        name:d.name,
-                        date:d.date,
-                        item_code:d.item_code,
-                        qty:d.qty,
-                        uom:d.uom,
-                        remark:d.remark
-                    },
-                    callback: function(r) { if(r.message) 
-                        { 
-                            //var doclist = frappe.model.sync(r.message);
-                            //doclist[0].name
-                        }    }
-            });
-        d.__unsaved=0;
-        frm.doc.__unsaved=0;
-        
-    },
-    remark:function(frm, cdt, cdn) {
-        var d = locals[cdt][cdn];
-            frappe.call(
-            { 
-                    method: "livestock.poultry.doctype.layer_batch.layer_batch.update_vaccine_rearing",
-                    args: {
-                        idx:d.idx,
-                        parent:d.parent,
-                        parentfield:d.parentfield,
-                        name:d.name,
-                        date:d.date,
-                        item_code:d.item_code,
-                        qty:d.qty,
-                        uom:d.uom,
-                        remark:d.remark
-                    },
-                    callback: function(r) {  if(r.message) 
-                        { 
-                            //var doclist = frappe.model.sync(r.message);
-                            //doclist[0].name
-                        }   }
-            });
-        d.__unsaved=0;
-        frm.doc.__unsaved=0;
-        
-    },
-    before_rearing_vaccine_remove:function(frm, cdt, cdn) {
-        
-        let row = frappe.get_doc(cdt, cdn);
-        if (row.docstatus==1)
-        {
-            frappe.throw('cannot delete this data, it have associate entry in stock entry please delete stock entry and delete this data');
-        }else{
-            if(!row.__islocal)
-            {
-                frappe.call(
-                    { 
-                            method: "livestock.poultry.doctype.layer_batch.layer_batch.delete_vaccine_rearing",
-                            args: {                               
-                                name:row.name,   
-                            },
-                            callback: function(r) {    }
-                    });
-            }
-        }
- 
-    },
-    before_laying_vaccine_remove:function(frm, cdt, cdn) {
-        
-        let row = frappe.get_doc(cdt, cdn);
-        if (row.docstatus==1)
-        {
-            frappe.throw('cannot delete this data, it have associate entry in stock entry please delete stock entry and delete this data');
-        }else{
-            if(!row.__islocal)
-            {
-                frappe.call(
-                    { 
-                            method: "livestock.poultry.doctype.layer_batch.layer_batch.delete_vaccine_rearing",
-                            args: {                               
-                                name:row.name,   
-                            },
-                            callback: function(r) {    }
-                    });
-            }
-        }
- 
-    }
-});
-*/
-//--------------------- end Vaccine------------------------------
 
 //------------------ Other items --------------------------------
 
