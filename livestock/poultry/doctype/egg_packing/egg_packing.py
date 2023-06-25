@@ -26,7 +26,7 @@ class EggPacking(Document):
 		stock_entry.set_posting_time='1'
 		stock_entry.purpose = "Manufacture"
 		stock_entry.stock_entry_type = "Manufacture"
-		stock_entry.manufacturing_type = "Egg"
+		stock_entry.manufacturing_type = "Egg Packing"
 		pcitems=[]
 		
 		pcmaterials=''
