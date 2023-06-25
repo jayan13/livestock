@@ -600,8 +600,7 @@ def get_egg_report(company=None,posted_on=None):
                 `tabStock Ledger Entry` 
                 left join   `tabStock Entry`  on  `tabStock Entry`.name=`tabStock Ledger Entry`.voucher_no
             WHERE
-                `tabStock Ledger Entry`.company = '{0}' 
-                and `tabStock Ledger Entry`.voucher_type='Stock Entry'
+                `tabStock Ledger Entry`.company = '{0}'                 
                 and `tabStock Ledger Entry`.voucher_type='Stock Entry'
                 AND `tabStock Entry`.stock_entry_type_option='Repacking'
                 and `tabStock Ledger Entry`.actual_qty > 0 
