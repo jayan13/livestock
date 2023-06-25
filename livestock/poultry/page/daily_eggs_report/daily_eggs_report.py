@@ -294,30 +294,10 @@ def get_repacking():
     item_conditions_sql = ''
     if itemsar:
         item_conditions_sql = """ and `tabStock Ledger Entry`.item_code in ('{}')""".format( "' ,'".join([str(elem) for elem in itemsar]))
-
-    sl_entry= frappe.db.sql("""
-            SELECT
-                IFNULL(sum(actual_qty),0) as qty
-            FROM
-                `tabStock Ledger Entry` 
-                left join   `tabStock Entry`  on  `tabStock Entry`.name=`tabStock Ledger Entry`.voucher_no
-            WHERE
-                `tabStock Ledger Entry`.company = '{0}' 
-                and `tabStock Ledger Entry`.actual_qty > 0 
-                and `tabStock Ledger Entry`.voucher_type='Stock Entry'                
-                AND `tabStock Entry`.stock_entry_type ='Repack'
-                AND `tabStock Ledger Entry`.is_cancelled = 0 
-                AND `tabStock Ledger Entry`.posting_date ='{1}'
-                {2}
-                {3}
-            """.format(company,cur_date,item_conditions_sql,warehouse_conditions_sql),as_dict=1,debug=0)
-    qty=0
-    if sl_entry:
-        qty=sl_entry[0].qty
-
+        
     sl_entrys= frappe.db.sql("""
             SELECT
-                IFNULL(sum(actual_qty),0) as qty
+                sum(actual_qty) as qty
             FROM
                 `tabStock Ledger Entry` 
                 left join   `tabStock Entry`  on  `tabStock Entry`.name=`tabStock Ledger Entry`.voucher_no
@@ -334,7 +314,7 @@ def get_repacking():
     data['value']=0
     for sl_entry in sl_entrys:
         if sl_entry.qty:
-            data['value']=round((float(sl_entry.qty)+float(qty))/360,2)
+            data['value']=round(sl_entry.qty/360,2)
                 
     data['fieldtype']='Float'
     return data
@@ -622,7 +602,8 @@ def get_egg_report(company=None,posted_on=None):
             WHERE
                 `tabStock Ledger Entry`.company = '{0}' 
                 and `tabStock Ledger Entry`.voucher_type='Stock Entry'
-                AND (`tabStock Entry`.stock_entry_type='Material Receipt' OR `tabStock Entry`.stock_entry_type='Repack')
+                and `tabStock Ledger Entry`.voucher_type='Stock Entry'
+                AND `tabStock Entry`.stock_entry_type_option='Repacking'
                 and `tabStock Ledger Entry`.actual_qty > 0 
                 AND `tabStock Ledger Entry`.is_cancelled = 0 
                 AND `tabStock Ledger Entry`.posting_date = '{1}'
