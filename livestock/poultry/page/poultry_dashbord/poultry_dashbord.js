@@ -184,7 +184,11 @@ MyPage =Class.extend({
 		var laygp_xl=[];
 		var reargp_mor_xl=[];
 		var laygp_mor_xl=[];
-
+		var reargp_feed_xl=[];
+		var laygp_feed_xl=[];
+		var reargp_weight_xl=[];
+		var laygp_weight_xl=[];
+		var laygp_performance_xl=[];
 		function get_report()
 		{
 			//console.log('rs='+reqsnd);
@@ -234,6 +238,11 @@ MyPage =Class.extend({
 						}
 						rearing_graph(field1.get_value(),field2.get_value());
 						laying_graph(field1.get_value(),field2.get_value());
+						laying_weight_graph(field1.get_value(),field2.get_value());
+						laying_feed_graph(field1.get_value(),field2.get_value());
+						rearing_weight_graph(field1.get_value(),field2.get_value());
+						rearing_feed_graph(field1.get_value(),field2.get_value());
+						laying_performance_graph(field1.get_value(),field2.get_value());
 							//let data2=r.message;
 							
 							//$(frappe.render_template("daily_eggs_report_data",data2)).appendTo("#report_egg");
@@ -260,7 +269,13 @@ MyPage =Class.extend({
 					rearing_gp:JSON.stringify(reargp_xl),
 					laying_gp:JSON.stringify(laygp_xl),
 					rearing_mor_gp:JSON.stringify(reargp_mor_xl),
-					laying_mor_gp:JSON.stringify(laygp_mor_xl),	
+					laying_mor_gp:JSON.stringify(laygp_mor_xl),
+					rearing_feed_gp:JSON.stringify(reargp_feed_xl),
+					laying_feed_gp:JSON.stringify(laygp_feed_xl),
+					rearing_weight_gp:JSON.stringify(reargp_weight_xl),
+					laying_weight_gp:JSON.stringify(laygp_weight_xl),
+					laying_performance_gp:JSON.stringify(laygp_performance_xl),
+
 				},
 				callback: function(response) {
 				  var files = response.message;
@@ -308,7 +323,7 @@ MyPage =Class.extend({
 {
 	$("#rear-mortality").html('');
 	frappe.call({
-		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_rear_graph',
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_rear_mor_graph',
 		//freeze: 1,
 		//freeze_message: 'Data loading ...please waite',
 		args: {
@@ -318,6 +333,7 @@ MyPage =Class.extend({
 		callback: function (r) {
 		  if (r.message) {
 			reargp_mor_xl=r.message.ideal
+			if(reargp_mor_xl.length){
 			let l_lbl=[]
 			let l_dta=[]
 			let act_dta=[]			 
@@ -337,7 +353,7 @@ MyPage =Class.extend({
 					datasets: [
 						{							
 							chartType: 'line',
-							name: "Ideal",
+							name: "Std.",
 							values: l_dta
 						},
 						{							
@@ -363,6 +379,7 @@ MyPage =Class.extend({
 			  });
 
 			 //--------------------------------------------------
+			}
 		  }
 		},
 	  }); 
@@ -373,7 +390,7 @@ function laying_graph(batch,period)
 	
 	$("#layer-mortality").html('');
 	frappe.call({
-		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_graph',
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_mor_graph',
 		//freeze: 1,
 		//freeze_message: 'Data loading ...please waite',
 		args: {
@@ -383,14 +400,28 @@ function laying_graph(batch,period)
 		callback: function (r) {
 		  if (r.message) {
 			laygp_mor_xl=r.message.ideal
+
+			if(laygp_mor_xl.length){
+
 			let ly_lbl=[]
 			let ly_dta=[]
 			let lyact_dta=[]
-						 
-			$.each( r.message.ideal, function( key, value ) {					
-				ly_lbl.push(value.age);
-				ly_dta.push(value.mortality);
-				lyact_dta.push(value.act_mortality);
+			let ly_lbl2=[]
+			let ly_dta2=[]
+			let lyact_dta2=[]
+			let cnt=0			 
+			$.each( r.message.ideal, function( key, value ) {
+				if(cnt< 43) {
+					ly_lbl.push(value.age);
+					ly_dta.push(value.mortality);
+					lyact_dta.push(value.act_mortality);
+				}else{
+					ly_lbl2.push(value.age);
+					ly_dta2.push(value.mortality);
+					lyact_dta2.push(value.act_mortality);
+				} 					
+				
+				cnt++;
 				});
 				
 				//console.log(ly_lbl);
@@ -403,7 +434,7 @@ function laying_graph(batch,period)
 					datasets: [
 						{
 							chartType: 'line',
-							name: "Ideal",
+							name: "Std.",
 							values: ly_dta
 						},
 						{							
@@ -429,12 +460,591 @@ function laying_graph(batch,period)
 				
 			  });
 
+			  let chart2 = new frappe.Chart( "#layer-mortality2", { 
+				// or DOM element ref: https://frappe.io/charts
+				data: {
+				   labels: ly_lbl2,
+			   
+				   datasets: [
+					   {
+						   chartType: 'line',
+						   name: "Std.",
+						   values: ly_dta2
+					   },
+					   {							
+						   chartType: 'line',
+						   name: "Actual",
+						   values: lyact_dta2
+					   },
+					   
+				   ],
+			   },
+			   title: "Laying Mortality",
+			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+			   height: 300,				
+			   colors: ['light-blue','#ffa3ef'],
+			   axisOptions: {					
+				   yLabel: "Value", // Label for y-axis
+				   
+				 },
+				 tooltipOptions: {
+				   formatTooltipX: d => d + ' Week',
+				   formatTooltipY: d => ' Mor. Cum. '+d+' %',
+			   }
+			   
+			 });
+
 			 //--------------------------------------------------
-			 
+			}
 		  }
 		},
 	  });
 }
+//-------------------------------------------------------------------------
+function laying_feed_graph(batch,period)
+{
+	
+	$("#layer-feed").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_feed_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			laygp_feed_xl=r.message.ideal
+
+			if(laygp_feed_xl.length){
+
+			let ly_lbl=[]
+			let ly_dta1=[]
+			let ly_dta2=[]
+			let lyact_dta=[]
+			let ly_lbl2=[]
+			let ly_dta12=[]
+			let ly_dta22=[]
+			let lyact_dta2=[]
+			let cnt=0;			 
+			$.each( r.message.ideal, function( key, value ) {
+				if(cnt< 43) {					
+				ly_lbl.push(value.age);
+				ly_dta1.push(value.v1);
+				ly_dta2.push(value.v2);
+				lyact_dta.push(value.act_feed);
+				}else{
+					ly_lbl2.push(value.age);
+				ly_dta12.push(value.v1);
+				ly_dta22.push(value.v2);
+				lyact_dta2.push(value.act_feed);
+				}
+				cnt++;
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#layer-feed", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Min Std. Feed Intake",
+							values: ly_dta1
+						},
+						{
+							chartType: 'line',
+							name: "Max Std. Feed Intake",
+							values: ly_dta2
+						},
+						{							
+							chartType: 'line',
+							name: "Actual Feed Intake",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Laying Feed",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Feed '+d+' gm',
+				}
+				
+			  });
+
+			  let chart2 = new frappe.Chart( "#layer-feed2", { 
+				// or DOM element ref: https://frappe.io/charts
+				data: {
+				   labels: ly_lbl2,
+			   
+				   datasets: [
+					   {
+						   chartType: 'line',
+						   name: "Min Std. Feed Intake",
+						   values: ly_dta12
+					   },
+					   {
+						   chartType: 'line',
+						   name: "Max Std. Feed Intake",
+						   values: ly_dta22
+					   },
+					   {							
+						   chartType: 'line',
+						   name: "Actual Feed Intake",
+						   values: lyact_dta2
+					   },
+					   
+				   ],
+			   },
+			   title: "Laying Feed",
+			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+			   height: 300,				
+			   colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+			   axisOptions: {					
+				   yLabel: "Value", // Label for y-axis
+				   
+				 },
+				 tooltipOptions: {
+				   formatTooltipX: d => d + ' Week',
+				   formatTooltipY: d => ' Feed '+d+' gm',
+			   }
+			   
+			 });
+
+			 //--------------------------------------------------
+			}
+		  }
+		},
+	  });
+}
+
+function laying_weight_graph(batch,period)
+{
+	
+	$("#layer-weight").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_weight_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			laygp_weight_xl=r.message.ideal
+
+			if(laygp_weight_xl.length){
+
+			let ly_lbl=[]
+			let ly_dta1=[]
+			let ly_dta2=[]
+			let lyact_dta=[]
+			let ly_lbl2=[]
+			let ly_dta12=[]
+			let ly_dta22=[]
+			let lyact_dta2=[]
+			let cnt=0;			 
+			$.each( r.message.ideal, function( key, value ) {
+				if(cnt< 43) {					
+				ly_lbl.push(value.age);
+				ly_dta1.push(value.v1);
+				ly_dta2.push(value.v2);
+				lyact_dta.push(value.act_weight);
+				}else {
+					ly_lbl2.push(value.age);
+					ly_dta12.push(value.v1);
+					ly_dta22.push(value.v2);
+					lyact_dta2.push(value.act_weight);
+				}
+				cnt++;
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#layer-weight", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Min Std. Weight",
+							values: ly_dta1
+						},
+						{
+							chartType: 'line',
+							name: "Max Std. Weight",
+							values: ly_dta2
+						},
+						{							
+							chartType: 'line',
+							name: "Actual Weight",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Laying Weight",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Weight '+d+' Kg',
+				}
+				
+			  });
+			  let chart2 = new frappe.Chart( "#layer-weight2", { 
+				// or DOM element ref: https://frappe.io/charts
+				data: {
+				   labels: ly_lbl2,
+			   
+				   datasets: [
+					   {
+						   chartType: 'line',
+						   name: "Min Std. Weight",
+						   values: ly_dta12
+					   },
+					   {
+						   chartType: 'line',
+						   name: "Max Std. Weight",
+						   values: ly_dta22
+					   },
+					   {							
+						   chartType: 'line',
+						   name: "Actual Weight",
+						   values: lyact_dta2
+					   },
+					   
+				   ],
+			   },
+			   title: "Laying Weight",
+			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+			   height: 300,				
+			   colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+			   axisOptions: {					
+				   yLabel: "Value", // Label for y-axis
+				   
+				 },
+				 tooltipOptions: {
+				   formatTooltipX: d => d + ' Week',
+				   formatTooltipY: d => ' Weight '+d+' Kg',
+			   }
+			   
+			 });
+
+
+			 //--------------------------------------------------
+			}
+		  }
+		},
+	  });
+}
+
+function rearing_feed_graph(batch,period)
+{
+	
+	$("#rear-feed").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_rear_feed_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			reargp_feed_xl=r.message.ideal
+
+			if(reargp_feed_xl.length){
+
+			let ly_lbl=[]
+			let ly_dta1=[]
+			let ly_dta2=[]
+			let lyact_dta=[]
+						 
+			$.each( r.message.ideal, function( key, value ) {					
+				ly_lbl.push(value.age);
+				ly_dta1.push(value.v1);
+				ly_dta2.push(value.v2);
+				lyact_dta.push(value.act_feed);
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#rear-feed", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Min Std. Feed Intake",
+							values: ly_dta1
+						},
+						{
+							chartType: 'line',
+							name: "Max Std. Feed Intake",
+							values: ly_dta2
+						},
+						{							
+							chartType: 'line',
+							name: "Actual Feed Intake",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Rearing Feed",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Feed '+d+' gm',
+				}
+				
+			  });
+
+			 //--------------------------------------------------
+			}
+		  }
+		},
+	  });
+}
+
+function rearing_weight_graph(batch,period)
+{
+	
+	$("#rear-weight").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_rear_weight_graph',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			reargp_weight_xl=r.message.ideal
+
+			if(reargp_weight_xl.length){
+
+			let ly_lbl=[]
+			let ly_dta1=[]
+			let ly_dta2=[]
+			let lyact_dta=[]
+						 
+			$.each( r.message.ideal, function( key, value ) {					
+				ly_lbl.push(value.age);
+				ly_dta1.push(value.v1);
+				ly_dta2.push(value.v2);
+				lyact_dta.push(value.act_weight);
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#rear-weight", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Min Std. Weight",
+							values: ly_dta1
+						},
+						{
+							chartType: 'line',
+							name: "Max Std. Weight",
+							values: ly_dta2
+						},
+						{							
+							chartType: 'line',
+							name: "Actual Weight",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Rearing Weight",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Weight '+d+' kg',
+				}
+				
+			  });
+
+			 //--------------------------------------------------
+			}
+		  }
+		},
+	  });
+}
+
+function laying_performance_graph(batch,period)
+{
+	
+	$("#layer-performance").html('');
+	frappe.call({
+		method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_lay_performance',
+		//freeze: 1,
+		//freeze_message: 'Data loading ...please waite',
+		args: {
+			batch: batch,
+			period: period,					  
+		  },
+		callback: function (r) {
+		  if (r.message) {
+			laygp_performance_xl=r.message.ideal
+
+			if(laygp_performance_xl.length){
+
+			let ly_lbl=[]
+			let ly_dta1=[]
+			let ly_dta2=[]
+			let lyact_dta=[]
+			let ly_lbl2=[]
+			let ly_dta12=[]
+			let ly_dta22=[]
+			let lyact_dta2=[]
+			let cnt=0;
+
+			$.each( r.message.ideal, function( key, value ) {
+				if(cnt<43){					
+				ly_lbl.push(value.age);
+				ly_dta1.push(value.v1);
+				ly_dta2.push(value.v2);
+				lyact_dta.push(value.act_eggs);
+				}else{
+					ly_lbl2.push(value.age);
+					ly_dta12.push(value.v1);
+					ly_dta22.push(value.v2);
+					lyact_dta2.push(value.act_eggs);
+				}
+				cnt++;
+				});
+				
+				//console.log(ly_lbl);
+			 //--------------------------------------------------
+			 let chart = new frappe.Chart( "#layer-performance", { 
+				 // or DOM element ref: https://frappe.io/charts
+				 data: {
+					labels: ly_lbl,
+				
+					datasets: [
+						{
+							chartType: 'line',
+							name: "Min Std. Eggs ",
+							values: ly_dta1
+						},
+						{
+							chartType: 'line',
+							name: "Max Std. Eggs",
+							values: ly_dta2
+						},
+						{							
+							chartType: 'line',
+							name: "Actual Eggs",
+							values: lyact_dta
+						},
+						
+					],
+				},
+				title: "Performance",
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				height: 300,				
+				colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+				axisOptions: {					
+					yLabel: "Value", // Label for y-axis
+					
+				  },
+				  tooltipOptions: {
+					formatTooltipX: d => d + ' Week',
+					formatTooltipY: d => ' Egg '+d+' Nos',
+				}
+				
+			  });
+
+			  let chart2 = new frappe.Chart( "#layer-performance2", { 
+				// or DOM element ref: https://frappe.io/charts
+				data: {
+				   labels: ly_lbl2,
+			   
+				   datasets: [
+					   {
+						   chartType: 'line',
+						   name: "Min Std. Eggs ",
+						   values: ly_dta12
+					   },
+					   {
+						   chartType: 'line',
+						   name: "Max Std. Eggs",
+						   values: ly_dta22
+					   },
+					   {							
+						   chartType: 'line',
+						   name: "Actual Eggs",
+						   values: lyact_dta2
+					   },
+					   
+				   ],
+			   },
+			   title: "Performance",
+			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+			   height: 300,				
+			   colors: ['#a1f198','#ffa5a5','#ffa3ef'],
+			   axisOptions: {					
+				   yLabel: "Value", // Label for y-axis
+				   
+				 },
+				 tooltipOptions: {
+				   formatTooltipX: d => d + ' Week',
+				   formatTooltipY: d => ' Egg '+d+' Nos',
+			   }
+			   
+			 });
+
+			 //--------------------------------------------------
+			}
+		  }
+		},
+	  });
+}
+//-----------------------------------------------------------------------------
 		
 	}
 })

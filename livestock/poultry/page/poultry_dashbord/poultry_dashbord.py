@@ -1302,16 +1302,17 @@ import os
 
 #from frappe.utils.response import download_file
 @frappe.whitelist()
-def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=None,laying_gp=None,rearing_mor_gp=None,laying_mor_gp=None):
+def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=None,laying_gp=None,rearing_mor_gp=None,laying_mor_gp=None,rearing_feed_gp=None,laying_feed_gp=None,rearing_weight_gp=None,laying_weight_gp=None,laying_performance_gp=None):
     import json
     import pandas as pd
     from openpyxl.utils.dataframe import dataframe_to_rows
-    from openpyxl import Workbook
+    from openpyxl import Workbook    
     from openpyxl.chart import (
         PieChart, LineChart,
         ProjectedPieChart,
         Reference
     )
+    
     from openpyxl.styles import Font
     from openpyxl.chart.axis import DateAxis
     #from openpyxl.worksheet.table import Table, TableStyleInfo
@@ -1327,31 +1328,100 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     gp_lay=json.loads(laying_gp)
     gp_rear_mor=json.loads(rearing_mor_gp)
     gp_lay_mor=json.loads(laying_mor_gp)
+
+    gp_rearing_feed=json.loads(rearing_feed_gp),
+    gp_laying_feed=json.loads(laying_feed_gp),
+    gp_rearing_weight=json.loads(rearing_weight_gp),
+    gp_laying_weight=json.loads(laying_weight_gp),
+    gp_laying_performance=json.loads(laying_performance_gp)
+
     rrowlen=len(rearingary)
     rcollen=len(rearingary[0])
     lrowlen=len(layingary)
     lcollen=len(layingary[0])
     browlen=len(budgetary)
     bcollen=len(budgetary[0])
+    report=[]
+    
+    rear_mor=[]
+    lbl=['Age','Std. Mortality %','Actual Mortality %']
+    #report.append(['Age','Std. Mortality %','Actual Mortality %','Age','Std. Min Feed','Std. Max Feed','Actual Feed','Age','Std. Min Weigt','Std. Max Weight','Actual Weight','Age','Std. Min Eggs','Std. Max Eggs','Actual Eggs'])
 
-    #frappe.throw(str(gp_rear))
-    #frappe.throw(str(rrowlen))
+    rear_mor.append(lbl)
+    j=0
+    if len(gp_rear_mor):        
+        for rm in gp_rear_mor:
+            rear_mor.append([rm.get('age'),rm.get('mortality'),rm.get('act_mortality')])            
+            #report.append([rm.get('age'),rm.get('mortality'),rm.get('act_mortality'),rm.get('age'),gp_rearing_feed[0][j].get('v1'),gp_rearing_feed[0][j].get('v2'),gp_rearing_feed[0][j].get('act_feed'),rm.get('age'),gp_rearing_weight[0][j].get('v1'),gp_rearing_weight[0][j].get('v2'),gp_rearing_weight[0][j].get('act_weight'),rm.get('age'),0,0,0])
+            
+            j+=1
+    lay_mor=[]
+    lay_mor.append(lbl)
+    k=0
+    #frappe.msgprint(str(gp_rearing_weight))
+    if len(gp_lay_mor):        
+        for lm in gp_lay_mor:
+            lay_mor.append([lm.get('age'),lm.get('mortality'),lm.get('act_mortality')])
+            #report.append([lm.get('age'),lm.get('mortality'),lm.get('act_mortality'),lm.get('age'),gp_laying_feed[0][k].get('v1'),gp_laying_feed[0][k].get('v2'),gp_laying_feed[0][k].get('act_feed'),lm.get('age'),gp_laying_weight[0][k].get('v1'),gp_laying_weight[0][k].get('v2'),gp_laying_weight[0][k].get('act_weight'),lm.get('age'),gp_laying_performance[k].get('v1'),gp_laying_performance[k].get('v2'),gp_laying_performance[k].get('act_eggs')])
+            k+=1
+            
+    rear_exp=[]
+    lbl=['','Expenses','Totals']
+    rear_exp.append(lbl)
+    if len(gp_rear):        
+        for rm in gp_rear:
+            rear_exp.append(['',rm.get('label'),rm.get('data')])            
+          
+    lay_exp=[]
+    lay_exp.append(lbl)
+    if len(gp_lay):        
+        for lm in gp_lay:
+            lay_exp.append(['',lm.get('label'),lm.get('data')])
 
-    df = pd.DataFrame(gp_rear)
-    df2 = pd.DataFrame(gp_lay)
+    gprearing_feed=[]
+    gprearing_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
+    if len(gp_rearing_feed):        
+        for lm in gp_rearing_feed[0]:
+            gprearing_feed.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_feed')])
 
-    df3 = pd.DataFrame(gp_rear_mor)
-    df4 = pd.DataFrame(gp_lay_mor)
-   
+    gplaying_feed=[]
+    gplaying_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
+    if len(gp_laying_feed):        
+        for lm in gp_laying_feed[0]:
+            gplaying_feed.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_feed')])
+    
+    gprearing_weight=[]
+    gprearing_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
+    if len(gp_rearing_weight):        
+        for lm in gp_rearing_weight[0]:
+            gprearing_weight.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_weight')])
+
+    gplaying_weight=[]
+    gplaying_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
+    if len(gp_laying_weight):        
+        for lm in gp_laying_weight[0]:
+            gplaying_weight.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_weight')])
+
+    gplaying_performance=[]
+    gplaying_performance.append(['Age','Std. Min Eggs','Std. Max Eggs','Actual Eggs'])
+    if len(gp_laying_performance):        
+        for lm in gp_laying_performance:
+            gplaying_performance.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_eggs')])
+
     wb = Workbook()
     ws = wb.active
     ws.title = "Rearing"
-    ws1 = wb.create_sheet("Budget")
     ws2 = wb.create_sheet("Production")
+    ws1 = wb.create_sheet("Budget")   
     ws5 = wb.create_sheet("Rear. Mor. GPH")
     ws6 = wb.create_sheet("Lay. Mor. GPH")
-    ws3 = wb.create_sheet("RearGP")
-    ws4 = wb.create_sheet("LayGP")
+    #rep = wb.create_sheet("Report")
+    ws7 = wb.create_sheet("Rear. Feed. GPH")
+    ws8 = wb.create_sheet("Lay. Feed. GPH")
+    ws9 = wb.create_sheet("Rear. Weight. GPH")
+    ws10 = wb.create_sheet("Lay. Weight. GPH")
+    ws11 = wb.create_sheet("Performance. GPH")
+    
 
     for row in rearingary:
        ws.append(row)
@@ -1361,24 +1431,63 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
 
     for row in layingary:
        ws2.append(row)
-
-    for row in dataframe_to_rows(df, index=False, header=True):
-        ws3.append(row)
-
-    for row in dataframe_to_rows(df2, index=False, header=True):
-        ws4.append(row)
-
-    for row in dataframe_to_rows(df3, index=False, header=True):
+    
+    ws.append([''])
+    for row in rear_exp:
+        ws.append(row)
+       
+    ws2.append([''])
+    for row in lay_exp:
+        ws2.append(row)
+        
+    for row in rear_mor:
         ws5.append(row)
 
-    for row in dataframe_to_rows(df4, index=False, header=True):
+    for row in lay_mor:
         ws6.append(row)
+
+    for row in gprearing_feed:
+        ws7.append(row)
+
+    for row in gplaying_feed:
+        ws8.append(row)
+    
+    for row in gprearing_weight:
+        ws9.append(row)
+
+    for row in gplaying_weight:
+        ws10.append(row)
+
+    for row in gplaying_performance:
+        ws11.append(row)
+
+
+    #for row in report:
+     #   rep.append(row)
     
     yellow = "00D5D7D9"
     black="00000000"
     thin = Side(border_style="thin", color=black)
     double = Side(border_style="double", color=black)
+    thick = Side(border_style="thick", color=black)
     #=====================================================
+    """"
+    for row in rep['A1:O1']:
+        for cell in row:
+            cell.font = ft
+            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
+    for row in rep['C1:C101']:
+        for cell in row:
+            cell.border = Border(right=thick)
+    for row in rep['G1:G101']:
+        for cell in row:
+            cell.border = Border(right=thick)
+    for row in rep['K1:K101']:
+        for cell in row:
+            cell.border = Border(right=thick)
+            """
+    
+    #===========================================================
     rlbl=getColumnName(rcollen)
     rhd="A1:"+str(rlbl)+str(1)
     
@@ -1453,13 +1562,16 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
             #cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
-
     if len(gp_rear):
         maxr=len(gp_rear)+1
         rhd="B"+str(rrowlen+2)
         pie = PieChart()
-        labels = Reference(ws3, min_col=1, min_row=2, max_row=maxr)
-        data = Reference(ws3, min_col=2, min_row=1, max_row=maxr)
+        #labels = Reference(ws3, min_col=2, min_row=2, max_row=maxr)
+        labels = "'Rearing'!$B$"+str(rrowlen+3)+":$B$"+str(rrowlen+1+maxr)
+        #frappe.msgprint(str(labels))
+        #data = Reference(ws3, min_col=3, min_row=1, max_row=maxr)
+        data = "'Rearing'!$C$"+str(rrowlen+3)+":$C$"+str(rrowlen+1+maxr)
+        #frappe.msgprint(str(data))
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
         pie.title = "Rearing"
@@ -1468,56 +1580,103 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     if len(gp_lay):
         maxr=len(gp_lay)+1
         rhd="B"+str(lrowlen+2)
-        pie = PieChart()
-        labels = Reference(ws4, min_col=1, min_row=2, max_row=maxr)
-        data = Reference(ws4, min_col=2, min_row=1, max_row=maxr)
+        pie = PieChart()        
+        labels = "'Production'!$B$"+str(lrowlen+3)+":$B$"+str(lrowlen+1+maxr)  
+        data = "'Production'!$C$"+str(lrowlen+3)+":$C$"+str(lrowlen+1+maxr)        
         pie.add_data(data, titles_from_data=True)
         pie.set_categories(labels)
         pie.title = "Laying"
         ws2.add_chart(pie, rhd)
-    
+    from copy import deepcopy
+    from openpyxl.chart.text import RichText
+    from openpyxl.drawing.text import RichTextProperties
+
     if len(gp_rear_mor):
+        
         maxr=len(gp_rear_mor)+1
-        """rhd="A1"
-        pie = LineChart()
-        labels = Reference(ws5, min_col=1, min_row=1, max_row=maxr)
-        data = Reference(ws5, min_col=3, min_row=2, max_row=maxr)
-        pie.add_data(data,  from_rows=True, titles_from_data=True)
-        pie.set_categories(labels)
-        pie.title = "Rearing Mortality"
-        ws5.add_chart(pie, rhd) """
-
-        #=========================
-        
-        
-
         c2 = LineChart()
-        c2.title = "Date Axis"
-        #c2.style = 12
-        c2.y_axis.title = "Size"
-        #c2.y_axis.crossAx = 500
-
-        #c2.x_axis = DateAxis(crossAx=100)
-        #c2.x_axis.number_format = 'd-mmm'
-        c2.x_axis.majorTimeUnit = "days"
-        #c2.x_axis.title = "Date"
+        c2.title = "Rearing Mortality"
+        c2.style = 13
+        c2.x_axis.title = 'Weeks'
+        c2.y_axis.title = 'Mortality %'
+        c2.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c2.x_axis.delete = False
+        c2.y_axis.delete = False
+        c2.height = 10 # default is 7.5
+        c2.width = 25 # default is 15
         data = Reference(ws5, min_col=2, min_row=1, max_col=3, max_row=maxr)
+        #frappe.msgprint(str(data)) #= 'Rear. Mor. GPH'!$B$1:$C$18
         c2.add_data(data, titles_from_data=True)
         dates = Reference(ws5, min_col=1, min_row=2, max_row=maxr)
+        #frappe.msgprint(str(dates)) #='Rear. Mor. GPH'!$A$2:$A$18
         c2.set_categories(dates)
+        ws5.add_chart(c2, "A1")
 
-        ws5.add_chart(c2, "A2")
-        
+        #=========================
     if len(gp_lay_mor):
         maxr=len(gp_lay_mor)+1
         rhd="A1"
-        pie = LineChart()
-        labels = Reference(ws6, min_col=1, min_row=1, max_row=maxr)
-        data = Reference(ws6, min_col=3, min_row=2, max_row=maxr)
-        pie.add_data(data,  from_rows=True, titles_from_data=True)
-        pie.set_categories(labels)
-        pie.title = "Laying Mortality"
-        ws6.add_chart(pie, rhd)
+        
+        c1 = LineChart()
+        c1.title = "Laying Mortality"
+        c1.style = 13
+        c1.x_axis.title = 'Weeks'
+        c1.y_axis.title = 'Mortality %'
+        c1.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c1.x_axis.delete = False
+        c1.y_axis.delete = False
+        c1.height = 20 # default is 7.5
+        c1.width = 60 # default is 15
+        data = Reference(ws6, min_col=2, min_row=1, max_col=3, max_row=maxr)
+        c1.add_data(data, titles_from_data=True)
+        dates = Reference(ws6, min_col=1, min_row=2, max_row=maxr)
+        c1.set_categories(dates)        
+        ws6.add_chart(c1, rhd)
+        
+    #----------------------------------------------------
+
+    if len(gprearing_feed):
+        
+        maxr=len(gprearing_feed)+1
+        c3 = LineChart()
+        c3.title = "Rearing Feed"
+        c3.style = 13
+        c3.x_axis.title = 'Weeks'
+        c3.y_axis.title = 'Feed'
+        c3.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c3.x_axis.delete = False
+        c3.y_axis.delete = False
+        c3.height = 10 # default is 7.5
+        c3.width = 25 # default is 15
+        data = Reference(ws7, min_col=2, min_row=1, max_col=4, max_row=maxr)
+        #frappe.msgprint(str(data)) #= 'Rear. Mor. GPH'!$B$1:$C$18        
+        c3.add_data(data, titles_from_data=True)
+        #dates = Reference(ws7, min_col=1, min_row=2, max_row=maxr)
+        #frappe.msgprint(str(dates)) #='Rear. Mor. GPH'!$A$2:$A$18
+        #c2.set_categories("'Rear. Feed. GPH'!$A$2:$A$18")
+        ws7.add_chart(c3, "A1")
+
+        #=========================
+    if len(gplaying_feed):
+        maxr=len(gplaying_feed)+1
+        rhd="A1"
+        
+        c4 = LineChart()
+        c4.title = "Laying Feed"
+        c4.style = 13
+        c4.x_axis.title = 'Weeks'
+        c4.y_axis.title = 'Feed'
+        c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c4.x_axis.delete = False
+        c4.y_axis.delete = False
+        c4.height = 20 # default is 7.5
+        c4.width = 60 # default is 15
+        data = Reference(ws8, min_col=2, min_row=1, max_col=4, max_row=maxr)
+        c4.add_data(data, titles_from_data=True)
+        #dates = Reference(ws8, min_col=1, min_row=2, max_row=maxr)
+        #c1.set_categories(dates)        
+        ws8.add_chart(c4, rhd)
+
 
     file_name = 'poultry_dash.xlsx'    
     temp_file=os.path.join(frappe.utils.get_bench_path(), "logs", file_name)
@@ -1555,7 +1714,7 @@ def down_file(file=None):
     frappe.local.response.type = "download"
 
 @frappe.whitelist()
-def get_rear_graph(batch,period):
+def get_rear_mor_graph(batch,period):
     bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
     strain=bth.strain
     doc_placed=bth.doc_placed
@@ -1579,7 +1738,7 @@ def get_rear_graph(batch,period):
     return {'ideal':actmort}
 
 @frappe.whitelist()
-def get_lay_graph(batch,period):
+def get_lay_mor_graph(batch,period):
     bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
     strain=bth.strain
     doc_placed=bth.doc_placed
@@ -1598,8 +1757,8 @@ def get_lay_graph(batch,period):
     for ly in actmort:
         date2=add_days(date2,7)
         wkd=date_diff(date2,date)//7
-        if maxweek < wkd:
-            break
+        #if maxweek < wkd:
+         #  break
         
         mortp=0
         for ac in actqry:
@@ -1610,5 +1769,189 @@ def get_lay_graph(batch,period):
         mortidel.append(ly)
     
     return {'ideal':mortidel}
+
+@frappe.whitelist()
+def get_lay_feed_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.flock_transfer_date)
+    stdfeed=frappe.db.get_all('Laying Period Performance',filters={'parent':strain},fields=['age','TRIM(SUBSTRING_INDEX(feed_intake,"–",1)) as v1','TRIM(SUBSTRING_INDEX(feed_intake,"–",-1)) as v2'],order_by='age')
     
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(qty*conversion_factor),0) as qty FROM  `tabLayer Feed` 
+    WHERE parentfield='laying_feed' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+    rear_mortality=0
+    rear_mortality_sql=frappe.db.sql(""" SELECT IFNULL(sum(total),0) as rear_mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='rearing_daily_mortality' and parent='{0}'  """.format(batch),as_dict=1,debug=0)
+    if rear_mortality_sql:
+        rear_mortality+=rear_mortality_sql[0].rear_mort
+
+    mortality=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(total),0) as mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='laying_mortality' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+
+    mortidel=[]
+    date2=date
+    maxweek=0
+    if actqry:
+        maxweek=actqry[-1].wk
+
+    for ly in stdfeed:
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        
+        #if maxweek < wkd:
+         #  break
+        mort=0
+        for mo in mortality:
+            if wkd<=mo.wk:
+                mort+=float(mo.mort)
+            
+
+        feed=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                livechick=float(doc_placed)-float(mort)+float(rear_mortality)
+                feed=float(ac.qty*1000000)/(float(livechick)*7)
+                              
+        ly.update({'act_feed':feed})
+        mortidel.append(ly)
     
+    return {'ideal':mortidel}
+
+@frappe.whitelist()
+def get_lay_weight_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.flock_transfer_date)
+    stdweight=frappe.db.get_all('Laying Period Performance',filters={'parent':strain},fields=['age','TRIM(SUBSTRING_INDEX(body_weight,"–",1)) as v1','TRIM(SUBSTRING_INDEX(body_weight,"–",-1)) as v2'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(weight),0) as weight FROM  `tabLayer Weight` 
+    WHERE parentfield='laying_weight' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+    
+    mortidel=[]
+    date2=date
+    maxweek=0
+    if actqry:
+        maxweek=actqry[-1].wk
+
+    for ly in stdweight:
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        #if maxweek < wkd:
+         #  break
+        
+        mortp=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                mortp=ac.weight
+                               
+        ly.update({'act_weight':mortp})
+        mortidel.append(ly)
+    
+    return {'ideal':mortidel}
+
+@frappe.whitelist()
+def get_rear_feed_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.doc_placed_date)
+    actmort=frappe.db.get_all('Rearing Period Performance',filters={'parent':strain},fields=['age','TRIM(SUBSTRING_INDEX(feed_intake,"–",1)) as v1','TRIM(SUBSTRING_INDEX(feed_intake,"–",-1)) as v2'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(qty*conversion_factor),0) as qty FROM  `tabLayer Feed` 
+    WHERE parentfield='rearing_feed' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+   
+    mortality=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(total),0) as mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='rearing_daily_mortality' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+    date2=date
+    for ly in actmort:
+    
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        
+        mort=0
+        for mo in mortality:
+            if wkd<=mo.wk:
+                mort+=float(mo.mort)
+            
+        feed=0
+        livechick=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                livechick=float(doc_placed)-float(mort)
+                feed=float(ac.qty*1000000)/(float(livechick)*7)
+        ly.update({'act_feed':feed})
+    return {'ideal':actmort}
+
+@frappe.whitelist()
+def get_rear_weight_graph(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.doc_placed_date)
+    actmort=frappe.db.get_all('Rearing Period Performance',filters={'parent':strain},fields=['age','TRIM(SUBSTRING_INDEX(body_weight,"–",1)) as v1','TRIM(SUBSTRING_INDEX(body_weight,"–",-1)) as v2'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(weight),0) as weight FROM  `tabLayer Weight` 
+    WHERE parentfield='rearing_weight' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+   
+    date2=date
+    for ly in actmort:
+    
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        mortp=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                mortp=ac.weight
+        ly.update({'act_weight':mortp})
+
+    return {'ideal':actmort}
+    
+@frappe.whitelist()
+def get_lay_performance(batch,period):
+    bth=frappe.db.get_value('Layer Batch',batch,['strain','doc_placed_date','flock_transfer_date','doc_placed'],as_dict=1)
+    strain=bth.strain
+    doc_placed=bth.doc_placed
+    date=getdate(bth.flock_transfer_date)
+    stdeggs=frappe.db.get_all('Laying Period Performance',filters={'parent':strain},fields=['age','TRIM(SUBSTRING_INDEX(hen_housed_eggs,"–",1)) as v1','TRIM(SUBSTRING_INDEX(hen_housed_eggs,"–",-1)) as v2'],order_by='age')
+    
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(qty*conversion_factor),0) as qty FROM  `tabEgg Production` 
+    WHERE  parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+    rear_mortality=0
+    rear_mortality_sql=frappe.db.sql(""" SELECT IFNULL(sum(total),0) as rear_mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='rearing_daily_mortality' and parent='{0}'  """.format(batch),as_dict=1,debug=0)
+    if rear_mortality_sql:
+        rear_mortality+=rear_mortality_sql[0].rear_mort
+
+    mortality=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') DIV 7 as wk,IFNULL(sum(total),0) as mort FROM  `tabLayer Mortality` 
+    WHERE parentfield='laying_mortality' and parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+
+    mortidel=[]
+    date2=date
+    maxweek=0
+    if actqry:
+        maxweek=actqry[-1].wk
+
+    for ly in stdeggs:
+        date2=add_days(date2,7)
+        wkd=date_diff(date2,date)//7
+        
+        #if maxweek < wkd:
+         #  break
+        mort=0
+        for mo in mortality:
+            if wkd<=mo.wk:
+                mort+=float(mo.mort)
+            
+
+        eggs=0
+        for ac in actqry:
+            if ac.wk==wkd:
+                livechick=float(doc_placed)-float(mort)+float(rear_mortality)
+                eggs=float(ac.qty)/(float(livechick)*7)
+                              
+        ly.update({'act_eggs':eggs})
+        mortidel.append(ly)
+    
+    return {'ideal':mortidel}
