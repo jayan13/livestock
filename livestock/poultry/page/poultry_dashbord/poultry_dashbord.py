@@ -1382,31 +1382,31 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
     gprearing_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
     if len(gp_rearing_feed):        
         for lm in gp_rearing_feed[0]:
-            gprearing_feed.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_feed')])
+            gprearing_feed.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_feed'))])
 
     gplaying_feed=[]
     gplaying_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
     if len(gp_laying_feed):        
         for lm in gp_laying_feed[0]:
-            gplaying_feed.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_feed')])
+            gplaying_feed.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_feed'))])
     
     gprearing_weight=[]
     gprearing_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
     if len(gp_rearing_weight):        
         for lm in gp_rearing_weight[0]:
-            gprearing_weight.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_weight')])
+            gprearing_weight.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_weight'))])
 
     gplaying_weight=[]
     gplaying_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
     if len(gp_laying_weight):        
         for lm in gp_laying_weight[0]:
-            gplaying_weight.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_weight')])
+            gplaying_weight.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_weight'))])
 
     gplaying_performance=[]
     gplaying_performance.append(['Age','Std. Min Eggs','Std. Max Eggs','Actual Eggs'])
     if len(gp_laying_performance):        
         for lm in gp_laying_performance:
-            gplaying_performance.append([lm.get('age'),lm.get('v1'),lm.get('v2'),lm.get('act_eggs')])
+            gplaying_performance.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_eggs'))])
 
     wb = Workbook()
     ws = wb.active
@@ -1610,6 +1610,13 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws5, min_col=1, min_row=2, max_row=maxr)
         #frappe.msgprint(str(dates)) #='Rear. Mor. GPH'!$A$2:$A$18
         c2.set_categories(dates)
+        s2 = c2.series[0]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c2.series[1]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
         ws5.add_chart(c2, "A1")
 
         #=========================
@@ -1630,14 +1637,21 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         data = Reference(ws6, min_col=2, min_row=1, max_col=3, max_row=maxr)
         c1.add_data(data, titles_from_data=True)
         dates = Reference(ws6, min_col=1, min_row=2, max_row=maxr)
-        c1.set_categories(dates)        
+        c1.set_categories(dates)
+        s2 = c1.series[0]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c1.series[1]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs        
         ws6.add_chart(c1, rhd)
         
     #----------------------------------------------------
 
     if len(gprearing_feed):
         
-        maxr=len(gprearing_feed)+1
+        maxr=len(gprearing_feed)
         c3 = LineChart()
         c3.title = "Rearing Feed"
         c3.style = 13
@@ -1648,17 +1662,28 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         c3.y_axis.delete = False
         c3.height = 10 # default is 7.5
         c3.width = 25 # default is 15
-        data = Reference(ws7, min_col=2, min_row=1, max_col=4, max_row=maxr)
-        #frappe.msgprint(str(data)) #= 'Rear. Mor. GPH'!$B$1:$C$18        
+        data = Reference(ws7, min_col=2, min_row=1, max_col=4, max_row=maxr)            
         c3.add_data(data, titles_from_data=True)
-        #dates = Reference(ws7, min_col=1, min_row=2, max_row=maxr)
-        #frappe.msgprint(str(dates)) #='Rear. Mor. GPH'!$A$2:$A$18
-        #c2.set_categories("'Rear. Feed. GPH'!$A$2:$A$18")
+        dates = Reference(ws7, min_col=1, min_row=2, max_row=maxr)        
+        c3.set_categories(dates)
+        s2 = c3.series[0]
+        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c3.series[1]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c3.series[2]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs        
+       
+
         ws7.add_chart(c3, "A1")
 
         #=========================
     if len(gplaying_feed):
-        maxr=len(gplaying_feed)+1
+        maxr=len(gplaying_feed)
         rhd="A1"
         
         c4 = LineChart()
@@ -1673,10 +1698,120 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         c4.width = 60 # default is 15
         data = Reference(ws8, min_col=2, min_row=1, max_col=4, max_row=maxr)
         c4.add_data(data, titles_from_data=True)
-        #dates = Reference(ws8, min_col=1, min_row=2, max_row=maxr)
-        #c1.set_categories(dates)        
+        dates = Reference(ws8, min_col=1, min_row=2, max_row=maxr)
+        c4.set_categories(dates)
+        s2 = c4.series[0]
+        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[1]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[2]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs 
+
         ws8.add_chart(c4, rhd)
 
+    #----------------------------------------------------
+
+    if len(gprearing_weight):
+        
+        maxr=len(gprearing_weight)
+        c3 = LineChart()
+        c3.title = "Rearing Weight"
+        c3.style = 13
+        c3.x_axis.title = 'Weeks'
+        c3.y_axis.title = 'Weight'
+        c3.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c3.x_axis.delete = False
+        c3.y_axis.delete = False
+        c3.height = 10 # default is 7.5
+        c3.width = 25 # default is 15
+        data = Reference(ws9, min_col=2, min_row=1, max_col=4, max_row=maxr)            
+        c3.add_data(data, titles_from_data=True)
+        dates = Reference(ws9, min_col=1, min_row=2, max_row=maxr)        
+        c3.set_categories(dates)
+        s2 = c3.series[0]
+        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c3.series[1]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c3.series[2]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs        
+       
+
+        ws9.add_chart(c3, "A1")
+
+        #=========================
+    if len(gplaying_weight):
+        maxr=len(gplaying_weight)
+        rhd="A1"
+        
+        c4 = LineChart()
+        c4.title = "Laying Weight"
+        c4.style = 13
+        c4.x_axis.title = 'Weeks'
+        c4.y_axis.title = 'Weight'
+        c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c4.x_axis.delete = False
+        c4.y_axis.delete = False
+        c4.height = 20 # default is 7.5
+        c4.width = 60 # default is 15
+        data = Reference(ws10, min_col=2, min_row=1, max_col=4, max_row=maxr)
+        c4.add_data(data, titles_from_data=True)
+        dates = Reference(ws10, min_col=1, min_row=2, max_row=maxr)
+        c4.set_categories(dates)
+        s2 = c4.series[0]
+        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[1]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[2]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs 
+
+        ws10.add_chart(c4, rhd)
+
+    if len(gplaying_performance):
+        maxr=len(gplaying_performance)
+        rhd="A1"
+        
+        c4 = LineChart()
+        c4.title = "Laying Performance"
+        c4.style = 13
+        c4.x_axis.title = 'Weeks'
+        c4.y_axis.title = 'Eggs'
+        c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
+        c4.x_axis.delete = False
+        c4.y_axis.delete = False
+        c4.height = 20 # default is 7.5
+        c4.width = 60 # default is 15
+        data = Reference(ws11, min_col=2, min_row=1, max_col=4, max_row=maxr)
+        c4.add_data(data, titles_from_data=True)
+        dates = Reference(ws11, min_col=1, min_row=2, max_row=maxr)
+        c4.set_categories(dates)
+        s2 = c4.series[0]
+        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[1]
+        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs
+
+        s2 = c4.series[2]
+        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs 054c85
+
+        ws11.add_chart(c4, rhd)
 
     file_name = 'poultry_dash.xlsx'    
     temp_file=os.path.join(frappe.utils.get_bench_path(), "logs", file_name)
