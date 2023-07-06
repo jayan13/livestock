@@ -48,9 +48,9 @@ def get_report(company,date_from,date_to):
                     WHERE
                     `tabStock Entry`.docstatus=1
                     AND  `tabStock Entry Detail`.item_code in ('{0}')
-                    AND `tabStock Entry Detail`.is_finished_item = 1
+                    AND ((`tabStock Entry Detail`.is_finished_item = 1
                     AND `tabStock Entry`.stock_entry_type = 'Manufacture'
-                    AND `tabStock Entry`.manufacturing_type = 'Egg'
+                    AND `tabStock Entry`.manufacturing_type = 'Egg') or (`tabStock Entry`.stock_entry_type = 'Material Receipt' AND `tabStock Entry`.stock_entry_type_option='Production') )
                     AND `tabStock Entry`.company = '{1}'
                     AND `tabStock Entry`.posting_date between '{2}' 
                     AND '{3}'
@@ -60,7 +60,7 @@ def get_report(company,date_from,date_to):
         if items:
             for itm in items:
                 html+='<tr>'
-                html+='<td>'+str(itm)+'</td>'
+                html+='<td>'+str(getitem_name(itm))+'</td>'
                 d=0
                 i=0
                 for dr in date_range:
@@ -91,13 +91,18 @@ def get_report(company,date_from,date_to):
     html+='<table class="table table-bordered" >'
     saleqtytot=[]
     saleamttot=[]
+    salerqtytot=[]
+    saleramttot=[]
     range_ress=[]
+    range_ressr=[]
     if date_range:
         html+='<tr class="table-secondary"><th rowspan="2">Items </th>'
         for dr in date_range:
-            html+='<th colspan="2">'+str(frappe.utils.formatdate(dr.get('from'), "MMM yy"))+'</th>'
+            html+='<th colspan="4">'+str(frappe.utils.formatdate(dr.get('from'), "MMM yy"))+'</th>'
             saleqtytot.append(0)
             saleamttot.append(0)
+            salerqtytot.append(0)
+            saleramttot.append(0)
             ressale=frappe.db.sql(""" SELECT `tabSales Invoice Item`.item_code,ROUND(sum(`tabSales Invoice Item`.base_net_amount),2) as amt,sum(qty*conversion_factor) as qty
                     FROM `tabSales Invoice`
                     JOIN `tabSales Invoice Item` on `tabSales Invoice Item`.parent = `tabSales Invoice`.name
@@ -108,17 +113,27 @@ def get_report(company,date_from,date_to):
                     AND `tabSales Invoice`.posting_date between '{2}' AND '{3}'
                     GROUP BY `tabSales Invoice Item`.item_code """.format(itemss_str,company,dr.get('from'),dr.get('to')),as_dict=1,debug=0)
             range_ress.append(ressale)
+            ressaler=frappe.db.sql(""" SELECT `tabSales Invoice Item`.item_code,ROUND(sum(`tabSales Invoice Item`.base_net_amount),2) as amt,sum(qty*conversion_factor) as qty
+                    FROM `tabSales Invoice`
+                    JOIN `tabSales Invoice Item` on `tabSales Invoice Item`.parent = `tabSales Invoice`.name
+                    WHERE `tabSales Invoice`.docstatus=1
+                    AND `tabSales Invoice`.is_return=1
+                    AND `tabSales Invoice Item`.item_code in ('{0}')
+                    AND `tabSales Invoice`.company = '{1}'
+                    AND `tabSales Invoice`.posting_date between '{2}' AND '{3}'
+                    GROUP BY `tabSales Invoice Item`.item_code """.format(itemss_str,company,dr.get('from'),dr.get('to')),as_dict=1,debug=0)
+            range_ressr.append(ressaler)
         html+='</tr>'
 
         html+='<tr class="table-secondary">'
         for dr in date_range:
-            html+='<th>Qty</th><th>Amount</th>'            
+            html+='<th>Qty</th><th>Amount</th><th>Rtn Qty</th><th>Rtn Amount</th>'            
         html+='</tr>'
 
         if itemss:
             for itm in itemss:
                 html+='<tr>'
-                html+='<td>'+str(itm)+'</td>'
+                html+='<td>'+str(getitem_name(itm))+'</td>'
                 d=0
                 i=0
                 for dr in date_range:
@@ -136,12 +151,30 @@ def get_report(company,date_from,date_to):
                                 amount=it.amt
                     html+='<td class="text-right">'+str(flt(qtyinctn,3))+'</td>'
                     html+='<td class="text-right">'+str(amount)+'</td>'
-                    
+
+                    srqty=0
+                    srval=0  
+                    salret=range_ressr[i]
+                    if salret:
+                        for ret in salret:
+                            if itm==ret.item_code:
+                                if ret.qty:
+                                    srqty=float(ret.qty)/360
+                                srval=ret.amt
+
+                    html+='<td class="text-right">'+str(flt(srqty,3))+'</td>'
+                    html+='<td class="text-right">'+str(srval)+'</td>'
 
                     tot=saleqtytot[i]
                     saleqtytot[i]=float(tot)+float(qtyinctn)
                     tots=saleamttot[i]
-                    saleamttot[i]=float(tots)+float(amount)    
+                    saleamttot[i]=float(tots)+float(amount)
+
+                    totr=salerqtytot[i]
+                    salerqtytot[i]=float(totr)+float(srqty)
+                    totsr=saleramttot[i]
+                    saleramttot[i]=float(totsr)+float(srval) 
+
                     i+=1
                 html+='</tr>'
             html+='<tr class="table-secondary"><th>Total</th>'
@@ -149,6 +182,8 @@ def get_report(company,date_from,date_to):
             for total in saleqtytot:
                  html+='<th class="text-right"><b>'+str(flt(total,3))+'</b></th>'
                  html+='<th class="text-right"><b>'+str(flt(saleamttot[j],3))+'</b></th>'
+                 html+='<th class="text-right"><b>'+str(flt(salerqtytot[j],3))+'</b></th>'
+                 html+='<th class="text-right"><b>'+str(flt(saleramttot[j],3))+'</b></th>'
                  j+=1
             html+='</tr>'
         
@@ -159,23 +194,14 @@ def get_report(company,date_from,date_to):
     html+='<table class="table table-bordered" >'
     saleqtytot=[]
     saleamttot=[]
-    range_ressr=[]
+    
     if date_range:
         html+='<tr class="table-secondary"><th rowspan="2">Items </th>'
         for dr in date_range:
             html+='<th colspan="2">'+str(frappe.utils.formatdate(dr.get('from'), "MMM yy"))+'</th>'
-            ressaler=frappe.db.sql(""" SELECT `tabSales Invoice Item`.item_code,ROUND(sum(`tabSales Invoice Item`.base_net_amount),2) as amt,sum(qty*conversion_factor) as qty
-                    FROM `tabSales Invoice`
-                    JOIN `tabSales Invoice Item` on `tabSales Invoice Item`.parent = `tabSales Invoice`.name
-                    WHERE `tabSales Invoice`.docstatus=1
-                    AND `tabSales Invoice`.is_return=1
-                    AND `tabSales Invoice Item`.item_code in ('{0}')
-                    AND `tabSales Invoice`.company = '{1}'
-                    AND `tabSales Invoice`.posting_date between '{2}' AND '{3}'
-                    GROUP BY `tabSales Invoice Item`.item_code """.format(itemss_str,company,dr.get('from'),dr.get('to')),as_dict=1,debug=0)
             saleqtytot.append(0)
             saleamttot.append(0)
-            range_ressr.append(ressaler)
+            
         html+='</tr>'
 
         html+='<tr class="table-secondary">'
@@ -186,7 +212,7 @@ def get_report(company,date_from,date_to):
         if itemss:
             for itm in itemss:
                 html+='<tr>'
-                html+='<td>'+str(itm)+'</td>'
+                html+='<td>'+str(getitem_name(itm))+'</td>'
                 d=0
                 i=0
                 for dr in date_range:

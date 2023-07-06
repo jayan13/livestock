@@ -9,7 +9,7 @@ MyPage =Class.extend({
 	init: function(wrapper){
 			this.page = frappe.ui.make_app_page({
 			parent: wrapper,
-			title: 'Egg Production Report',
+			title: 'Egg Production & Sales Monthly Comparison Report',
 			single_column: true
 		});
 			this.make();
@@ -65,7 +65,7 @@ MyPage =Class.extend({
 				
 			}
 		});
-		fdate=frappe.datetime.add_months(frappe.datetime.get_today(), -4);
+		fdate=frappe.datetime.add_months(frappe.datetime.get_today(), -2);
 		field1.set_value(fdate);
 		field2.set_value(frappe.datetime.get_today());		
 		//this.page.add_inner_button('Get  Report', () => get_report());
