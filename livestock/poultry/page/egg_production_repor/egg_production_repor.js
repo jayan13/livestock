@@ -9,7 +9,7 @@ MyPage =Class.extend({
 	init: function(wrapper){
 			this.page = frappe.ui.make_app_page({
 			parent: wrapper,
-			title: 'Egg Production & Sales Monthly Comparison Report',
+			title: 'Egg Production & Sales Monthly Comparison Report',
 			single_column: true
 		});
 			this.make();
@@ -17,19 +17,20 @@ MyPage =Class.extend({
 	make: function()
 	{
 		const comarry=[];
-		
-		
-		
+		var date = new Date();
+		var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+		var firstDay = new Date(date.getFullYear(), date.getMonth()-2, 1);
 			let field = this.page.add_field({
 			label: 'Company',
-			fieldtype: 'Select',
+			fieldtype: 'Link',
 			fieldname: 'company',
-			options: [],
+			options: 'Company',
 			change() {
 				get_report();
-			}
+			},
+			default:'ABU DHABI POULTRY FARM - SOLE PROPRIETORSHIP L.L.C.'
 		});
-		
+		/*
 		frappe.call({
           method: 'livestock.poultry.page.egg_production_repor.egg_production_repor.get_company_list',
           args: {},
@@ -43,7 +44,7 @@ MyPage =Class.extend({
 				
             }
           },
-        });
+        }); */
 		let field1 = this.page.add_field({
 			label: 'Date',
 			fieldtype: 'Date',
@@ -65,9 +66,11 @@ MyPage =Class.extend({
 				
 			}
 		});
-		fdate=frappe.datetime.add_months(frappe.datetime.get_today(), -2);
-		field1.set_value(fdate);
-		field2.set_value(frappe.datetime.get_today());		
+		//frappe.datetime.month_start()
+		//fdate=frappe.datetime.add_months(frappe.datetime.get_today(), -2);
+		//fdate=frappe.datetime.month_start(fdate);
+		field1.set_value(firstDay);
+		field2.set_value(lastDay);		
 		//this.page.add_inner_button('Get  Report', () => get_report());
 		this.page.add_inner_button('Print', () => print_rep());
 		let data='';
