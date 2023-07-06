@@ -165,7 +165,7 @@ MyPage =Class.extend({
 				},
 			
 				title: "Laying",
-				type: 'pie', // or 'bar', 'line', 'pie', 'percentage'
+				type: 'pie', // or 'bar', 'line', 'pie', 'percentage' 
 				height: 500,				
 				colors: ['purple', '#ffa3ef', 'light-blue'],
 			
@@ -365,9 +365,9 @@ MyPage =Class.extend({
 					],
 				},
 				title: "Rearing Mortality",
-				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
+				type: 'line', // or 'bar', 'line', 'pie', 'percentage' #2490ef
 				height: 300,				
-				colors: ['light-blue','#054c85'],
+				colors: ['#ff2e2e','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis					
 				  },
@@ -448,7 +448,7 @@ function laying_graph(batch,period)
 				title: "Laying Mortality",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['light-blue','#054c85'],
+				colors: ['#ff2e2e','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -482,7 +482,7 @@ function laying_graph(batch,period)
 			   title: "Laying Mortality",
 			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 			   height: 300,				
-			   colors: ['light-blue','#054c85'],
+			   colors: ['#ff2e2e','#2490ef'],
 			   axisOptions: {					
 				   yLabel: "Value", // Label for y-axis
 				   
@@ -572,7 +572,7 @@ function laying_feed_graph(batch,period)
 				title: "Laying Feed",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['#a1f198','#ffa5a5','#054c85'],
+				colors: ['#ff2e2e','#55af46','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -611,7 +611,7 @@ function laying_feed_graph(batch,period)
 			   title: "Laying Feed",
 			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 			   height: 300,				
-			   colors: ['#a1f198','#ffa5a5','#054c85'],
+			   colors: ['#ff2e2e','#55af46','#2490ef'],
 			   axisOptions: {					
 				   yLabel: "Value", // Label for y-axis
 				   
@@ -701,7 +701,7 @@ function laying_weight_graph(batch,period)
 				title: "Laying Weight",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['#a1f198','#ffa5a5','#054c85'],
+				colors: ['#ff2e2e','#55af46','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -739,7 +739,7 @@ function laying_weight_graph(batch,period)
 			   title: "Laying Weight",
 			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 			   height: 300,				
-			   colors: ['#a1f198','#ffa5a5','#054c85'],
+			   colors: ['#ff2e2e','#55af46','#2490ef'],
 			   axisOptions: {					
 				   yLabel: "Value", // Label for y-axis
 				   
@@ -818,7 +818,7 @@ function rearing_feed_graph(batch,period)
 				title: "Rearing Feed",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['#a1f198','#ffa5a5','#054c85'],
+				colors: ['#ff2e2e','#55af46','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -896,7 +896,7 @@ function rearing_weight_graph(batch,period)
 				title: "Rearing Weight",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['#a1f198','#ffa5a5','#054c85'],
+				colors: ['#ff2e2e','#55af46','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -987,7 +987,7 @@ function laying_performance_graph(batch,period)
 				title: "Performance",
 				type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 				height: 300,				
-				colors: ['#a1f198','#ffa5a5','#054c85'],
+				colors: ['#ff2e2e','#55af46','#2490ef'],
 				axisOptions: {					
 					yLabel: "Value", // Label for y-axis
 					
@@ -1026,7 +1026,7 @@ function laying_performance_graph(batch,period)
 			   title: "Performance",
 			   type: 'line', // or 'bar', 'line', 'pie', 'percentage'
 			   height: 300,				
-			   colors: ['#a1f198','#ffa5a5','#054c85'],
+			   colors: ['#ff2e2e','#55af46','#2490ef'],
 			   axisOptions: {					
 				   yLabel: "Value", // Label for y-axis
 				   

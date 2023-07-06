@@ -1611,11 +1611,11 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         #frappe.msgprint(str(dates)) #='Rear. Mor. GPH'!$A$2:$A$18
         c2.set_categories(dates)
         s2 = c2.series[0]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c2.series[1]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
         ws5.add_chart(c2, "A1")
 
@@ -1639,11 +1639,11 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws6, min_col=1, min_row=2, max_row=maxr)
         c1.set_categories(dates)
         s2 = c1.series[0]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c1.series[1]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs        
         ws6.add_chart(c1, rhd)
         
@@ -1667,15 +1667,15 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws7, min_col=1, min_row=2, max_row=maxr)        
         c3.set_categories(dates)
         s2 = c3.series[0]
-        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c3.series[1]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c3.series[2]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs        
        
 
@@ -1701,15 +1701,15 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws8, min_col=1, min_row=2, max_row=maxr)
         c4.set_categories(dates)
         s2 = c4.series[0]
-        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[1]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs 
 
         ws8.add_chart(c4, rhd)
@@ -1734,15 +1734,15 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws9, min_col=1, min_row=2, max_row=maxr)        
         c3.set_categories(dates)
         s2 = c3.series[0]
-        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c3.series[1]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c3.series[2]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs        
        
 
@@ -1768,15 +1768,15 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws10, min_col=1, min_row=2, max_row=maxr)
         c4.set_categories(dates)
         s2 = c4.series[0]
-        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[1]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "054c85"
+        s2.graphicalProperties.line.solidFill = "2490ef"
         s2.graphicalProperties.line.width = 30000 # width in EMUs 
 
         ws10.add_chart(c4, rhd)
@@ -1800,16 +1800,16 @@ def down_report(company,batch,rearing=None,laying=None,budget=None,rearing_gp=No
         dates = Reference(ws11, min_col=1, min_row=2, max_row=maxr)
         c4.set_categories(dates)
         s2 = c4.series[0]
-        s2.graphicalProperties.line.solidFill = "a1f198"
+        s2.graphicalProperties.line.solidFill = "ff2e2e"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[1]
-        s2.graphicalProperties.line.solidFill = "ffa5a5"
+        s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
         s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "054c85"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs 054c85
+        s2.graphicalProperties.line.solidFill = "2490ef"
+        s2.graphicalProperties.line.width = 30000 # width in EMUs 2490ef
 
         ws11.add_chart(c4, rhd)
 
