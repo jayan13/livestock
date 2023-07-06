@@ -1,6 +1,7 @@
 <style>
-  .table { margin-top: 5px !important;}
+  .table { margin-top: 5px !important; width: max-content; min-width: 100%;}
   .table th{ font-size: 13px !important;}
+  .table td{ border: 1px solid #ccc;}
   .table th:first-child,
 .table td:first-child {
   position: sticky;
@@ -15,11 +16,14 @@
 .table th{font-weight: normal;}
 .table th,.table td{ padding: 6px !important;}
 /*.table-secondary td,.table-secondary th {font-weight: bold;} */
-#rephd{
+.rephd{
   font-size: 18px;
   font-weight: bold;
   padding-top: 15px;
   padding-bottom: 5px;
+}
+.scrl{
+  overflow-x: auto;
 }
 </style>
 <div id="report_egg" style="background-color:#fff;width:100%; padding:14px;">
