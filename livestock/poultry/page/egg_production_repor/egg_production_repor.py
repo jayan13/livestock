@@ -10,8 +10,8 @@ def get_company_list():
 def get_report(company,date_from,date_to):
     date_from=getdate(date_from)
     date_to=getdate(date_to)
-    date_range=[]
-    items=frappe.db.get_all("Item",filters={'item_group':'EGGS','item_code':['NOT in',['ORG1115','ORG1130']]},fields=['item_code'],order_by='item_code',pluck='item_code')
+    date_range=[] #['ORG1115','ORG1130'] ['ORG EGG','ORG EGG BROWN']
+    items=frappe.db.get_all("Item",filters={'item_group':'EGGS','item_code':['NOT in',['ORG EGG','ORG EGG BROWN']]},fields=['item_code'],order_by='item_code',pluck='item_code')
     items_str="','".join(items)
     itemss=frappe.db.get_all("Item",filters={'item_group':'EGGS','item_code':['NOT in',['ORG EGG','ORG EGG BROWN']]},fields=['item_code'],order_by='item_code',pluck='item_code')
     itemss_str="','".join(itemss)
@@ -177,8 +177,8 @@ def get_report(company,date_from,date_to):
                     
                     net=qtyinctn+srqty
                     snet=amount+srval
-                    html+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(net))+'</td>'
-                    html+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(snet))+'</td>'
+                    html+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(net))+'</b></td>'
+                    html+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(snet))+'</b></td>'
 
                     ntot=netqty_tot[i]
                     netqty_tot[i]=float(net)+float(ntot)
