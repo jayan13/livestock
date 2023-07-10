@@ -40,6 +40,11 @@ def get_report(company,batch,period=None):
     if layer.flock_transfer_date:
         flock_transfer_date=getdate(layer.flock_transfer_date)
 
+    act_rear_start_date=doc_placed_date
+    act_rear_end_date=flock_transfer_date or getdate(nowdate())
+    act_lay_start_date=flock_transfer_date    
+    act_lay_end_date=project_end or getdate(nowdate())
+
     if period=='Start Date Of Project':
         rear_start_date=doc_placed_date
         lay_start_date=flock_transfer_date
@@ -148,7 +153,7 @@ def get_report(company,batch,period=None):
                 finished_product=rearing_shed.finished_product
         if base_row_material:
             itemamt=frappe.db.sql("""select IFNULL(sum(i.net_amount), 0) as amount from `tabPurchase Invoice Item` i left join `tabPurchase Invoice` p on p.name=i.parent 
-where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and p.project='{4}' """.format(rear.get('start'),rear.get('end'),base_row_material,finished_product,layer.name),as_dict=1,debug=0)
+where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and p.docstatus=1 and p.project='{4}' """.format(rear.get('start'),rear.get('end'),base_row_material,finished_product,layer.name),as_dict=1,debug=0)
             if itemamt:
                 rear_doc.append(itemamt[0].amount)
                 col_tot+=float(itemamt[0].amount)
