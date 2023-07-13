@@ -193,7 +193,7 @@ def get_report(company,store):
                 and s.status not in ('Draft','Return','Cancelled')                
                 AND s.docstatus = 1 
                 and s.is_return!=1 
-                AND MONTH(s.posting_date) = MONTH(DATE_SUB('{1}', INTERVAL -1 MONTH)) and YEAR(s.posting_date) = YEAR('{1}') 
+                AND MONTH(s.posting_date) = MONTH(DATE_SUB('{1}', INTERVAL 1 MONTH)) and YEAR(s.posting_date) = YEAR('{1}') 
                 AND si.item_code in ('{2}')
                 and si.warehouse = '{3}'
             """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
@@ -237,7 +237,7 @@ def get_report(company,store):
                 and s.is_return=1
                 and s.customer in ('{2}') 
                 and s.naming_series in ('DISCOUNT-.####','BUSINESS-PROMO-.####')
-                AND MONTH(s.posting_date) = MONTH(DATE_SUB('{1}', INTERVAL -1 MONTH)) and YEAR(s.posting_date) = YEAR('{1}') 
+                AND MONTH(s.posting_date) = MONTH(DATE_SUB('{1}', INTERVAL 1 MONTH)) and YEAR(s.posting_date) = YEAR('{1}') 
                 
             """.format(company,posted_on,customersal),as_dict=1,debug=0)
     avg_dis_last=0   
