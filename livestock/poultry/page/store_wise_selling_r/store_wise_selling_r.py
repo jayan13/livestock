@@ -232,7 +232,7 @@ def get_report(company,store):
                 `tabSales Invoice` s
             WHERE
                 s.company = '{0}'
-                and s.status not in ('Draft','Return','Cancelled')                
+                and s.status not in ('Draft','Cancelled')                
                 AND s.docstatus = 1 
                 and s.is_return=1
                 and s.customer in ('{2}') 
@@ -255,7 +255,7 @@ def get_report(company,store):
                 `tabSales Invoice` s
             WHERE
                 s.company = '{0}'
-                and s.status not in ('Draft','Return','Cancelled')                
+                and s.status not in ('Draft','Cancelled')                
                 AND s.docstatus = 1
                 and s.is_return=1
                 and s.customer in ('{2}')
