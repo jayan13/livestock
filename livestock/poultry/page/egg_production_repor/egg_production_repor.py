@@ -50,7 +50,7 @@ def get_report(company,date_from,date_to):
                     AND  `tabStock Entry Detail`.item_code in ('{0}')
                     AND ((`tabStock Entry Detail`.is_finished_item = 1
                     AND `tabStock Entry`.stock_entry_type = 'Manufacture'
-                    AND `tabStock Entry`.manufacturing_type in ('Egg','Egg Packing') ) or (`tabStock Entry`.stock_entry_type = 'Material Receipt' AND `tabStock Entry`.stock_entry_type_option='Production') )
+                    AND `tabStock Entry`.manufacturing_type in ('Egg','Egg Packing') ) or (`tabStock Entry`.stock_entry_type = 'Material Receipt' AND `tabStock Entry`.stock_entry_type_option in ('Production','Organic Packing')) )
                     AND `tabStock Entry`.company = '{1}'
                     AND `tabStock Entry`.posting_date between '{2}' 
                     AND '{3}'
