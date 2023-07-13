@@ -50,7 +50,7 @@ def get_report(company,date_from,date_to):
                     AND  `tabStock Entry Detail`.item_code in ('{0}')
                     AND ((`tabStock Entry Detail`.is_finished_item = 1
                     AND `tabStock Entry`.stock_entry_type = 'Manufacture'
-                    AND `tabStock Entry`.manufacturing_type = 'Egg') or (`tabStock Entry`.stock_entry_type = 'Material Receipt' AND `tabStock Entry`.stock_entry_type_option='Production') )
+                    AND `tabStock Entry`.manufacturing_type in ('Egg','Egg Packing') ) or (`tabStock Entry`.stock_entry_type = 'Material Receipt' AND `tabStock Entry`.stock_entry_type_option='Production') )
                     AND `tabStock Entry`.company = '{1}'
                     AND `tabStock Entry`.posting_date between '{2}' 
                     AND '{3}'
@@ -80,6 +80,7 @@ def get_report(company,date_from,date_to):
                     proddatetot[i]=float(tot)+float(qtyinctn)    
                     i+=1
                 html+='</tr>'
+
             html+='<tr class="table-secondary"><th>Total</th>'
             for total in proddatetot:
                  html+='<th class="text-right"><b>'+str(frappe.utils.fmt_money(flt(total,3)))+'</b></th>'
