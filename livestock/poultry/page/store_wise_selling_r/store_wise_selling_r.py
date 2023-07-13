@@ -48,7 +48,7 @@ def get_report(company,store):
 
     html+='<div class="rephd">Stock in Hand: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Store : '+str(store)+' </div>' 
     html+='<table class="table table-bordered" id="prod">'
-    html+='<tr class="table-secondary"><th style="width: 300px;">Items </th><th>Qty In Ctn</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;">Items </th><th class="text-right">Qty In Ctn</th></tr>'
     total_ctn=0
     for ent in sl_entrys:
         qty=flt(ent.qty/360,3)
@@ -60,7 +60,7 @@ def get_report(company,store):
 
     html+='<div class="rephd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;"></th><th>Today</th><th>MTD</th><th>Prev Month</th><th>YTD</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;"></th><th class="text-right">Today</th><th class="text-right">MTD</th><th class="text-right">Prev Month</th><th class="text-right">YTD</th></tr>'
     
     today_qty=0
     this_qty=0
@@ -177,15 +177,14 @@ def get_report(company,store):
         if year_amt:
             avgyear_sale=year_amt/year_qty
         
-
-    html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_sale,4)))+'</td><td></td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_sale,4)))+'</td></tr>'
-    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale)+'</td><td  class="text-right">'+str(avgthis_sale)+'</td><td></td><td  class="text-right">'+str(avgyear_sale)+'</td></tr>'
     #------------------------------------------------
     befthis_qty=0
     befyear_qty=0
+    prev_mth_sale=0
+    prev_mth_avg_sale=0
     sl_curmonth_bf= frappe.db.sql("""
             SELECT
-                IFNULL(sum(si.stock_qty),0) as qty
+                IFNULL(sum(si.base_amount),0) as amount,IFNULL(sum(si.stock_qty),0) as qty
             FROM
                 `tabSales Invoice` s
                 left join `tabSales Invoice Item` si on si.parent=s.name
@@ -200,6 +199,10 @@ def get_report(company,store):
             """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
     if sl_curmonth_bf:        
         befthis_qty=sl_curmonth_bf[0].qty
+        prev_mth_sale=sl_curmonth_bf[0].amount
+        if prev_mth_sale:
+            prev_mth_avg_sale=prev_mth_sale/befthis_qty
+            prev_mth_avg_sale=f"{prev_mth_avg_sale:.12f}"
 
     sl_curyear_bf= frappe.db.sql("""
             SELECT
@@ -268,29 +271,15 @@ def get_report(company,store):
             avg_dis_year=f"{avg_dis_year:.12f}"            
             avg_disy_sale=(year_amt+sl_curyear_dis[0].amt)/befyear_qty
 
+    html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_sale,4)))+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_sale,4)))+'</td></tr>'
+    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale)+'</td><td  class="text-right">'+str(avgthis_sale)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_avg_sale,4)))+'</td><td  class="text-right">'+str(avgyear_sale)+'</td></tr>'
+    
     html+='<tr><td>Average Discount till Prev month</td><td class="text-right"></td><td></td><td  class="text-right">'+str(avg_dis_last)+'</td><td  class="text-right">'+str(avg_dis_year)+'</td></tr>'
     html+='<tr><td>Avg SP after discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(avg_dis_sale)+'</td><td  class="text-right">'+str(avg_disy_sale)+'</td></tr>'
 
     html+='</table>'
 
-    html+='<div class="rephd">Organic &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
-    html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;"></th><th>Today</th><th>MTD</th><th>YTD</th></tr>'
-    html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_amt_org,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_amt_org,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_amt_org,4)))+'</td></tr>'
-    avgtoday_sale_org=0
-    if today_amt_org:
-        avgtoday_sale_org=today_amt_org/today_qty_org
-
-    avgthis_sale_org=0
-    if this_amt_org:
-        avgthis_sale_org=this_amt_org/this_qty_org
-
-    avgyear_sale_org=0
-    if year_amt_org:
-        avgyear_sale_org=year_amt_org/year_qty_org
-
-    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale_org)+'</td><td  class="text-right">'+str(avgthis_sale_org)+'</td><td  class="text-right">'+str(avgyear_sale_org)+'</td></tr>'
-    html+='</table>'
+    
 
     out_standing= frappe.db.sql("""
             SELECT sum(ot.outstanding_amount) as outstanding_amount,ot.customer from (
@@ -350,13 +339,13 @@ def get_report(company,store):
     cus_rows=Sort(cus_rows)
     html+='<div class="rephd">Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;">Customer</th><th>Outstanding</th><th>Credit Note</th><th>Balance Outstanding</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
     html+='<tr><td>Total Outstanding</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand+retn,4)))+'</b></td></tr>'
     html+='</table>'
 
     html+='<div class="rephd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;">Average Selling Price - Breakup</th><th>Today</th><th>MTD</th><th>YTD</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;">Average Selling Price - Breakup</th><th class="text-right">Today</th><th class="text-right">MTD</th><th class="text-right">YTD</th></tr>'
     
     avg_selling_d=0
     avg_selling_m=0
@@ -394,8 +383,8 @@ def get_report(company,store):
                     item_cnt_y+=1
                     avg_selling_y+=yavg
 
-            
-        html+='<tr><td>'+str(getitem_name(itm))+'</td><td class="text-right">'+str(flt(davg,4))+'</td><td  class="text-right">'+str(flt(mavg,4))+'</td><td  class="text-right">'+str(flt(yavg,4))+'</td></tr>'
+        if davg or mavg or yavg:            
+            html+='<tr><td>'+str(getitem_name(itm))+'</td><td class="text-right">'+str(flt(davg,4))+'</td><td  class="text-right">'+str(flt(mavg,4))+'</td><td  class="text-right">'+str(flt(yavg,4))+'</td></tr>'
 
     avg_d=0
     if avg_selling_d:
@@ -416,7 +405,26 @@ def get_report(company,store):
 
     html+='<div class="rephd">Organic &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;">Average Selling Price - Breakup</th><th>Today</th><th>MTD</th><th>YTD</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;"></th><th class="text-right">Today</th><th class="text-right">MTD</th><th class="text-right">YTD</th></tr>'
+    html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_amt_org,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_amt_org,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_amt_org,4)))+'</td></tr>'
+    avgtoday_sale_org=0
+    if today_amt_org:
+        avgtoday_sale_org=today_amt_org/today_qty_org
+
+    avgthis_sale_org=0
+    if this_amt_org:
+        avgthis_sale_org=this_amt_org/this_qty_org
+
+    avgyear_sale_org=0
+    if year_amt_org:
+        avgyear_sale_org=year_amt_org/year_qty_org
+
+    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale_org)+'</td><td  class="text-right">'+str(avgthis_sale_org)+'</td><td  class="text-right">'+str(avgyear_sale_org)+'</td></tr>'
+    html+='</table>'
+
+    html+='<div class="rephd">Organic &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
+    html+='<table class="table table-bordered" >'
+    html+='<tr class="table-secondary"><th style="width: 300px;">Average Selling Price - Breakup</th><th class="text-right">Today</th><th class="text-right">MTD</th><th class="text-right">YTD</th></tr>'
     
     avg_selling_d=0
     avg_selling_m=0
@@ -454,8 +462,8 @@ def get_report(company,store):
                     item_cnt_y+=1
                     avg_selling_y+=yavg
 
-            
-        html+='<tr><td>'+str(getitem_name(itm))+'</td><td class="text-right">'+str(flt(davg,4))+'</td><td  class="text-right">'+str(flt(mavg,4))+'</td><td  class="text-right">'+str(flt(yavg,4))+'</td></tr>'
+        if davg or mavg or yavg:    
+            html+='<tr><td>'+str(getitem_name(itm))+'</td><td class="text-right">'+str(flt(davg,4))+'</td><td  class="text-right">'+str(flt(mavg,4))+'</td><td  class="text-right">'+str(flt(yavg,4))+'</td></tr>'
 
     avg_d=0
     if avg_selling_d:
@@ -474,7 +482,7 @@ def get_report(company,store):
 
     html+='<div class="rephd">Customer Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 600px;">Customer</th><th>Outstanding</th><th>Credit Note</th><th>Balance Outstanding</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 600px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
     for cs in cus_rows:
         html+='<tr><td>'+str(cs[0])+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(cs[1],4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs[2],4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs[3],4)))+'</td></tr>'
     
