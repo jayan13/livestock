@@ -195,6 +195,7 @@ def get_report(company,store):
                 and s.is_return!=1 
                 AND MONTH(s.posting_date) = MONTH(DATE_SUB('{1}', INTERVAL 1 MONTH)) and YEAR(s.posting_date) = YEAR('{1}') 
                 AND si.item_code in ('{2}')
+                AND si.item_code not in ('ORG1115','ORG1130')
                 and si.warehouse = '{3}'
             """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
     if sl_curmonth_bf:        
@@ -204,25 +205,7 @@ def get_report(company,store):
             prev_mth_avg_sale=prev_mth_sale/befthis_qty
             prev_mth_avg_sale=f"{prev_mth_avg_sale:.12f}"
 
-    sl_curyear_bf= frappe.db.sql("""
-            SELECT
-                IFNULL(sum(si.stock_qty),0) as qty
-            FROM
-                `tabSales Invoice` s
-                left join `tabSales Invoice Item` si on si.parent=s.name
-            WHERE
-                s.company = '{0}'
-                and s.status not in ('Draft','Return','Cancelled')                
-                AND s.docstatus = 1
-                and s.is_return!=1 
-                AND MONTH(s.posting_date) < MONTH('{1}') and YEAR(s.posting_date) = YEAR('{1}') 
-                AND si.item_code in ('{2}')
-                and si.warehouse = '{3}'
-            """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
-
     
-    if sl_curyear_bf:
-        befyear_qty=sl_curyear_bf[0].qty
 
 #-------------------------------------------------
     sl_curmonth_dis= frappe.db.sql("""
@@ -246,7 +229,29 @@ def get_report(company,store):
         if sl_curmonth_dis[0].amt:
             avg_dis_last=sl_curmonth_dis[0].amt/befthis_qty
             avg_dis_last=f"{avg_dis_last:.12f}"  
-            avg_dis_sale=(this_amt+sl_curmonth_dis[0].amt)/befthis_qty
+            avg_dis_sale=(prev_mth_sale+sl_curmonth_dis[0].amt)/befthis_qty
+
+    sl_curyear_bf= frappe.db.sql("""
+            SELECT
+                IFNULL(sum(si.base_amount),0) as amount,IFNULL(sum(si.stock_qty),0) as qty
+            FROM
+                `tabSales Invoice` s
+                left join `tabSales Invoice Item` si on si.parent=s.name
+            WHERE
+                s.company = '{0}'
+                and s.status not in ('Draft','Return','Cancelled')                
+                AND s.docstatus = 1
+                and s.is_return!=1 
+                AND MONTH(s.posting_date) < MONTH('{1}') and YEAR(s.posting_date) = YEAR('{1}') 
+                AND si.item_code in ('{2}')
+                AND si.item_code not in ('ORG1115','ORG1130')
+                and si.warehouse = '{3}'
+            """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
+
+    
+    if sl_curyear_bf:
+        befyear_qty=sl_curyear_bf[0].qty
+        befyear_amt=sl_curyear_bf[0].amount
 
     sl_curyear_dis= frappe.db.sql("""
             SELECT
@@ -269,7 +274,7 @@ def get_report(company,store):
         if sl_curyear_dis[0].amt:            
             avg_dis_year=float(sl_curyear_dis[0].amt)/float(befyear_qty)
             avg_dis_year=f"{avg_dis_year:.12f}"            
-            avg_disy_sale=(year_amt+sl_curyear_dis[0].amt)/befyear_qty
+            avg_disy_sale=(befyear_amt+sl_curyear_dis[0].amt)/befyear_qty
 
     html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_sale,4)))+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_sale,4)))+'</td></tr>'
     html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale)+'</td><td  class="text-right">'+str(avgthis_sale)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_avg_sale,4)))+'</td><td  class="text-right">'+str(avgyear_sale)+'</td></tr>'
