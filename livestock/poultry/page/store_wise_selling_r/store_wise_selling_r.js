@@ -57,7 +57,7 @@ MyPage =Class.extend({
 		
 		function get_report()
 		{
-			$('#report_egg').html('');
+			$('#store').html('');
 			if(field.get_value())
 			{		
 					frappe.call({
@@ -70,7 +70,7 @@ MyPage =Class.extend({
 					},
 					callback: function (r) {
 					  if (r.message) {
-						  $('#report_egg').html(r.message);
+						  $('#store').html(r.message);
 							
 							
 					  }
@@ -90,7 +90,7 @@ MyPage =Class.extend({
 function print_rep()
 		{
 
-			  var divrear=document.getElementById('report_egg');
+			  var divrear=document.getElementById('store');
 					
 					  var newWin=window.open('','Print-Window');
 					  newWin.document.open();
