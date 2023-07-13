@@ -59,10 +59,11 @@ def get_report(company,date_from,date_to):
         html+='</tr>'
         if items:
             for itm in items:
-                html+='<tr>'
-                html+='<td>'+str(getitem_name(itm))+'</td>'
+                html2='<tr>'
+                html2+='<td>'+str(getitem_name(itm))+'</td>'
                 d=0
                 i=0
+                ffg=0
                 for dr in date_range:
                     #if itm.item_code=='CG11111':
                      #   d=1
@@ -73,13 +74,16 @@ def get_report(company,date_from,date_to):
                             if itm==it.item_code:
                                 if it.qty:
                                     qtyinctn=float(it.qty)/360
+                                    ffg=1
 
-                    html+='<td class="text-right">'+str(frappe.utils.fmt_money(flt(qtyinctn,3)))+'</td>'
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(flt(qtyinctn,3)))+'</td>'
 
                     tot=proddatetot[i]
                     proddatetot[i]=float(tot)+float(qtyinctn)    
                     i+=1
-                html+='</tr>'
+                html2+='</tr>'
+                if ffg==1:
+                    html+=html2
 
             html+='<tr class="table-secondary"><th>Total</th>'
             for total in proddatetot:
@@ -137,10 +141,11 @@ def get_report(company,date_from,date_to):
 
         if itemss:
             for itm in itemss:
-                html+='<tr>'
-                html+='<td>'+str(getitem_name(itm))+'</td>'
+                html2='<tr>'
+                html2+='<td>'+str(getitem_name(itm))+'</td>'
                 d=0
                 i=0
+                fgf=0
                 for dr in date_range:
                     #if itm.item_code=='CG11111':
                      #   d=1
@@ -159,9 +164,10 @@ def get_report(company,date_from,date_to):
                             if itm==it.item_code:
                                 if it.qty:
                                     qtyinctn=float(it.qty)/360
+                                    fgf=1
                                 amount=it.amt
-                    html+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(flt(qtyinctn,3)))+'</td>'
-                    html+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(amount))+'</td>'
+                    html2+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(flt(qtyinctn,3)))+'</td>'
+                    html2+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(amount))+'</td>'
 
                     srqty=0
                     srval=0  
@@ -171,15 +177,16 @@ def get_report(company,date_from,date_to):
                             if itm==ret.item_code:
                                 if ret.qty:
                                     srqty=float(ret.qty)/360
+                                    fgf=1
                                 srval=ret.amt
 
-                    html+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(flt(srqty,3)))+'</td>'
-                    html+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(srval))+'</td>'
+                    html2+='<td class="text-right" '+str(sty)+'>'+str(frappe.utils.fmt_money(flt(srqty,3)))+'</td>'
+                    html2+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(srval))+'</td>'
                     
                     net=qtyinctn+srqty
                     snet=amount+srval
-                    html+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(net))+'</b></td>'
-                    html+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(snet))+'</b></td>'
+                    html2+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(net))+'</b></td>'
+                    html2+='<td class="text-right" '+str(sty)+' ><b>'+str(frappe.utils.fmt_money(snet))+'</b></td>'
 
                     ntot=netqty_tot[i]
                     netqty_tot[i]=float(net)+float(ntot)
@@ -198,7 +205,9 @@ def get_report(company,date_from,date_to):
                     saleramttot[i]=float(totsr)+float(srval) 
 
                     i+=1
-                html+='</tr>'
+                html2+='</tr>'
+                if fgf==1:
+                    html+=html2
             html+='<tr class="table-secondary"><th>Total</th>'
             j=0
             for total in saleqtytot:
@@ -216,69 +225,7 @@ def get_report(company,date_from,date_to):
     html+='</table></div>'
 
     #================== sales return ===========
-    html+='<div class="rephd">Sales Return: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From Date: '+str(frappe.utils.formatdate(date_from))+' To Date : '+str(frappe.utils.formatdate(date_to))+'</div>' 
-    html+='<div class="scrl" ><table class="table table-bordered" >'
-    saleqtytot=[]
-    saleamttot=[]
     
-    if date_range:
-        html+='<tr class="table-secondary"><th rowspan="2" style="width: 225px;">Items </th>'
-        for dr in date_range:
-            html+='<th colspan="2" style="text-align:center;font-weight:bold">'+str(frappe.utils.formatdate(dr.get('from'), "MMM yy"))+'</th>'
-            saleqtytot.append(0)
-            saleamttot.append(0)
-            
-        html+='</tr>'
-
-        html+='<tr class="table-secondary">'
-        for dr in date_range:
-            html+='<th>Qty</th><th>Amount</th>'            
-        html+='</tr>'
-
-        if itemss:
-            for itm in itemss:
-                html+='<tr>'
-                html+='<td>'+str(getitem_name(itm))+'</td>'
-                d=0
-                i=0
-                for dr in date_range:
-                    #if itm.item_code=='CG11111':
-                     #   d=1
-                    if ((i+1) % 2) == 0:                        
-                        sty=' style="background-color: #f3faff; border: 1px solid #ccc;" '
-                        
-                        
-                    else:                        
-                        sty=' style=" border: 1px solid #ccc;" '
-                        
-
-                    qtyinctn=0
-                    amount=0
-                    itmqty=range_ressr[i]
-                    if itmqty:
-                        for it in itmqty:
-                            if itm==it.item_code:
-                                if it.qty:
-                                    qtyinctn=float(it.qty)/360
-                                amount=it.amt
-                    html+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(flt(qtyinctn,3)))+'</td>'
-                    html+='<td class="text-right" '+str(sty)+' >'+str(frappe.utils.fmt_money(amount))+'</td>'
-
-                    tot=saleqtytot[i]
-                    saleqtytot[i]=float(tot)+float(qtyinctn)
-                    tots=saleamttot[i]
-                    saleamttot[i]=float(tots)+float(amount)    
-                    i+=1
-                html+='</tr>'
-            html+='<tr class="table-secondary"><th>Total</th>'
-            j=0
-            for total in saleqtytot:
-                 html+='<th class="text-right"><b>'+str(frappe.utils.fmt_money(flt(total,3)))+'</b></th>'
-                 html+='<th class="text-right"><b>'+str(frappe.utils.fmt_money(flt(saleamttot[j],3)))+'</b></th>'
-                 j+=1
-            html+='</tr>'
-        
-    html+='</table></div>'
 
     return html
 
