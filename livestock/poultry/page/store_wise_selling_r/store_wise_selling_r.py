@@ -9,22 +9,7 @@ def get_report(company,store):
     items_str="','".join(items)
     
     posted_on=getdate(nowdate())
-    sl_entrys= frappe.db.sql("""
-            SELECT
-                sum(actual_qty) as qty,item_code
-            FROM
-                `tabStock Ledger Entry` 
-            WHERE
-                company = '{0}' 
-                and actual_qty > 0 
-                and voucher_type='Stock Entry'
-                AND is_cancelled = 0 
-                AND posting_date < '{1}'
-                AND item_code in ('{2}')
-                and warehouse = '{3}'
-            GROUP BY
-                item_code
-            """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
+    sl_entrys=frappe.db.get_all('Bin',filters={'warehouse':store,'item_code':['in',items]},fields=['actual_qty as qty','item_code'])
     
     custsql=frappe.db.sql("""
             SELECT
@@ -53,6 +38,8 @@ def get_report(company,store):
     for ent in sl_entrys:
         qty=flt(ent.qty/360,3)
         total_ctn+=qty
+        if not qty:
+            continue
         html+='<tr><td>'+str(getitem_name(ent.item_code))+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(qty,3)))+'</td></tr>'
 
     html+='<tr><td>Total</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(total_ctn,3)))+'</b></td></tr>'
