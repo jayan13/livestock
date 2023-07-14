@@ -291,7 +291,7 @@ def get_report(company,store):
         
     html+='<div class="rephd">Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 300px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 300px;">Customer</th><th class="text-right">Debit</th><th class="text-right">Credit</th><th class="text-right">Balance Outstanding</th></tr>'
     html+='<tr><td>Total Outstanding</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand-retn,4)))+'</b></td></tr>'
     html+='</table>'
 
@@ -434,7 +434,7 @@ def get_report(company,store):
 
     html+='<div class="rephd">Customer Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
-    html+='<tr class="table-secondary"><th style="width: 600px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
+    html+='<tr class="table-secondary"><th style="width: 600px;">Customer</th><th class="text-right">Debit</th><th class="text-right">Credit</th><th class="text-right">Balance Outstanding</th></tr>'
     for cs in out_standing:
         html+='<tr><td>'+str(cs.party)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(cs.debit,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs.credit,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs.balance,4)))+'</td></tr>'
     
