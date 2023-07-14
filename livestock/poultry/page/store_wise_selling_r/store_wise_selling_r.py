@@ -271,68 +271,28 @@ def get_report(company,store):
 
     html+='</table>'
 
+    out_standing=frappe.db.sql(""" select party,sum(debit) as debit,sum(credit) as credit,(sum(debit)-sum(credit)) as balance from `tabGL Entry`
+                where company='{0}' 
+                and party_type='Customer'
+                and (posting_date <='{1}' or is_opening = 'Yes') 
+                and is_cancelled = 0
+                and party in ('{2}')
+                group by party order by balance desc """.format(company,posted_on,customersal),as_dict=1,debug=0)
     
-
-    out_standing= frappe.db.sql("""
-            SELECT sum(ot.outstanding_amount) as outstanding_amount,ot.customer from (
-            SELECT
-                s.outstanding_amount as outstanding_amount,s.customer as customer
-            FROM
-                `tabSales Invoice` s
-                left join `tabSales Invoice Item` si on si.parent=s.name
-            WHERE
-                s.company = '{0}'
-                and s.status not in ('Draft','Paid','Cancelled')                
-                AND s.docstatus = 1
-                and s.is_return!=1 
-                AND si.item_code in ('{2}')
-                and si.warehouse = '{3}' 
-                GROUP BY s.name ) as ot group by ot.customer
-            """.format(company,posted_on,items_str,store),as_dict=1,debug=0)
-            # AND YEAR(s.posting_date) = YEAR('{1}')
-    
-    out_standing_ret=frappe.db.sql("""
-            SELECT
-                sum(outstanding_amount) as outstanding_amount,customer
-            FROM
-                `tabSales Invoice` where
-                company = '{0}'                              
-                AND docstatus = 1
-                and is_return=1
-                and outstanding_amount < 0  
-                and customer in ('{2}')
-                group by customer
-                """.format(company,posted_on,customersal),as_dict=1,debug=0)
-                #and naming_series not in ('DISCOUNT-.####','BUSINESS-PROMO-.####')  AND YEAR(posting_date) = YEAR('{1}')
     
     outstand=0
     retn=0
-    cus_rows=[]
-    for cus in customer:
-        flg=0
-        row=[cus,0,0,0]
-        if out_standing:
-            for ot in out_standing:
-                if cus==ot.customer:
-                    outstand+=ot.outstanding_amount
-                    row[1]=ot.outstanding_amount
-                    flg=1
-
-        if out_standing_ret:
-            for re in out_standing_ret:
-                if cus==re.customer:
-                    retn+=re.outstanding_amount
-                    row[2]=re.outstanding_amount
-                    flg=1
-
-        if flg==1:
-            row[3]=row[1]+row[2]
-            cus_rows.append(row)
-    cus_rows=Sort(cus_rows)
+    balout=0
+    
+    for cus in out_standing:
+        outstand+=cus.debit
+        retn+=cus.credit
+        balout+=cus.balance
+        
     html+='<div class="rephd">Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
     html+='<tr class="table-secondary"><th style="width: 300px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
-    html+='<tr><td>Total Outstanding</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand+retn,4)))+'</b></td></tr>'
+    html+='<tr><td>Total Outstanding</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand-retn,4)))+'</b></td></tr>'
     html+='</table>'
 
     html+='<div class="rephd">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
@@ -475,10 +435,10 @@ def get_report(company,store):
     html+='<div class="rephd">Customer Outstanding Amount &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
     html+='<table class="table table-bordered" >'
     html+='<tr class="table-secondary"><th style="width: 600px;">Customer</th><th class="text-right">Outstanding</th><th class="text-right">Credit Note</th><th class="text-right">Balance Outstanding</th></tr>'
-    for cs in cus_rows:
-        html+='<tr><td>'+str(cs[0])+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(cs[1],4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs[2],4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs[3],4)))+'</td></tr>'
+    for cs in out_standing:
+        html+='<tr><td>'+str(cs.party)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(cs.debit,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs.credit,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(cs.balance,4)))+'</td></tr>'
     
-    html+='<tr><td>Total</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand+retn,4)))+'</b></td></tr>'
+    html+='<tr><td>Total</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(balout,4)))+'</b></td></tr>'
     html+='</table>'
     
     return html
@@ -494,3 +454,10 @@ def Sort(sub_li):
     sub_li.sort(key = lambda x: x[1],reverse=1)
     return sub_li
 
+def get_item_ctn_qty(item_code,stock_qty):
+    ctnqty=0   
+    cv=frappe.db.get_value('UOM Conversion Detail', {'parent': item_code,'uom':'Ctn'}, 'conversion_factor', as_dict=1,debug=0)
+    if stock_qty>0:
+        ctnqty=round(stock_qty/cv.conversion_factor,2)
+        
+    return ctnqty
