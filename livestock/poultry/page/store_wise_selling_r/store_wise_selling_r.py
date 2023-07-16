@@ -1,6 +1,5 @@
 import frappe
 from frappe.utils import getdate,add_days,get_first_day,get_last_day,nowdate,flt,date_diff
-@frappe.whitelist()
 
 @frappe.whitelist()
 def get_report(company,store):
@@ -440,8 +439,185 @@ def get_report(company,store):
     
     html+='<tr><td>Total</td><td class="text-right"><b>'+str(frappe.utils.fmt_money(flt(outstand,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(retn,4)))+'</b></td><td  class="text-right"><b>'+str(frappe.utils.fmt_money(flt(balout,4)))+'</b></td></tr>'
     html+='</table>'
-    
+    #----------------------------------------------------------
+    setting=frappe.db.get_value("Store Performance Report Setting",{'company':company,'store':store},['cost_center','name'], as_dict=1)
+    if setting:
+        exptot=0
+        html+='<div class="rephd">Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
+        html+='<table class="table table-bordered" >'
+        html+='<tr class="table-secondary"><th style="width: 600px;">Expense</th><th class="text-right">Today</th><th class="text-right">MTD</th><th class="text-right">YTD</th></tr>'
+        
+        cost_center=setting.cost_center.replace("'", "\\'")
+        vehicle_maintenance=get_accounts(setting.name,'vehicle_maintenance')
+        petty_cash_expenses=get_accounts(setting.name,'petty_cash_expenses')
+        vehicle_str="','".join(vehicle_maintenance)
+        petty_str="','".join(petty_cash_expenses)
+        
+        vehsql=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            and posting_date ='{1}'  
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,vehicle_str),as_dict=1,debug=0)
+
+        vehsqlm=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            AND MONTH(posting_date) = MONTH('{1}') and YEAR(posting_date) = YEAR('{1}') 
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,vehicle_str),as_dict=1,debug=0)
+
+        vehsqly=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            AND YEAR(posting_date) = YEAR('{1}')
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,vehicle_str),as_dict=1,debug=0)
+        if vehicle_maintenance:
+            for vm in vehicle_maintenance:
+                flg=1
+                html2='<tr><td>'+str(vm)+'</td>'
+
+                if vehsql:
+                    v=0
+                    for vv in vehsql:
+                        if vm==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                if vehsqlm:
+                    v=0
+                    for vv in vehsqlm:
+                        if vm==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                if vehsqly:
+                    v=0
+                    for vv in vehsqly:
+                        if vm==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                html2+='</tr>'
+                if flg==1:
+                    html+=html2
+
+        #----------------------------------------------------------
+        petsql=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            and posting_date ='{1}'  
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,petty_str),as_dict=1,debug=0)
+
+        petsqlm=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            AND MONTH(posting_date) = MONTH('{1}') and YEAR(posting_date) = YEAR('{1}') 
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,petty_str),as_dict=1,debug=0)
+
+        petsqly=frappe.db.sql(""" select account, sum(debit) as debit,sum(credit) as credit,sum(debit-credit) as exp
+            from `tabGL Entry`
+            where company='{0}' 
+            and account in ('{3}') 
+            and cost_center ='{2}' 
+            AND YEAR(posting_date) = YEAR('{1}')
+            and is_cancelled = 0 group by account
+            """.format(company,posted_on,cost_center,petty_str),as_dict=1,debug=1)
+        #frappe.msgprint(str(petsqly))
+        if petty_cash_expenses:
+            for ptty in petty_cash_expenses:
+                flg=0
+                html2='<tr><td>'+str(ptty)+'-hh</td>'
+
+                if petsql:
+                    v=0
+                    for vv in petsql:
+                        if ptty==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                if petsqlm:
+                    v=0
+                    for vv in petsqlm:
+                        if ptty==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                if petsqly:
+                    v=0
+                    for vv in petsqly:
+                        if ptty==vv.account:
+                            v=vv.exp
+                            if vv.exp != 0:
+                                flg=1
+                    html2+='<td class="text-right">'+str(frappe.utils.fmt_money(v))+'</td>'
+                else:
+                    html2+='<td class="text-right">0</td>'
+
+                html2+='</tr>'
+                
+                if flg==1:
+                    html+=html2
+
+        html+='</table>'    
     return html
+def get_accounts(parent,parentfield):
+    acc=[]
+    acsql=frappe.db.sql(""" select ex.account,a.is_group from `tabExpense Accounts` ex 
+        left join `tabAccount` a on a.name=ex.account 
+                where ex.parent='{0}' and ex.parentfield='{1}' """.format(parent,parentfield),as_dict=1,debug=0)
+    if acsql:
+        for ac in acsql:
+            if ac.is_group:
+                acc=acc+get_child_acc(ac.account)
+            else:
+                acc.append(ac.account.replace("'", "\\'"))
+    return acc
+
+def get_child_acc(account):
+    accc=[]
+    acsql=frappe.db.sql(""" select name,is_group from  `tabAccount` where parent_account='{0}' """.format(account),as_dict=1,debug=0)
+    if acsql:
+        for ac in acsql:
+            if ac.is_group:
+                accc=accc+get_child_acc(ac.name)
+            else:
+                accc.append(ac.name.replace("'", "\\'"))
+    return accc
+
 
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
