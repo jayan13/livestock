@@ -343,10 +343,10 @@ def get_report(company,store):
             """.format(company,posted_on,cost_center),as_dict=1,debug=0)
 
     html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_sale,4)))+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(sale_prev_year,4)))+'</td></tr>'
-    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale)+'</td><td  class="text-right">'+str(avgthis_sale)+'</td><td class="text-right">'+str(flt(prev_mth_avg_sale,4))+'</td><td  class="text-right">'+str(flt(avgyear_sale,4))+'</td><td  class="text-right">'+str(flt(prev_year_avg,4))+'</td></tr>'
-    html+='<tr><td>Discount till Prev month</td><td class="text-right"></td><td></td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_mth_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_yr_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(prev_year_dis))+'</td></tr>'
-    html+='<tr><td>Average Discount till Prev month</td><td class="text-right"></td><td></td><td  class="text-right">'+str(avg_dis_last)+'</td><td  class="text-right">'+str(avg_dis_year)+'</td><td  class="text-right">'+str(previ_year_avg_dis)+'</td></tr>'
-    html+='<tr><td>Avg SP after discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(avg_dis_sale)+'</td><td  class="text-right">'+str(avg_disy_sale)+'</td><td  class="text-right">'+str(previ_year_avg_dis_af)+'</td></tr>'
+    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(flt(avgtoday_sale,4))+'</td><td  class="text-right">'+str(flt(avgthis_sale,4))+'</td><td class="text-right">'+str(flt(prev_mth_avg_sale,4))+'</td><td  class="text-right">'+str(flt(avgyear_sale,4))+'</td><td  class="text-right">'+str(flt(prev_year_avg,4))+'</td></tr>'
+    html+='<tr><td>Discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_mth_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_yr_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(prev_year_dis))+'</td></tr>'
+    html+='<tr><td>Average Discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(flt(avg_dis_last,4))+'</td><td  class="text-right">'+str(flt(avg_dis_year,4))+'</td><td  class="text-right">'+str(flt(previ_year_avg_dis,4))+'</td></tr>'
+    html+='<tr><td>Avg SP after discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(flt(avg_dis_sale,4))+'</td><td  class="text-right">'+str(flt(avg_disy_sale,4))+'</td><td  class="text-right">'+str(flt(previ_year_avg_dis_af,4))+'</td></tr>'
 
     html+='</table>'
 
@@ -465,7 +465,7 @@ def get_report(company,store):
     if year_amt_org:
         avgyear_sale_org=year_amt_org/year_qty_org
 
-    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale_org)+'</td><td  class="text-right">'+str(avgthis_sale_org)+'</td><td  class="text-right">'+str(avgyear_sale_org)+'</td><td  class="text-right">'+str(prev_year_org_avg)+'</td></tr>'
+    html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(flt(avgtoday_sale_org,4))+'</td><td  class="text-right">'+str(flt(avgthis_sale_org,4))+'</td><td  class="text-right">'+str(flt(avgyear_sale_org,4))+'</td><td  class="text-right">'+str(flt(prev_year_org_avg,4))+'</td></tr>'
     html+='</table>'
 
     html+='<div class="rephd">Organic &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>' 
