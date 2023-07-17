@@ -328,6 +328,20 @@ def get_report(company,store):
 
     previ_year_avg_dis_af=(sale_prev_year+prev_year_dis)/sale_prev_qty
 
+    wthout_cost= frappe.db.sql("""
+            SELECT
+                count(s.name) as cnt
+            FROM
+                `tabSales Invoice` s
+            WHERE
+                s.company = '{0}'                               
+                AND s.docstatus = 1
+                and s.is_return=1
+                and s.cost_center is null
+                and s.naming_series in ('DISCOUNT-.####','BUSINESS-PROMO-.####') 
+                AND  YEAR(s.posting_date) between YEAR(DATE_SUB('{1}', INTERVAL 2 YEAR)) and YEAR('{1}')
+            """.format(company,posted_on,cost_center),as_dict=1,debug=0)
+
     html+='<tr><td>Sales</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(today_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(this_sale,4)))+'</td><td class="text-right">'+str(frappe.utils.fmt_money(flt(prev_mth_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(year_sale,4)))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(flt(sale_prev_year,4)))+'</td></tr>'
     html+='<tr><td>Average Selling Price</td><td class="text-right">'+str(avgtoday_sale)+'</td><td  class="text-right">'+str(avgthis_sale)+'</td><td class="text-right">'+str(flt(prev_mth_avg_sale,4))+'</td><td  class="text-right">'+str(flt(avgyear_sale,4))+'</td><td  class="text-right">'+str(flt(prev_year_avg,4))+'</td></tr>'
     html+='<tr><td>Discount till Prev month</td><td class="text-right"></td><td></td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_mth_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(cur_yr_dis))+'</td><td  class="text-right">'+str(frappe.utils.fmt_money(prev_year_dis))+'</td></tr>'
@@ -335,6 +349,12 @@ def get_report(company,store):
     html+='<tr><td>Avg SP after discount</td><td class="text-right"></td><td></td><td  class="text-right">'+str(avg_dis_sale)+'</td><td  class="text-right">'+str(avg_disy_sale)+'</td><td  class="text-right">'+str(previ_year_avg_dis_af)+'</td></tr>'
 
     html+='</table>'
+
+    if wthout_cost:
+        if wthout_cost[0].cnt==1:
+            html+='<div style="color: #7a7a7a;font-size: 12px;"> * There is 1 (Discount or Promotional) Record, without cost center </div>'
+        else:
+            html+='<div style="color: #7a7a7a;font-size: 12px;"> * There are '+str(wthout_cost[0].cnt)+' (Discount or Promotional) Records, without cost center </div>'
 
     out_standing=frappe.db.sql(""" select party,sum(debit) as debit,sum(credit) as credit,(sum(debit)-sum(credit)) as balance from `tabGL Entry`
                 where company='{0}' 
