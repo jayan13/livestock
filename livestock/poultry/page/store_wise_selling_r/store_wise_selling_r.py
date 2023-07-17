@@ -596,7 +596,7 @@ def get_report(company,store):
             """.format(company,posted_on,cost_center,vehicle_str),as_dict=1,debug=0)
         if vehicle_maintenance:
             for vm in vehicle_maintenance:
-                flg=1
+                flg=0
                 html2='<tr><td>'+str(vm)+'</td>'
 
                 if vehsql:
