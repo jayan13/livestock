@@ -69,8 +69,15 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry = frappe.new_doc("Stock Entry")    
 	stock_entry.company = lbatch.company
 	stock_entry.letter_head = frappe.db.get_value('Company',lbatch.company,'default_letter_head') or 'No Letter Head'
+	item_account_details = get_item_defaults(sett.base_row_material, sett.company)
+	batch_no=''
 	if sett.base_row_material==sett.finished_product:
 		stock_entry.stock_entry_type = "Material Transfer"
+		if item_account_details.has_batch_no:		
+			batch=frappe.db.sql(""" select i.warehouse,i.batch_no from `tabPurchase Receipt` p left join `tabPurchase Receipt Item` i on i.parent=p.name 
+			where p.docstatus=1 and i.item_code='{0}' and p.project='{1}' """.format(sett.base_row_material,lbatch.project),as_dict=1)
+			if batch:
+				batch_no=batch[0].batch_no
 	else:
 		stock_entry.stock_entry_type = "Repack"
 
@@ -82,7 +89,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 
 	
 	if sett.base_row_material:
-		item_account_details = get_item_defaults(sett.base_row_material, sett.company)
+		
 		stock_uom = item_account_details.stock_uom
 		conversion_factor = get_conversion_factor(sett.base_row_material, stock_uom).get("conversion_factor")
 		cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
@@ -113,6 +120,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
                         "amount":amount,  
                         "transfer_qty":transfer_qty,
                         'conversion_factor': flt(conversion_factor),
+						'batch_no':batch_no,
                                   
         })
 	else:
@@ -126,19 +134,20 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		expense_account=sett.expense_account or item_account_details.get("expense_account")                                
 		precision = cint(frappe.db.get_default("float_precision")) or 3		
 		amount=flt(int(transfer_qty) * flt(base_row_rate), precision)
-		batch_no=''
+		
 		if item_account_details.has_batch_no:
-			manufacture_date=posting_date.strftime("%d-%m-%Y")
-			batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
-			if not frappe.db.exists("Batch", {"name": batch_no}):
-				ibatch = frappe.new_doc("Batch")
-				ibatch.batch_id=batch_no
-				ibatch.item=sett.finished_product
-				ibatch.item_name=item_account_details.name
-				ibatch.batch_qty=transfer_qty
-				ibatch.manufacturing_date=posting_date
-				ibatch.stock_uom=stock_uom
-				ibatch.insert()	
+			if not batch_no:
+				manufacture_date=posting_date.strftime("%d-%m-%Y")
+				batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
+				if not frappe.db.exists("Batch", {"name": batch_no}):
+					ibatch = frappe.new_doc("Batch")
+					ibatch.batch_id=batch_no
+					ibatch.item=sett.finished_product
+					ibatch.item_name=item_account_details.name
+					ibatch.batch_qty=transfer_qty
+					ibatch.manufacturing_date=posting_date
+					ibatch.stock_uom=stock_uom
+					ibatch.insert()	
 		stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
 							'item_code': sett.finished_product,
@@ -210,15 +219,22 @@ def create_stock_entry_mortality(item,parent_field=''):
 	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 	batch_no=''
-	rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse  from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
-	d.item_code='{0}' and s.manufacturing_type='Layer Chicken' and 
-	s.docstatus=1 and s.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
-	row_material_target_warehouse=sett.row_material_target_warehouse
-	if rearbatch:
-		batch_no=rearbatch[0].batch_no
-		row_material_target_warehouse=rearbatch[0].t_warehouse or sett.row_material_target_warehouse
-
 	item_account_details = get_item_defaults(item_code, sett.company)
+	row_material_target_warehouse=sett.row_material_target_warehouse
+	if item_account_details.has_batch_no:
+
+		if parent_field=='laying_mortality':
+			batch=frappe.db.sql("""select d.batch_no,d.t_warehouse as warehouse  from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
+			d.item_code='{0}' and s.manufacturing_type='Layer Chicken' and 
+			s.docstatus=1 and s.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
+		else:
+			batch=frappe.db.sql(""" select i.warehouse,i.batch_no from `tabPurchase Receipt` p left join `tabPurchase Receipt Item` i on i.parent=p.name 
+			where p.docstatus=1 and i.item_code='{0}' and p.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
+
+		if batch:
+			batch_no=batch[0].batch_no
+			row_material_target_warehouse=batch[0].warehouse or sett.row_material_target_warehouse
+
 	expense_account=sett.mortality_expense_account or item_account_details.get("expense_account")
 	stock_uom = item_account_details.stock_uom
 	conversion_factor = get_conversion_factor(item_code, uom).get("conversion_factor")
