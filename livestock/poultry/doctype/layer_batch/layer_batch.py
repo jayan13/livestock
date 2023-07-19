@@ -210,7 +210,7 @@ def create_stock_entry_mortality(item,parent_field=''):
 	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
 	batch_no=''
-	rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse as batch_no from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
+	rearbatch=frappe.db.sql("""select d.batch_no,d.t_warehouse  from `tabStock Entry Detail` d left join `tabStock Entry` s on s.name=d.parent where 
 	d.item_code='{0}' and s.manufacturing_type='Layer Chicken' and 
 	s.docstatus=1 and s.project='{1}' """.format(item_code,lbatch.project),as_dict=1)
 	row_material_target_warehouse=sett.row_material_target_warehouse
