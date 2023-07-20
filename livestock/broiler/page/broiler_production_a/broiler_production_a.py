@@ -33,9 +33,11 @@ def get_report(company,date_from,date_to):
     html+='<div class="scrl" ><table class="table table-bordered" id="prod">'
     proddatetot=[]
     range_res=[]
+    
     if date_range:
         html+='<tr class="table-secondary"><th style="width: 250px;">Items </th>'
         for dr in date_range:
+            
             html+='<th style="text-align:center;font-weight:bold">'+str(frappe.utils.formatdate(dr.get('from'), "MMM yy"))+'(Weight in Kg)</th>'
             proddatetot.append(0)
             resprd=frappe.db.sql(""" SELECT sum(qty*conversion_factor*weight_per_unit) as qty,weight_per_unit,`tabStock Entry Detail`.item_code 
@@ -54,6 +56,7 @@ def get_report(company,date_from,date_to):
                     GROUP BY `tabStock Entry Detail`.item_code """.format(items_str,company,dr.get('from'),dr.get('to')),as_dict=1,debug=0)
             range_res.append(resprd)
         html+='</tr>'
+        #frappe.msgprint(str(range_res))
         if items:
             for itm in items:
                 html2='<tr>'
@@ -62,7 +65,7 @@ def get_report(company,date_from,date_to):
                 i=0
                 fg=0
                 for dr in date_range:
-                    
+                    qtyinctn=0
                     itmqty=range_res[i]
                     if itmqty:
                         for it in itmqty:
