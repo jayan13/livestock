@@ -782,7 +782,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                                 ind_expanse+=float(exp)/float(batchcount[0].cnt)
 
                 lay_ind_expanse_tot+=ind_expanse
-                col_tot+=ind_expanse
+                #col_tot+=ind_expanse #commemted on 21-07-2023
                 lay_ind_expanse_data.update({'title':re.title,'amt':ind_expanse})
                 lay_ind_expanse_item.append(lay_ind_expanse_data)
             lay_ind_expanse.append(lay_ind_expanse_item)
