@@ -30,8 +30,16 @@ class BroilerBatch(Document):
 		pjt=frappe.get_doc("Project", self.project)
 		pjt.broiler_batch=self.name
 		pjt.save()
+		
+	def before_rename(doctype,old,new,merge):
+		name=frappe.db.get_value('Project',new,'name')
+		if name:
+			frappe.throw('Project with name '+str(new)+' Exist, Please Choose Another name or Delete Existing Project')
+		else:
+			frappe.rename_doc('Project', old, new)
+			frappe.db.set_value('Broiler Batch', old, 'project', new)
 
-	def on_update(self):
+	def on_update(self):		
 		if len(self.feed)>0:
 			stot=0
 			ftot=0
@@ -48,3 +56,4 @@ class BroilerBatch(Document):
 			if self.status=='Completed':
 				pjt.expected_end_date=nowdate()
 			pjt.save()
+			

@@ -31,6 +31,15 @@ class LayerBatch(Document):
 		#pjt.broiler_batch=self.name
 		#pjt.save()
 		pass
+
+	def before_rename(doctype,old,new,merge):
+		name=frappe.db.get_value('Project',new,'name')
+		if name:
+			frappe.throw('Project with name '+str(new)+' Exist, Please Choose Another name or Delete Existing Project')
+		else:
+			frappe.rename_doc('Project', old, new)
+			frappe.db.set_value('Layer Batch', old, 'project', new)
+
 	def on_update(self):
 		pjt=frappe.get_doc("Project", self.name)
 		
