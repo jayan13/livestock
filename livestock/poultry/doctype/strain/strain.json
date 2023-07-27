@@ -10,7 +10,8 @@
   "strain",
   "strain_category",
   "rearing_period",
-  "laying_period"
+  "laying_period",
+  "broiler_period"
  ],
  "fields": [
   {
@@ -34,15 +35,23 @@
    "options": "Rearing Period Performance"
   },
   {
+   "depends_on": "eval:doc.strain_category=='Layer'",
    "fieldname": "laying_period",
    "fieldtype": "Table",
    "label": "Laying Period",
    "options": "Laying Period Performance"
+  },
+  {
+   "depends_on": "eval:doc.strain_category=='Broiler'",
+   "fieldname": "broiler_period",
+   "fieldtype": "Table",
+   "label": "Broiler Period",
+   "options": "Broiler Period Performance"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-10 15:40:33.062701",
+ "modified": "2023-07-27 17:33:04.984694",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "strain",

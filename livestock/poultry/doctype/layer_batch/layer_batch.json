@@ -33,12 +33,16 @@
   "import_items_from_material_transfer",
   "rearing_feed",
   "add_rearing_feed",
+  "issue_rearing_feed",
   "rearing_medicine",
   "add_rearing_medicine",
+  "issue_rearing_medicine",
   "rearing_items",
   "add_rearing_items",
+  "issue_rearing_items",
   "rearing_daily_mortality",
   "add_rearing_mortality",
+  "issue_rearing_mortality",
   "total_mortaliy",
   "rearing_temperature",
   "add_rearing_temperature",
@@ -423,6 +427,30 @@
    "fieldtype": "Date",
    "label": "Completed Date",
    "mandatory_depends_on": "eval:(doc.status==\"Completed\")"
+  },
+  {
+   "depends_on": "eval:doc.item_processed==0",
+   "fieldname": "issue_rearing_feed",
+   "fieldtype": "Button",
+   "label": "Issue Feed"
+  },
+  {
+   "depends_on": "eval:doc.item_processed==0",
+   "fieldname": "issue_rearing_medicine",
+   "fieldtype": "Button",
+   "label": "Issue Medicine"
+  },
+  {
+   "depends_on": "eval:doc.item_processed==0",
+   "fieldname": "issue_rearing_items",
+   "fieldtype": "Button",
+   "label": "Issue items"
+  },
+  {
+   "depends_on": "eval:doc.item_processed==0",
+   "fieldname": "issue_rearing_mortality",
+   "fieldtype": "Button",
+   "label": "Submit Mortality"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -440,7 +468,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2023-05-29 11:21:05.231931",
+ "modified": "2023-06-21 18:21:46.278492",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Batch",

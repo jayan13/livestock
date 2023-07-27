@@ -26,13 +26,14 @@ MyPage =Class.extend({
 		
 			let field = this.page.add_field({
 			label: 'Company',
-			fieldtype: 'Select',
+			fieldtype: 'Link',
 			fieldname: 'company',
-			options: [],
+			options: 'Company',
 			change() {
 				load_batch();
 				get_report();
-			}
+			},
+			default:'ABU DHABI POULTRY FARM - SOLE PROPRIETORSHIP L.L.C.'
 		});
 		
 		frappe.call({
@@ -73,22 +74,24 @@ MyPage =Class.extend({
 		this.page.add_inner_button('Print', () => print_rep());
 		this.page.add_inner_button('Download', () => download_rep());
 		let load_batch=function(){
-			$('[data-fieldname="batch"][type="text"]').empty();
-			frappe.call({
-				method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_batch_list',
-				args: {company: field.get_value(),},
-				callback: function (r) {
-					
-				  if (r.message) {
-					  $('[data-fieldname="batch"][type="text"]').append($("<option></option>").attr("value", "").text("")); 
-					  $.each( r.message.batchs, function( key, value ) {					
-						  
-						  $('[data-fieldname="batch"][type="text"]').append($("<option></option>").attr("value", value.name).text(value.name)); 
-					  }); 
-					  
-				  }
-				},
-			  });
+			if(field.get_value()){
+				$('[data-fieldname="batch"][type="text"]').empty();
+				frappe.call({
+					method: 'livestock.poultry.page.poultry_dashbord.poultry_dashbord.get_batch_list',
+					args: {company: field.get_value(),},
+					callback: function (r) {
+						
+					if (r.message) {
+						$('[data-fieldname="batch"][type="text"]').append($("<option></option>").attr("value", "").text("")); 
+						$.each( r.message.batchs, function( key, value ) {					
+							
+							$('[data-fieldname="batch"][type="text"]').append($("<option></option>").attr("value", value.name).text(value.name)); 
+						}); 
+						
+					}
+					},
+				});
+			}
 		}
 		
 /*
@@ -104,6 +107,7 @@ MyPage =Class.extend({
 		$(frappe.render_template("poultry_dashbord",data)).appendTo(this.page.main);
 
 		//$("#exp_data").html("test");
+		load_batch();
 		
 		$('#myTab a').on('click', function (e) {
 			

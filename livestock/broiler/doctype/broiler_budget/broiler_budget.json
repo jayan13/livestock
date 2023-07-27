@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:batch",
+ "creation": "2023-07-24 09:16:38.783939",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch",
+  "doc",
+  "feed",
+  "medicine",
+  "vaccine",
+  "wages",
+  "others",
+  "production",
+  "sales"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "label": "Batch",
+   "options": "Broiler Batch",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "doc",
+   "fieldtype": "Float",
+   "label": "DOC"
+  },
+  {
+   "default": "0",
+   "fieldname": "production",
+   "fieldtype": "Float",
+   "label": "Production"
+  },
+  {
+   "default": "0",
+   "fieldname": "sales",
+   "fieldtype": "Float",
+   "label": "Sales"
+  },
+  {
+   "default": "0",
+   "fieldname": "feed",
+   "fieldtype": "Float",
+   "label": "Feed"
+  },
+  {
+   "default": "0",
+   "fieldname": "medicine",
+   "fieldtype": "Float",
+   "label": "Medicine"
+  },
+  {
+   "default": "0",
+   "fieldname": "vaccine",
+   "fieldtype": "Float",
+   "label": "Vaccine"
+  },
+  {
+   "default": "0",
+   "fieldname": "wages",
+   "fieldtype": "Float",
+   "label": "Wages"
+  },
+  {
+   "default": "0",
+   "fieldname": "others",
+   "fieldtype": "Float",
+   "label": "Others"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-07-24 09:33:48.581629",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "Broiler Budget",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

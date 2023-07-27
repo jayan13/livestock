@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-27 17:09:25.810884",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "age",
+  "weight",
+  "daily_gain",
+  "avg_daily_gain",
+  "cum_feed_conversion",
+  "daily_feed_intake",
+  "cum_feed_intake",
+  "fcr"
+ ],
+ "fields": [
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Age (days)"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight (g)",
+   "precision": "3"
+  },
+  {
+   "fieldname": "daily_gain",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Daily Gain (g)",
+   "precision": "3"
+  },
+  {
+   "fieldname": "avg_daily_gain",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Avg. Daily Gain (g)",
+   "precision": "3"
+  },
+  {
+   "fieldname": "cum_feed_conversion",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Cum. Feed Conversion",
+   "precision": "3"
+  },
+  {
+   "fieldname": "daily_feed_intake",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Daily Feed Intake (g)",
+   "precision": "3"
+  },
+  {
+   "fieldname": "cum_feed_intake",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Cum. Feed Intake (g)",
+   "precision": "3"
+  },
+  {
+   "fieldname": "fcr",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "FCR",
+   "precision": "3"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-07-27 17:09:25.810884",
+ "modified_by": "Administrator",
+ "module": "Broiler",
+ "name": "Broiler Period Performance",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

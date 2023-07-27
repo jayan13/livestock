@@ -15,13 +15,17 @@
   "base_row_material",
   "row_material_target_warehouse",
   "medicine_warehouse",
+  "medicine_expense_account",
   "column_break_6",
   "other_item_warehouse",
+  "other_items_expense_account",
   "finished_product",
   "product_target_warehouse",
   "cull",
   "cull_target_warehouse",
-  "feed_warehouse"
+  "mortality_expense_account",
+  "feed_warehouse",
+  "feed_expense_account"
  ],
  "fields": [
   {
@@ -106,11 +110,35 @@
    "fieldtype": "Link",
    "label": "Stock Adjustment Account(While Manufacture Entry)",
    "options": "Account"
+  },
+  {
+   "fieldname": "feed_expense_account",
+   "fieldtype": "Link",
+   "label": "Feed Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "mortality_expense_account",
+   "fieldtype": "Link",
+   "label": "Mortality Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "medicine_expense_account",
+   "fieldtype": "Link",
+   "label": "Medicine Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "other_items_expense_account",
+   "fieldtype": "Link",
+   "label": "Other Items Expense Account",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-03 15:47:05.020866",
+ "modified": "2023-06-20 01:19:22.424405",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Rearing Shed",

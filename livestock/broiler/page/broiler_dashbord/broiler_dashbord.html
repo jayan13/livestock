@@ -1,0 +1,92 @@
+<style>
+  .table th:first-child,
+.table td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #d5d7d9;
+  color: #373737;
+  border-color: #b0b5b9;
+
+}
+.table th{font-weight: normal;}
+.table-secondary td,.table-secondary th {font-weight: bold;}
+</style>
+<div id="report_egg" style="background-color:#fff;width:100%; padding:14px;">
+  
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link " id="budget-tab" data-toggle="tab" href="#budget" role="tab" aria-controls="budget" aria-selected="false">Budget </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" id="rearing-tab" data-toggle="tab" href="#rearing" role="tab" aria-controls="rearing" aria-selected="true">Broiler Production Costs</a>
+    </li>
+    
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="mortality-tab" data-toggle="tab" href="#mortality" role="tab" aria-controls="mortality" aria-selected="false">Mortality Graph</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="feed-tab" data-toggle="tab" href="#feed" role="tab" aria-controls="feed" aria-selected="false">Feed Graph</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="weight-tab" data-toggle="tab" href="#weight" role="tab" aria-controls="weight" aria-selected="false">Weight Graph</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" id="performance-tab" data-toggle="tab" href="#performance" role="tab" aria-controls="performance" aria-selected="false">FCR</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade" id="budget" role="tabpanel" aria-labelledby="budget-tab">
+      
+     <div style="min-height:100px;width:100%;padding:4px;" id="bud" >
+      <span style="padding:15px; ;"><b>Budget</b></span>
+      <table class="table table-bordered" id="budgets">
+        
+      </table>
+     </div> 
+
+    </div>
+    <div class="tab-pane fade show active" id="rearing" role="tabpanel" aria-labelledby="rearing-tab">
+      <div style="min-height:100px;width:100%;padding:4px;overflow-x: auto;" id="rer">
+        <span style="padding:15px; ;"><b>Broiler Production Costs</b></span>
+        <table class="table table-bordered" id="rer_exp">
+          
+        </table>
+      </div>
+      <div id="rear-chart" > </div>
+      
+    </div>
+    
+    <div class="tab-pane fade" id="mortality" role="tabpanel" aria-labelledby="mortality-tab">
+      <span style="padding:25px; display: block;font-size: 16px;"><b>Accumulated Mortality</b></span>
+      <div id="rear-mortality" > </div>
+      
+    </div>
+
+    <div class="tab-pane fade" id="feed" role="tabpanel" aria-labelledby="feed-tab">
+      <span style="padding:25px; display: block;font-size: 16px;"><b>Feed Intake</b></span>
+      <div id="rear-feed" > </div>
+      
+    </div>
+
+    <div class="tab-pane fade" id="weight" role="tabpanel" aria-labelledby="weight-tab">
+      <span style="padding:25px; display: block;font-size: 16px;"><b>Weight Gain</b></span>
+      <div id="rear-weight" > </div>
+      
+    </div>
+
+    <div class="tab-pane fade" id="performance" role="tabpanel" aria-labelledby="performance-tab">
+      <span style="padding:25px; display: block;font-size: 16px;"><b>FCR</b></span>
+      <div id="layer-performance" > </div>
+      
+    </div>
+    
+  </div>
+  
+
+
+    
+
+    
+    
+</div>
+    

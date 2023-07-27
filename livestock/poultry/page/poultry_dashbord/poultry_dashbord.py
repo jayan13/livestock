@@ -600,7 +600,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             for itm in layer.laying_feed:
                 feed.append(itm.item_code)
                     
-            feeds="','".join(feed)
+            feeds="','".join(frappe.utils.unique(feed))
             feedsql=frappe.db.sql(""" select IFNULL(sum(d.amount), 0) as amount from `tabStock Entry Detail` d left join `tabStock Entry` s 
                 on d.parent=s.name where s.stock_entry_type='Material Issue' and s.posting_date 
                 between '{0}' and '{1}' and  s.docstatus=1 and d.item_code in ('{2}') and s.project='{3}' 
@@ -620,7 +620,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
                 if itm.item_code in vaccine_list:
                     vacc.append(itm.item_code)
                 
-            vaccs="','".join(vacc)
+            vaccs="','".join(frappe.utils.unique(vacc))
             vaccsql=frappe.db.sql(""" select IFNULL(sum(d.amount), 0) as amount from `tabStock Entry Detail` d left join `tabStock Entry` s 
                 on d.parent=s.name where s.stock_entry_type='Material Issue' and s.posting_date 
                 between '{0}' and '{1}' and  s.docstatus=1 and d.item_code in ('{2}') and s.project='{3}' 
@@ -636,7 +636,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             for itm in layer.laying_medicine:                
                 if itm.item_code not in vaccine_list:
                     med.append(itm.item_code)
-            meds="','".join(med)
+            meds="','".join(frappe.utils.unique(med))
             medsql=frappe.db.sql(""" select IFNULL(sum(d.amount), 0) as amount from `tabStock Entry Detail` d left join `tabStock Entry` s 
                 on d.parent=s.name where s.stock_entry_type='Material Issue' and s.posting_date 
                 between '{0}' and '{1}' and  s.docstatus=1 and d.item_code in ('{2}') and s.project='{3}' 
@@ -657,7 +657,7 @@ where p.posting_date between '{0}' and '{1}' and i.item_code in('{2}','{3}') and
             oth=[]
             for itm in layer.laying_items:
                 oth.append(itm.item_code)
-            oths="','".join(oth)
+            oths="','".join(frappe.utils.unique(oth))
             othsql=frappe.db.sql(""" select IFNULL(sum(d.amount), 0) as amount from `tabStock Entry Detail` d left join `tabStock Entry` s 
                 on d.parent=s.name where s.stock_entry_type='Material Issue' and s.posting_date 
                 between '{0}' and '{1}' and  s.docstatus=1 and d.item_code in ('{2}') and s.project='{3}' 
@@ -1943,7 +1943,7 @@ def get_lay_feed_graph(batch,period):
          #  break
         mort=0
         for mo in mortality:
-            if wkd<=mo.wk:
+            if mo.wk<=wkd:
                 mort+=float(mo.mort)
             
 
@@ -2012,7 +2012,7 @@ def get_rear_feed_graph(batch,period):
         
         mort=0
         for mo in mortality:
-            if wkd<=mo.wk:
+            if mo.wk<=wkd:
                 mort+=float(mo.mort)
             
         feed=0
@@ -2081,7 +2081,7 @@ def get_lay_performance(batch,period):
          #  break
         mort=0
         for mo in mortality:
-            if wkd<=mo.wk:
+            if mo.wk<=wkd:
                 mort+=float(mo.mort)
             
 

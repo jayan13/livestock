@@ -331,7 +331,49 @@ frappe.ui.form.on("Feed",
                                     } 
                             }
                     });
-            } 
+            },starter_qty(frm, cdt, cdn) 
+            { 
+				var d = locals[cdt][cdn];
+				var ftotal=0;
+				var stotal=0;
+				frm.doc.feed.forEach(function(d) { 
+					if(d.finisher_item)
+					{
+						ftotal += d.finisher_qty; 
+					}
+					if(d.starter_item)
+					{
+						stotal += d.starter_qty; 
+					}
+					});
+
+				frm.set_value('total_finisher_qty', ftotal);
+				frm.set_value('total_starter_qty', stotal);
+				refresh_field('total_finisher_qty');
+				refresh_field('total_starter_qty');
+				
+			},
+		finisher_qty(frm, cdt, cdn) 
+            { 	var d = locals[cdt][cdn];
+				var ftotal=0;
+				var stotal=0;
+				frm.doc.feed.forEach(function(d) { 
+					if(d.finisher_item)
+					{
+						ftotal += d.finisher_qty; 
+					}
+					if(d.starter_item)
+					{
+						stotal += d.starter_qty; 
+					}
+					});
+
+				frm.set_value('total_finisher_qty', ftotal);
+				frm.set_value('total_starter_qty', stotal);
+				refresh_field('total_finisher_qty');
+				refresh_field('total_starter_qty');
+				
+			} 
 });
 
 frappe.ui.form.on("Vaccine", 

@@ -10,6 +10,7 @@
   "evening",
   "morning",
   "total",
+  "issue",
   "remark",
   "rate",
   "conversion_factor",
@@ -75,12 +76,20 @@
    "fieldtype": "Data",
    "label": "Stock Entry",
    "read_only": 1
+  },
+  {
+   "default": "No",
+   "fieldname": "issue",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Issued",
+   "options": "No\nYes"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-06-14 19:06:15.491506",
+ "modified": "2023-06-21 18:32:20.597514",
  "modified_by": "Administrator",
  "module": "Poultry",
  "name": "Layer Mortality",
