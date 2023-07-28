@@ -826,8 +826,9 @@ def get_rear_weight_graph(batch):
     daycnt=date_diff(getdate(bth.end_date),date)+1
     stdweight=frappe.db.get_all('Broiler Period Performance',filters={'parent':strain},fields=['age','weight','daily_gain','avg_daily_gain'],order_by='age')
     
-    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') as wk,IFNULL(weight,0) as weight FROM  `tabWeight` 
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') as wk,IFNULL(weight,0) as weight,IFNULL(lag(weight,1) over(order by `date`),0) as prev_weight FROM  `tabWeight` 
     WHERE parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+   
    
     actmort=[]
     for x in range(daycnt):
@@ -835,11 +836,12 @@ def get_rear_weight_graph(batch):
 
         for ac in stdweight:
             if ac.age==x:               
-                rx.update({'weight':ac.weight})
-
+                rx.update({'weight':ac.daily_gain})
+        wgain=0
         for ac in actqry:
             if ac.wk==x:
-                rx.update({'act_weight':ac.weight})
+                wgain=ac.weight-ac.prev_weight
+                rx.update({'act_weight':wgain})
     
         actmort.append(rx)
         
@@ -855,6 +857,15 @@ def get_frc_graph(batch):
     daycnt=date_diff(getdate(bth.end_date),date)+1
     stdfcr=frappe.db.get_all('Broiler Period Performance',filters={'parent':strain},fields=['age','fcr'],order_by='age')
     
+    actqry=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') as wk,IFNULL(starter_qty,0)+IFNULL(finisher_qty,0) as qty FROM  `tabFeed` 
+    WHERE parent='{0}' and `date` >='{1}' order by wk """.format(batch,date),as_dict=1,debug=0)
+   
+    mortality=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') as wk,IFNULL(total,0) as mort FROM  `tabMortality` 
+    WHERE  parent='{0}' and `date` >='{1}' order by wk """.format(batch,date),as_dict=1,debug=0)
+
+    weight=frappe.db.sql(""" SELECT DATEDIFF(`date`,'{1}') as wk,IFNULL(weight,0) as weight,IFNULL(lag(weight,1) over(order by `date`),0) as prev_weight FROM  `tabWeight` 
+    WHERE parent='{0}' and `date` >='{1}' GROUP BY wk order by wk """.format(batch,date),as_dict=1,debug=0)
+    
     actmort=[]
     for x in range(daycnt):
         rx={'age':x,'fcr':0,'act_fcr':0}
@@ -863,9 +874,30 @@ def get_frc_graph(batch):
             if ac.age==x:               
                 rx.update({'fcr':ac.fcr})
 
-        """for ac in actqry:
-            if ac.wk==x:
-                rx.update({'act_fcr':ac.weight})"""
+        mort=0
+        livechick=0
+        for mo in mortality:
+            if mo.wk<=x:
+                mort+=float(mo.mort)
+        
+        livechick+=float(doc_placed)-float(mort)
+
+        feed=0
+        qty=0
+        for ac in actqry:
+            if ac.wk<=x:
+                qty+=ac.qty
+                
+        if qty:
+            feed=float(qty*50000)/float(livechick)
+
+        for we in weight:
+            fcr=0
+            if we.wk==x:
+                fcr=feed/we.weight
+                rx.update({'act_fcr':flt(fcr,3)})
+
+        
     
         actmort.append(rx)
     return {'ideal':actmort}
