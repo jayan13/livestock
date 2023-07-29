@@ -420,11 +420,27 @@ def get_report(company,batch):
         #-----------------------------------------
     start=rear_start_date
     end=rear_end_date
-    sal=frappe.db.get_all('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
+    s=get_first_day(rear_start_date)
+    e=get_last_day(rear_end_date)
+    saldy=date_diff(e,s)
+    tdy=date_diff(rear_end_date,rear_start_date)
+    deptsql=''
+    if len(dept):
+        dp='","'.join(dept)
+        deptsql=' and department in ("'+str(dp)+'") '
+    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  MONTH(end_date) between MONTH('{2}') and MONTH('{3}')""".format(layer.company,deptsql,rear_start_date,rear_end_date),as_dict=1,debug=0)
+    totsal=0
+    if salsql:
+        for sal in salsql:
+            totsal+=sal.net_pay
+
     salary=0
+    if totsal:
+        daysal=float(totsal)/float(saldy)
+    
+    salary=float(daysal)*float(tdy)
+    
     salary_expanse=0
-    if sal:
-        salary+=sum(c for c in sal)
 
     wageper=0
     mtotsrt=0
@@ -469,7 +485,7 @@ def get_report(company,batch):
         wageper=(float(live)*100)/float(totlive)
     else:
         wageper=100
-
+    #frappe.msgprint(str(wageper))
     if salary:
             
         if wageper:
