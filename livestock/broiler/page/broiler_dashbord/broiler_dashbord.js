@@ -529,9 +529,12 @@ function print_rep()
 					var divrear=document.getElementById('rearing');					
 					var divbud=document.getElementById('budget');
 					var divmorgp=document.getElementById('mortality');
+					var divfeedgp=document.getElementById('feed');
+					var divweggp=document.getElementById('weight');
+					var divprp=document.getElementById('performance');
 					  var newWin=window.open('','Print-Window');
 					  newWin.document.open();
-					  newWin.document.write('<html><style>table, th, td {border: 1px solid;border-collapse: collapse; } table{ width:100%;} table td{ text-align:right;} #rear-chart{display:none;}#layer-chart{display:none;} .table-secondary td,.table-secondary th {background-color: #d5d7d9;font-weight: bold;}  @media print { #prod{overflow-x:unset !important;} #rer{overflow-x:unset !important;} } </style><body onload="window.print()">'+divbud.innerHTML+divrear.innerHTML+divmorgp.innerHTML+'</body></html>');
+					  newWin.document.write('<html><style>table, th, td {border: 1px solid;border-collapse: collapse; } table{ width:100%;} table td{ text-align:right;} #rear-chart{display:none;}#layer-chart{display:none;} .table-secondary td,.table-secondary th {background-color: #d5d7d9;font-weight: bold;}  @media print { #prod{overflow-x:unset !important;} #rer{overflow-x:unset !important;} } </style><body onload="window.print()">'+divbud.innerHTML+divrear.innerHTML+divmorgp.innerHTML+divfeedgp.innerHTML+divweggp.innerHTML+divprp.innerHTML+'</body></html>');
 					  newWin.document.close();
 					  setTimeout(function(){newWin.close();},10);
 		  

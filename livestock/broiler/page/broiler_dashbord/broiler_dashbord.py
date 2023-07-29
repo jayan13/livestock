@@ -730,6 +730,7 @@ def get_report(company,batch):
         production=budget.production
         sales=budget.sales
     budget_html='' 
+    budget_html+='<tr><td colspan="2"><b>'+str(layer.name)+'<b></td></tr>' 
     budget_html+='<tr><th style="width:30%;">Doc</th><td>'+str(doc)+'</td></tr>'      
     budget_html+='<tr><th>Feed</th><td>'+str(feed)+'</td></tr>'    
     budget_html+='<tr><th>vaccine<td>'+str(vaccine)+'</td></tr>'    
@@ -949,12 +950,10 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
     gp_rear_mor=json.loads(rearing_mor_gp)   
     gp_rearing_feed=json.loads(rearing_feed_gp)   
     gp_rearing_weight=json.loads(rearing_weight_gp)
-    
+    gp_laying_performance=json.loads(frc_gp)
 
     rrowlen=len(rearingary)
     rcollen=len(rearingary[0])
-    lrowlen=len(layingary)
-    lcollen=len(layingary[0])
     browlen=len(budgetary)
     bcollen=len(budgetary[0])
     report=[]
@@ -971,15 +970,6 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
             #report.append([rm.get('age'),rm.get('mortality'),rm.get('act_mortality'),rm.get('age'),gp_rearing_feed[0][j].get('v1'),gp_rearing_feed[0][j].get('v2'),gp_rearing_feed[0][j].get('act_feed'),rm.get('age'),gp_rearing_weight[0][j].get('v1'),gp_rearing_weight[0][j].get('v2'),gp_rearing_weight[0][j].get('act_weight'),rm.get('age'),0,0,0])
             
             j+=1
-    lay_mor=[]
-    lay_mor.append(lbl)
-    k=0
-    #frappe.msgprint(str(gp_rearing_weight))
-    if len(gp_lay_mor):        
-        for lm in gp_lay_mor:
-            lay_mor.append([lm.get('age'),lm.get('mortality'),lm.get('act_mortality')])
-            #report.append([lm.get('age'),lm.get('mortality'),lm.get('act_mortality'),lm.get('age'),gp_laying_feed[0][k].get('v1'),gp_laying_feed[0][k].get('v2'),gp_laying_feed[0][k].get('act_feed'),lm.get('age'),gp_laying_weight[0][k].get('v1'),gp_laying_weight[0][k].get('v2'),gp_laying_weight[0][k].get('act_weight'),lm.get('age'),gp_laying_performance[k].get('v1'),gp_laying_performance[k].get('v2'),gp_laying_performance[k].get('act_eggs')])
-            k+=1
             
     rear_exp=[]
     lbl=['','Expenses','Totals']
@@ -988,55 +978,35 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         for rm in gp_rear:
             rear_exp.append(['',rm.get('label'),rm.get('data')])            
           
-    lay_exp=[]
-    lay_exp.append(lbl)
-    if len(gp_lay):        
-        for lm in gp_lay:
-            lay_exp.append(['',lm.get('label'),lm.get('data')])
-
     gprearing_feed=[]
-    gprearing_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
+    gprearing_feed.append(['Age','Std Feed','Actual Feed'])
+    #frappe.msgprint(str(gp_rearing_feed))
     if len(gp_rearing_feed):        
-        for lm in gp_rearing_feed[0]:
-            gprearing_feed.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_feed'))])
+        for lm in gp_rearing_feed:
+            gprearing_feed.append([lm.get('age'),float(lm.get('feed')),float(lm.get('act_feed'))])
 
-    gplaying_feed=[]
-    gplaying_feed.append(['Age','Std. Min Feed','Std. Max Feed','Actual Feed'])
-    if len(gp_laying_feed):        
-        for lm in gp_laying_feed[0]:
-            gplaying_feed.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_feed'))])
     
     gprearing_weight=[]
-    gprearing_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
+    gprearing_weight.append(['Age','Std Weigt','Actual Weight'])
     if len(gp_rearing_weight):        
-        for lm in gp_rearing_weight[0]:
-            gprearing_weight.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_weight'))])
+        for lm in gp_rearing_weight:
+            gprearing_weight.append([lm.get('age'),float(lm.get('weight')),float(lm.get('act_weight'))])
 
-    gplaying_weight=[]
-    gplaying_weight.append(['Age','Std. Min Weigt','Std. Max Weight','Actual Weight'])
-    if len(gp_laying_weight):        
-        for lm in gp_laying_weight[0]:
-            gplaying_weight.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_weight'))])
-
+    
     gplaying_performance=[]
-    gplaying_performance.append(['Age','Std. Min Eggs','Std. Max Eggs','Actual Eggs'])
+    gplaying_performance.append(['Age','Std. FCR','Actual FCR'])
     if len(gp_laying_performance):        
         for lm in gp_laying_performance:
-            gplaying_performance.append([lm.get('age'),float(lm.get('v1')),float(lm.get('v2')),float(lm.get('act_eggs'))])
+            gplaying_performance.append([lm.get('age'),float(lm.get('fcr')),float(lm.get('act_fcr'))])
 
     wb = Workbook()
     ws = wb.active
-    ws.title = "Rearing"
-    ws2 = wb.create_sheet("Production")
+    ws.title = "Rearing"    
     ws1 = wb.create_sheet("Budget")   
-    ws5 = wb.create_sheet("Rear. Mor. GPH")
-    ws6 = wb.create_sheet("Lay. Mor. GPH")
-    #rep = wb.create_sheet("Report")
-    ws7 = wb.create_sheet("Rear. Feed. GPH")
-    ws8 = wb.create_sheet("Lay. Feed. GPH")
-    ws9 = wb.create_sheet("Rear. Weight. GPH")
-    ws10 = wb.create_sheet("Lay. Weight. GPH")
-    ws11 = wb.create_sheet("Performance. GPH")
+    ws5 = wb.create_sheet("Mor. GPH")    
+    ws7 = wb.create_sheet("Feed. GPH")    
+    ws9 = wb.create_sheet("Weight. GPH")
+    ws11 = wb.create_sheet("FCR")
     
 
     for row in rearingary:
@@ -1045,34 +1015,18 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
     for row in budgetary:
        ws1.append(row)
 
-    for row in layingary:
-       ws2.append(row)
-    
     ws.append([''])
     for row in rear_exp:
         ws.append(row)
-       
-    ws2.append([''])
-    for row in lay_exp:
-        ws2.append(row)
-        
+               
     for row in rear_mor:
         ws5.append(row)
 
-    for row in lay_mor:
-        ws6.append(row)
-
     for row in gprearing_feed:
         ws7.append(row)
-
-    for row in gplaying_feed:
-        ws8.append(row)
     
     for row in gprearing_weight:
         ws9.append(row)
-
-    for row in gplaying_weight:
-        ws10.append(row)
 
     for row in gplaying_performance:
         ws11.append(row)
@@ -1086,23 +1040,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
     thin = Side(border_style="thin", color=black)
     double = Side(border_style="double", color=black)
     thick = Side(border_style="thick", color=black)
-    #=====================================================
-    """"
-    for row in rep['A1:O1']:
-        for cell in row:
-            cell.font = ft
-            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
-    for row in rep['C1:C101']:
-        for cell in row:
-            cell.border = Border(right=thick)
-    for row in rep['G1:G101']:
-        for cell in row:
-            cell.border = Border(right=thick)
-    for row in rep['K1:K101']:
-        for cell in row:
-            cell.border = Border(right=thick)
-            """
-    
+
     #===========================================================
     rlbl=getColumnName(rcollen)
     rhd="A1:"+str(rlbl)+str(1)
@@ -1154,29 +1092,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
             cell.font = ft
             cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
     #----------------------------------------------------------------------------------------------
-    rlbl=getColumnName(lcollen)
-    rhd="A1:"+str(rlbl)+str(1)
-    for row in ws2[rhd]:
-        for cell in row:
-            cell.font = ft
-            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
-
-    rhd="A1:"+str(rlbl)+str(lrowlen)
-    for row in ws2[rhd]:
-        rowhed=0
-        for cell in row:
-            cell.border = Border(top=thin, left=thin, right=thin, bottom=thin)
-            if "Total" in str(cell.value) or 'Net Profit' in str(cell.value) or 'Operational Cost' in str(cell.value):
-                rowhed=1
-            if rowhed==1:
-                cell.font = ft
-                cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
     
-    rhd="A1:A"+str(lrowlen)
-    for row in ws2[rhd]:
-        for cell in row:
-            #cell.font = ft
-            cell.fill = PatternFill(start_color=yellow, end_color=yellow,fill_type = "solid")
 
     if len(gp_rear):
         maxr=len(gp_rear)+1
@@ -1193,16 +1109,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         pie.title = "Rearing"
         ws.add_chart(pie, rhd)
         
-    if len(gp_lay):
-        maxr=len(gp_lay)+1
-        rhd="B"+str(lrowlen+2)
-        pie = PieChart()        
-        labels = "'Production'!$B$"+str(lrowlen+3)+":$B$"+str(lrowlen+1+maxr)  
-        data = "'Production'!$C$"+str(lrowlen+3)+":$C$"+str(lrowlen+1+maxr)        
-        pie.add_data(data, titles_from_data=True)
-        pie.set_categories(labels)
-        pie.title = "Laying"
-        ws2.add_chart(pie, rhd)
+    
     from copy import deepcopy
     from openpyxl.chart.text import RichText
     from openpyxl.drawing.text import RichTextProperties
@@ -1236,32 +1143,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         ws5.add_chart(c2, "A1")
 
         #=========================
-    if len(gp_lay_mor):
-        maxr=len(gp_lay_mor)+1
-        rhd="A1"
-        
-        c1 = LineChart()
-        c1.title = "Laying Mortality"
-        c1.style = 13
-        c1.x_axis.title = 'Weeks'
-        c1.y_axis.title = 'Mortality %'
-        c1.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
-        c1.x_axis.delete = False
-        c1.y_axis.delete = False
-        c1.height = 20 # default is 7.5
-        c1.width = 60 # default is 15
-        data = Reference(ws6, min_col=2, min_row=1, max_col=3, max_row=maxr)
-        c1.add_data(data, titles_from_data=True)
-        dates = Reference(ws6, min_col=1, min_row=2, max_row=maxr)
-        c1.set_categories(dates)
-        s2 = c1.series[0]
-        s2.graphicalProperties.line.solidFill = "ff2e2e"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs
 
-        s2 = c1.series[1]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs        
-        ws6.add_chart(c1, rhd)
         
     #----------------------------------------------------
 
@@ -1298,37 +1180,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         ws7.add_chart(c3, "A1")
 
         #=========================
-    if len(gplaying_feed):
-        maxr=len(gplaying_feed)
-        rhd="A1"
-        
-        c4 = LineChart()
-        c4.title = "Laying Feed"
-        c4.style = 13
-        c4.x_axis.title = 'Weeks'
-        c4.y_axis.title = 'Feed'
-        c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
-        c4.x_axis.delete = False
-        c4.y_axis.delete = False
-        c4.height = 20 # default is 7.5
-        c4.width = 60 # default is 15
-        data = Reference(ws8, min_col=2, min_row=1, max_col=4, max_row=maxr)
-        c4.add_data(data, titles_from_data=True)
-        dates = Reference(ws8, min_col=1, min_row=2, max_row=maxr)
-        c4.set_categories(dates)
-        s2 = c4.series[0]
-        s2.graphicalProperties.line.solidFill = "ff2e2e"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs
-
-        s2 = c4.series[1]
-        s2.graphicalProperties.line.solidFill = "55af46"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs
-
-        s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs 
-
-        ws8.add_chart(c4, rhd)
+    
 
     #----------------------------------------------------
 
@@ -1364,38 +1216,7 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
 
         ws9.add_chart(c3, "A1")
 
-        #=========================
-    if len(gplaying_weight):
-        maxr=len(gplaying_weight)
-        rhd="A1"
-        
-        c4 = LineChart()
-        c4.title = "Laying Weight"
-        c4.style = 13
-        c4.x_axis.title = 'Weeks'
-        c4.y_axis.title = 'Weight'
-        c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
-        c4.x_axis.delete = False
-        c4.y_axis.delete = False
-        c4.height = 20 # default is 7.5
-        c4.width = 60 # default is 15
-        data = Reference(ws10, min_col=2, min_row=1, max_col=4, max_row=maxr)
-        c4.add_data(data, titles_from_data=True)
-        dates = Reference(ws10, min_col=1, min_row=2, max_row=maxr)
-        c4.set_categories(dates)
-        s2 = c4.series[0]
-        s2.graphicalProperties.line.solidFill = "ff2e2e"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs
-
-        s2 = c4.series[1]
-        s2.graphicalProperties.line.solidFill = "55af46"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs
-
-        s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs 
-
-        ws10.add_chart(c4, rhd)
+    
 
     if len(gplaying_performance):
         maxr=len(gplaying_performance)
@@ -1429,7 +1250,8 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
 
         ws11.add_chart(c4, rhd)
 
-    file_name = 'poultry_dash.xlsx'    
+    #file_name = 'broiler_dash.xlsx'
+    file_name=batch+'.xlsx'    
     temp_file=os.path.join(frappe.utils.get_bench_path(), "logs", file_name)
     wb.save(temp_file)
     return temp_file
