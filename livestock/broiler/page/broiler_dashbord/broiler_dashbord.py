@@ -17,7 +17,7 @@ def get_company_list():
 @frappe.whitelist()
 def get_batch_list(company=None):
     data = {}
-    data["batchs"] = frappe.get_all("Broiler Batch",filters={'docstatus':['!=','2'],'company':company},fields=['name'],limit_page_length=0, order_by="name",debug=0)
+    data["batchs"] = frappe.get_all("Broiler Batch",filters={'docstatus':['!=','2'],'company':company},fields=['name'],limit_page_length=0, order_by="start_date desc",debug=0)
     return data
 
 @frappe.whitelist()
@@ -420,7 +420,7 @@ def get_report(company,batch):
         #-----------------------------------------
     start=rear_start_date
     end=rear_end_date
-    sal=frappe.db.get_all('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]]},fields=['net_pay'],pluck='net_pay')
+    sal=frappe.db.get_all('Salary Slip',filters={'status':['in',['Draft','Submitted']],'company':layer.company,'end_date':['between',[start,end]],'department':['in',dept]},fields=['net_pay'],pluck='net_pay')
     salary=0
     salary_expanse=0
     if sal:
@@ -522,7 +522,7 @@ def get_report(company,batch):
         rear_ind_expanse.append(rear_ind_expanse_item)
      
     #----------------------------------
-        reat_tot.append(col_tot)
+    reat_tot.append(col_tot)
     #------------------------------
     rearing_ind_array=[]
     if rear_ind_itm_cnt:
