@@ -756,7 +756,7 @@ def get_report(company,batch):
                 rear_html+='<tr class="table-secondary"><td>Cull Items</td> <td class="text-right"> Qty</td> <td class="text-right"> Amount</td></tr>'
                 rear_html+='<tr><td>'+str(getitem_name(man.item_code))+'</td><td class="text-right">'+str(man.qty)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(man.amount))+'</td></tr>'
         if production_cnt:
-            cost=float(col_tot)/float(production_cnt)
+            cost=float(col_tot)/(float(production_cnt)+float(layer.current_alive_chicks))
             rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
             rear_html+='<tr class="table-secondary"><td>Cost/Chicken</td> <td class="text-right" colspan="2"><b>'+str(flt(cost,4))+'</b></td></tr>'
     
