@@ -36,7 +36,17 @@ MyPage =Class.extend({
 			default:'ABU DHABI MODERNE POULTRY FARM L.L.C.'
 		});
 		
-		
+		let field2 = this.page.add_field({
+			label: 'Batch Status',
+			fieldtype: 'Select',
+			fieldname: 'status',
+			options: ['Open','Completed'],
+			default:'Open',
+			change() {
+				load_batch();
+				get_report();
+			}
+		});
 		
 		let field1 = this.page.add_field({
 			label: 'Broiler Batch',
@@ -56,7 +66,7 @@ MyPage =Class.extend({
 				$('[data-fieldname="batch"][type="text"]').empty();
 				frappe.call({
 					method: 'livestock.broiler.page.broiler_dashbord.broiler_dashbord.get_batch_list',
-					args: {company: field.get_value(),},
+					args: {company: field.get_value(),status: field2.get_value()},
 					callback: function (r) {
 						
 					if (r.message) {
@@ -158,7 +168,7 @@ MyPage =Class.extend({
 						 $('#budgets').html(r.message.budget);
 						 $("#layer-chart").html('');
 						 $("#rear-chart").html('');
-						 $("#detail").html('Batch : '+r.message.batch+'&nbsp;&nbsp;&nbsp;&nbsp; Date: '+r.message.date);
+						 $("#detail").html(r.message.msg);
 						 
 						 reargp_xl=r.message.rear_graph
 						 

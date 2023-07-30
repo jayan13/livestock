@@ -15,9 +15,9 @@ def get_company_list():
     return data
 
 @frappe.whitelist()
-def get_batch_list(company=None):
+def get_batch_list(company=None,status=None):
     data = {}
-    data["batchs"] = frappe.get_all("Broiler Batch",filters={'docstatus':['!=','2'],'company':company},fields=['name'],limit_page_length=0, order_by="start_date desc",debug=0)
+    data["batchs"] = frappe.get_all("Broiler Batch",filters={'docstatus':['!=','2'],'company':company,'status':status},fields=['name'],limit_page_length=0, order_by="start_date desc",debug=0)
     return data
 
 @frappe.whitelist()
@@ -761,9 +761,16 @@ def get_report(company,batch):
             cost=float(col_tot)/(float(production_cnt)+float(layer.current_alive_chicks))
             rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
             rear_html+='<tr class="table-secondary"><td>Cost/Chicken</td> <td class="text-right" colspan="2"><b>'+str(flt(cost,4))+'</b></td></tr>'
-    curdate=nowdate() #.strftime("%d-%m-%y")
+    
+    curdate=layer.end_date
+    if getdate(layer.end_date) > getdate(nowdate()):
+        curdate=nowdate()
+        
+    
     curdate=getdate(curdate).strftime("%d-%m-%Y")
-    return {'rear':rear_html,'budget':budget_html,'rear_graph':rear_graph,'date':curdate,'batch':layer.name}
+    
+    msg='Batch : '+str(layer.name)+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: '+str(layer.receiving_date)+' To '+str(curdate)
+    return {'rear':rear_html,'budget':budget_html,'rear_graph':rear_graph,'msg':msg}
 
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
