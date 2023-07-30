@@ -435,6 +435,7 @@ def get_report(company,batch):
             totsal+=sal.net_pay
 
     salary=0
+    daysal=0
     if totsal:
         daysal=float(totsal)/float(saldy)
     
@@ -853,12 +854,12 @@ def get_rear_weight_graph(batch):
 
         for ac in stdweight:
             if ac.age==x:               
-                rx.update({'weight':ac.daily_gain})
+                rx.update({'weight':ac.weight})
         wgain=0
         for ac in actqry:
             if ac.wk==x:
-                wgain=ac.weight-ac.prev_weight
-                rx.update({'act_weight':wgain})
+                #wgain=ac.weight-ac.prev_weight
+                rx.update({'act_weight':ac.weight})
     
         actmort.append(rx)
         
@@ -1118,9 +1119,9 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         
         maxr=len(gp_rear_mor)+1
         c2 = LineChart()
-        c2.title = "Rearing Mortality"
+        c2.title = "Mortality"
         c2.style = 13
-        c2.x_axis.title = 'Weeks'
+        c2.x_axis.title = 'Days'
         c2.y_axis.title = 'Mortality %'
         c2.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
         c2.x_axis.delete = False
@@ -1151,16 +1152,16 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         
         maxr=len(gprearing_feed)
         c3 = LineChart()
-        c3.title = "Rearing Feed"
+        c3.title = "Feed"
         c3.style = 13
-        c3.x_axis.title = 'Weeks'
-        c3.y_axis.title = 'Feed'
+        c3.x_axis.title = 'Days'
+        c3.y_axis.title = 'Cum. Feed Intake'
         c3.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
         c3.x_axis.delete = False
         c3.y_axis.delete = False
         c3.height = 10 # default is 7.5
-        c3.width = 25 # default is 15
-        data = Reference(ws7, min_col=2, min_row=1, max_col=4, max_row=maxr)            
+        c3.width = 45 # default is 15
+        data = Reference(ws7, min_col=2, min_row=1, max_col=3, max_row=maxr)            
         c3.add_data(data, titles_from_data=True)
         dates = Reference(ws7, min_col=1, min_row=2, max_row=maxr)        
         c3.set_categories(dates)
@@ -1172,9 +1173,9 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
-        s2 = c3.series[2]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs        
+        #s2 = c3.series[2]
+        #s2.graphicalProperties.line.solidFill = "2490ef"
+        #s2.graphicalProperties.line.width = 30000 # width in EMUs        
        
 
         ws7.add_chart(c3, "A1")
@@ -1188,16 +1189,16 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         
         maxr=len(gprearing_weight)
         c3 = LineChart()
-        c3.title = "Rearing Weight"
+        c3.title = "Weight"
         c3.style = 13
-        c3.x_axis.title = 'Weeks'
-        c3.y_axis.title = 'Weight'
+        c3.x_axis.title = 'Days'
+        c3.y_axis.title = 'Weight Gain'
         c3.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
         c3.x_axis.delete = False
         c3.y_axis.delete = False
         c3.height = 10 # default is 7.5
-        c3.width = 25 # default is 15
-        data = Reference(ws9, min_col=2, min_row=1, max_col=4, max_row=maxr)            
+        c3.width = 40 # default is 15
+        data = Reference(ws9, min_col=2, min_row=1, max_col=3, max_row=maxr)            
         c3.add_data(data, titles_from_data=True)
         dates = Reference(ws9, min_col=1, min_row=2, max_row=maxr)        
         c3.set_categories(dates)
@@ -1209,9 +1210,9 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
-        s2 = c3.series[2]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs        
+        #s2 = c3.series[2]
+        #s2.graphicalProperties.line.solidFill = "2490ef"
+        #s2.graphicalProperties.line.width = 30000 # width in EMUs        
        
 
         ws9.add_chart(c3, "A1")
@@ -1223,16 +1224,16 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         rhd="A1"
         
         c4 = LineChart()
-        c4.title = "Laying Performance"
+        c4.title = "Performance"
         c4.style = 13
-        c4.x_axis.title = 'Weeks'
-        c4.y_axis.title = 'Eggs'
+        c4.x_axis.title = 'Days'
+        c4.y_axis.title = 'FCR'
         c4.x_axis.title.txPr = RichText(bodyPr=RichTextProperties(rot="-180"))
         c4.x_axis.delete = False
         c4.y_axis.delete = False
-        c4.height = 20 # default is 7.5
-        c4.width = 60 # default is 15
-        data = Reference(ws11, min_col=2, min_row=1, max_col=4, max_row=maxr)
+        c4.height = 10 # default is 7.5
+        c4.width = 40 # default is 15
+        data = Reference(ws11, min_col=2, min_row=1, max_col=3, max_row=maxr)
         c4.add_data(data, titles_from_data=True)
         dates = Reference(ws11, min_col=1, min_row=2, max_row=maxr)
         c4.set_categories(dates)
@@ -1244,9 +1245,9 @@ def down_report(company,batch,rearing=None,budget=None,rearing_gp=None,rearing_m
         s2.graphicalProperties.line.solidFill = "55af46"
         s2.graphicalProperties.line.width = 30000 # width in EMUs
 
-        s2 = c4.series[2]
-        s2.graphicalProperties.line.solidFill = "2490ef"
-        s2.graphicalProperties.line.width = 30000 # width in EMUs 2490ef
+        #s2 = c4.series[2]
+        #s2.graphicalProperties.line.solidFill = "2490ef"
+        #s2.graphicalProperties.line.width = 30000 # width in EMUs 2490ef
 
         ws11.add_chart(c4, rhd)
 
