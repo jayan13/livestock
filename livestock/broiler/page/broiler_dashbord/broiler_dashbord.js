@@ -158,7 +158,8 @@ MyPage =Class.extend({
 						 $('#budgets').html(r.message.budget);
 						 $("#layer-chart").html('');
 						 $("#rear-chart").html('');
-
+						 $("#detail").html('Batch : '+r.message.batch+'&nbsp;&nbsp;&nbsp;&nbsp; Date: '+r.message.date);
+						 
 						 reargp_xl=r.message.rear_graph
 						 
 						 let r_lbl=[]
@@ -346,12 +347,12 @@ function rearing_feed_graph(batch)
 					datasets: [
 						{
 							chartType: 'line',
-							name: "Feed Intake",
+							name: "Cum. Feed Intake",
 							values: ly_dta
 						},
 						{							
 							chartType: 'line',
-							name: "Actual Feed Intake",
+							name: "Actual Cum. Feed Intake",
 							values: lyact_dta
 						},
 						

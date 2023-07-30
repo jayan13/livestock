@@ -599,7 +599,7 @@ def get_report(company,batch):
     i=0
     for doc in rear_doc:
         if i==0:
-            rear_html+='<th scope="row">'+str(doc)+'</th>'
+            rear_html+='<th scope="row">'+str(doc)+' :(Qty-'+str(layer.doc_placed)+')</th>'
         else:
             rear_html+='<td class="text-right" colspan="2">'+str(frappe.utils.fmt_money(doc))+'</td>'
         i+=1
@@ -759,8 +759,9 @@ def get_report(company,batch):
             cost=float(col_tot)/(float(production_cnt)+float(layer.current_alive_chicks))
             rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
             rear_html+='<tr class="table-secondary"><td>Cost/Chicken</td> <td class="text-right" colspan="2"><b>'+str(flt(cost,4))+'</b></td></tr>'
-    
-    return {'rear':rear_html,'budget':budget_html,'rear_graph':rear_graph}
+    curdate=nowdate() #.strftime("%d-%m-%y")
+    curdate=getdate(curdate).strftime("%d-%m-%Y")
+    return {'rear':rear_html,'budget':budget_html,'rear_graph':rear_graph,'date':curdate,'batch':layer.name}
 
 def getitem_name(item_code):
     return frappe.db.get_value('Item',item_code,'item_name')
