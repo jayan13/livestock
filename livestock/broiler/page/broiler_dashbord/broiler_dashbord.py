@@ -749,6 +749,8 @@ def get_report(company,batch):
                 rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
                 rear_html+='<tr class="table-secondary"><td> Broiler Produced</td> <td class="text-right"> Qty</td> <td class="text-right"> Amount (With Out Indirect Exp.)</td></tr>'
                 rear_html+='<tr><td>'+str(getitem_name(man.item_code))+'</td><td class="text-right">'+str(man.qty)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(man.amount))+'</td></tr>'
+                if layer.current_alive_chicks:
+                    rear_html+='<tr><td>Live Chicken</td><td class="text-right">'+str(float(layer.current_alive_chicks))+'</td><td class="text-right"></td></tr>'
         
         for man in manuf:
             if man.item_code==cull:
