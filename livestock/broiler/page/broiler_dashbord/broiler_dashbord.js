@@ -347,7 +347,7 @@ function rearing_feed_graph(batch)
 					datasets: [
 						{
 							chartType: 'line',
-							name: "Cum. Feed Intake",
+							name: "Std. Cum. Feed Intake",
 							values: ly_dta
 						},
 						{							
