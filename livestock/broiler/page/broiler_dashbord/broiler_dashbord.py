@@ -486,7 +486,7 @@ def get_report(company,batch):
         wageper=(float(live)*100)/float(totlive)
     else:
         wageper=100
-    frappe.msgprint(str(wageper))
+    #frappe.msgprint(str(wageper))
     if salary:
             
         if wageper:
