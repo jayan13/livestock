@@ -428,7 +428,7 @@ def get_report(company,batch):
     if len(dept):
         dp='","'.join(dept)
         deptsql=' and department in ("'+str(dp)+'") '
-    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  MONTH(end_date) between MONTH('{2}') and MONTH('{3}')""".format(layer.company,deptsql,rear_start_date,rear_end_date),as_dict=1,debug=1)
+    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  MONTH(end_date) between MONTH('{2}') and MONTH('{3}')""".format(layer.company,deptsql,rear_start_date,rear_end_date),as_dict=1,debug=0)
     totsal=0
     if salsql:
         for sal in salsql:
@@ -464,11 +464,11 @@ def get_report(company,batch):
             where b.company='{0}' 
             and ((b.receiving_date < '{2}' and (b.end_date is NULL or b.end_date='')) 
             or (b.receiving_date < '{2}' and b.end_date >'{1}')) and b.name<>'{3}'
-            group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
+            group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=1)
             
     totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabBroiler Batch` b 
         left join `tabMortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
-            b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
+            b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=1)
     crr={}
     if totcurrent:
         for cr in totcurrent:
@@ -486,7 +486,7 @@ def get_report(company,batch):
         wageper=(float(live)*100)/float(totlive)
     else:
         wageper=100
-    frappe.msgprint(str(salary)+' '+str(totlive))
+    #frappe.msgprint(str(wageper))
     if salary:
             
         if wageper:
