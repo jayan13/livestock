@@ -453,7 +453,7 @@ def get_report(company,batch):
         batch_live=0
         eachday_live=frappe.db.sql("""select b.doc_placed-IFNULL(sum(m.total), 0) as live,b.name from `tabBroiler Batch` b 
         left join `tabMortality` m on b.name=m.parent and m.date <= '{1}' where
-            b.company='{0}' and '{1}' between b.receiving_date and b.end_date  group by b.name""".format(layer.company,st_date,layer.name),as_dict=1,debug=0)
+            b.company='{0}' and '{1}' between b.receiving_date and b.end_date  group by b.name""".format(layer.company,st_date,layer.name),as_dict=1,debug=1)
         for ech in eachday_live:
             if layer.name==ech.name:
                 batch_live+=float(ech.live)
