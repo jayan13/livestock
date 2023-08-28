@@ -429,9 +429,9 @@ def get_report(company,batch):
         dp='","'.join(dept)
         deptsql=' and department in ("'+str(dp)+'") '
 
-    date_range=frappe.db.sql(""" select min(start_date) as start_date,max(end_date) as end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)    
-    if date_range:
-        saldy=date_diff(date_range[0].end_date,date_range[0].start_date)+1
+    #date_range=frappe.db.sql(""" select min(start_date) as start_date,max(end_date) as end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)    
+    #if date_range:
+        #saldy=date_diff(date_range[0].end_date,date_range[0].start_date)+1
         
     salsql=frappe.db.sql(""" select net_pay,start_date,end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)
     totsal=0
@@ -472,6 +472,7 @@ def get_report(company,batch):
 
         salper=(float(batch_live)*100)/float(tot_live)
         totper+=float(salper)
+        daysal=float(totsal)/float(tdy)
         salary_expanse+=(float(daysal)/100)*float(salper)
         st_date=add_days(st_date,1)
     wageper=float(totper)/float(tdy)    
