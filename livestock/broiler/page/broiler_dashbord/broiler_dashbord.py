@@ -464,11 +464,11 @@ def get_report(company,batch):
             where b.company='{0}' 
             and ((b.receiving_date < '{2}' and (b.end_date is NULL or b.end_date='')) 
             or (b.receiving_date < '{2}' and b.end_date >'{1}')) and b.name<>'{3}'
-            group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=1)
+            group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
             
     totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabBroiler Batch` b 
         left join `tabMortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
-            b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=1)
+            b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
     crr={}
     if totcurrent:
         for cr in totcurrent:
