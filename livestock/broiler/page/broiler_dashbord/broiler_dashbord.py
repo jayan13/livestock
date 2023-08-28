@@ -428,7 +428,12 @@ def get_report(company,batch):
     if len(dept):
         dp='","'.join(dept)
         deptsql=' and department in ("'+str(dp)+'") '
-    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)
+
+    date_range=frappe.db.sql(""" select min(start_date) as start_date,max(end_date) as end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)    
+    if date_range:
+        saldy=date_diff(date_range[0].end_date,date_range[0].start_date)+1
+        
+    salsql=frappe.db.sql(""" select net_pay,start_date,end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)
     totsal=0
     if salsql:
         for sal in salsql:
