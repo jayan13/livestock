@@ -428,7 +428,7 @@ def get_report(company,batch):
     if len(dept):
         dp='","'.join(dept)
         deptsql=' and department in ("'+str(dp)+'") '
-    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  MONTH(end_date) between MONTH('{2}') and MONTH('{3}')""".format(layer.company,deptsql,rear_start_date,rear_end_date),as_dict=1,debug=0)
+    salsql=frappe.db.sql(""" select net_pay from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)
     totsal=0
     if salsql:
         for sal in salsql:
@@ -436,71 +436,43 @@ def get_report(company,batch):
 
     salary=0
     daysal=0
+    
     if totsal:
         daysal=float(totsal)/float(saldy)
     
-    salary=float(daysal)*float(tdy)
-    
     salary_expanse=0
+    salary=float(daysal)*float(tdy)
+    wageper=100
+    #find each day live chicken and each day salary. each day batch sal = each day live percentage * each day salary
+    st_date=rear_start_date
+    salary_expanse=0
+    totper=0
+    while getdate(st_date) < getdate(add_days(rear_end_date,1)):
+        
+        tot_live=0
+        batch_live=0
+        eachday_live=frappe.db.sql("""select b.doc_placed-IFNULL(sum(m.total), 0) as live,b.name from `tabBroiler Batch` b 
+        left join `tabMortality` m on b.name=m.parent and m.date <= '{1}' where
+            b.company='{0}' and '{1}' between b.receiving_date and b.end_date  group by b.name""".format(layer.company,st_date,layer.name),as_dict=1,debug=0)
+        for ech in eachday_live:
+            if layer.name==ech.name:
+                batch_live+=float(ech.live)
+            else:
+                tot_live+=float(ech.live)
 
-    wageper=0
-    mtotsrt=0
-    mtotend=0
-    mortmonthavg=0
-    live=0
-    if layer.daily_mortality:
-        for mor in layer.daily_mortality:
-            if getdate(mor.date)< getdate(start):
-                mtotsrt+=float(mor.total)
-            if getdate(start) <= getdate(mor.date)<=getdate(end):
-                mtotend+=float(mor.total)
-
-        if mtotend:
-            mortmonthavg=float(mtotend)/2
-    live=float(layer.doc_placed)-float(mtotsrt)-float(mortmonthavg)
-    mort_to=add_days(getdate(start),15)
-    totbfor=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.doc_placed,b.name from `tabBroiler Batch` b 
-            left join  `tabMortality` m on b.name=m.parent and m.date < '{1}'            
-            where b.company='{0}' 
-            and ((b.receiving_date < '{2}' and (b.end_date is NULL or b.end_date='')) 
-            or (b.receiving_date < '{2}' and b.end_date >'{1}')) and b.name<>'{3}'
-            group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
-            
-    totcurrent=frappe.db.sql("""select IFNULL(sum(m.total), 0) as tot,b.name from `tabBroiler Batch` b 
-        left join `tabMortality` m on b.name=m.parent and m.date between '{1}' and '{2}' where
-            b.company='{0}' and b.name<>'{3}' group by b.name""".format(layer.company,start,end,layer.name),as_dict=1,debug=0)
-    crr={}
-    if totcurrent:
-        for cr in totcurrent:
-            crr.update({cr.name:cr.tot})
-    totlive=0
-    if totbfor:
-        for bf in totbfor:
-            totavg=0
-            if crr.get(bf.name):
-                totavg=float(crr.get(bf.name))/2
-
-            totlive+=bf.doc_placed-bf.tot-totavg
-
-    if totlive:
-        wageper=(float(live)*100)/float(totlive)
-    else:
-        wageper=100
-    #frappe.msgprint(str(wageper))
-    if salary:
-            
-        if wageper:
-            salary_expanse=(float(salary)/100)*float(wageper)                
-        else:
-            batchcount=frappe.db.sql(""" select count(name) as cnt from `tabBroiler Batch` where  status='Open' """,as_dict=1,debug=0)
-            if batchcount:
-                salary_expanse=float(salary)/float(batchcount[0].cnt)
-
+        salper=(float(batch_live)*100)/float(tot_live)
+        totper+=float(salper)
+        salary_expanse+=(float(daysal)/100)*float(salper)
+        st_date=add_days(st_date,1)
+    wageper=float(totper)/float(tdy)    
+    
+    if daysal:
         rear_wages.append(salary_expanse)
         rear_wages_tot+=salary_expanse
         col_tot+=salary_expanse
     else:
         rear_wages.append(0)
+
         #========================================================================
     rearind=frappe.db.get_all('Broiler Indirect Expenses',filters={'company':layer.company},fields=['title','name'])
     if rearind:
