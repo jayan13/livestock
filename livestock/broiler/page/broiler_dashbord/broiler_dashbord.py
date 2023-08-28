@@ -441,19 +441,24 @@ def get_report(company,batch):
         daysal=float(totsal)/float(saldy)
     
     salary_expanse=0
-    salary=float(daysal)*float(tdy)
+    #salary=float(daysal)*float(tdy)
     wageper=100
     #find each day live chicken and each day salary. each day batch sal = each day live percentage * each day salary
     st_date=rear_start_date
     salary_expanse=0
     totper=0
-    while getdate(st_date) < getdate(add_days(rear_end_date,1)):
+    ed_date=rear_end_date
+    if getdate(rear_end_date) > getdate(nowdate()):
+        ed_date=getdate(nowdate())
+        tdy=date_diff(ed_date,rear_start_date)
+
+    while getdate(st_date) < getdate(add_days(ed_date,1)):
         
         tot_live=0
         batch_live=0
         eachday_live=frappe.db.sql("""select b.doc_placed-IFNULL(sum(m.total), 0) as live,b.name from `tabBroiler Batch` b 
         left join `tabMortality` m on b.name=m.parent and m.date <= '{1}' where
-            b.company='{0}' and '{1}' between b.receiving_date and b.end_date  group by b.name""".format(layer.company,st_date,layer.name),as_dict=1,debug=1)
+            b.company='{0}' and '{1}' between b.receiving_date and b.end_date  group by b.name""".format(layer.company,st_date,layer.name),as_dict=1,debug=0)
         for ech in eachday_live:
             if layer.name==ech.name:
                 batch_live+=float(ech.live)
