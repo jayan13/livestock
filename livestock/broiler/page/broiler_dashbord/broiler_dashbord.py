@@ -472,9 +472,11 @@ def get_report(company,batch):
 
         salper=(float(batch_live)*100)/float(tot_live)
         totper+=float(salper)
-        daysal=float(totsal)/float(tdy)
-        salary_expanse+=(float(daysal)/100)*float(salper)
+        if totsal:
+            daysal=float(totsal)/float(tdy)
+            salary_expanse+=(float(daysal)/100)*float(salper)
         st_date=add_days(st_date,1)
+        
     wageper=float(totper)/float(tdy)    
     
     if daysal:
