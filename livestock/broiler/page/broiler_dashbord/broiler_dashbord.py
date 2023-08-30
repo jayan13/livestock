@@ -87,9 +87,9 @@ def get_report(company,batch):
     #rear_miscel=['Miscellaneous Production Req.']
     rear_other=['Others']
     rear_direct=['Direct Material Cost']
-    rear_tot_direct=['Total (Direct Material Cost + Wages)']
+    rear_tot_direct=['Total Direct Exp (Direct Material Cost + Wages)']
     rear_wages=['Wages']
-    reat_tot=['Total']
+    reat_tot=['Total (Direct + Indirect Expense)']
     rear_doc_tot=0
     rear_feed_tot=0
     rear_vaccine_tot=0
