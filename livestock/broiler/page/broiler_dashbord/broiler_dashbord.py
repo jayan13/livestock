@@ -86,6 +86,8 @@ def get_report(company,batch):
     #rear_bio=['Biosecurity Requirements']
     #rear_miscel=['Miscellaneous Production Req.']
     rear_other=['Others']
+    rear_direct=['Direct Material Cost']
+    rear_tot_direct=['Total (Direct Material Cost + Wages)']
     rear_wages=['Wages']
     reat_tot=['Total']
     rear_doc_tot=0
@@ -117,6 +119,7 @@ def get_report(company,batch):
     date_lbl=rear_start_date.strftime("%d/%m/%y")+'-'+rear_end_date.strftime("%d/%m/%y")
     rear_lbl.append(date_lbl)
     col_tot=0
+    direct_material_cost=0
         #---------------------------------
     base_row_material=''
     finished_product=''
@@ -159,6 +162,7 @@ def get_report(company,batch):
             rear_doc.append(amt)
             rear_doc_tot=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_doc.append('0')
     else:
@@ -253,6 +257,7 @@ def get_report(company,batch):
             rear_feed.append(amt)
             rear_feed_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_feed.append(0)
 
@@ -290,6 +295,7 @@ def get_report(company,batch):
             rear_medicine.append(amt)
             rear_medicine_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_medicine.append(0)
 
@@ -326,6 +332,7 @@ def get_report(company,batch):
             rear_vaccine.append(amt)
             rear_vaccine_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_vaccine.append(0)
                     
@@ -363,6 +370,7 @@ def get_report(company,batch):
             rear_other.append(amt)
             rear_other_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_other.append(0)
     else:
@@ -376,6 +384,7 @@ def get_report(company,batch):
             rear_feed.append(amt)
             rear_feed_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_feed.append(0)    
         
@@ -388,6 +397,7 @@ def get_report(company,batch):
             rear_medicine.append(amt)
             rear_medicine_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_medicine.append(0)
 
@@ -401,6 +411,7 @@ def get_report(company,batch):
             rear_vaccine.append(amt)
             rear_vaccine_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_vaccine.append(0)
                     
@@ -414,9 +425,12 @@ def get_report(company,batch):
             rear_other.append(amt)
             rear_other_tot+=amt
             col_tot+=amt
+            direct_material_cost+=amt
         else:
             rear_other.append(0)
 
+    #-------------------------------
+    rear_direct.append(direct_material_cost)
         #-----------------------------------------
     start=rear_start_date
     end=rear_end_date
@@ -429,9 +443,9 @@ def get_report(company,batch):
         dp='","'.join(dept)
         deptsql=' and department in ("'+str(dp)+'") '
 
-    #date_range=frappe.db.sql(""" select min(start_date) as start_date,max(end_date) as end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)    
-    #if date_range:
-        #saldy=date_diff(date_range[0].end_date,date_range[0].start_date)+1
+    date_range=frappe.db.sql(""" select min(start_date) as start_date,max(end_date) as end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)    
+    if date_range:
+        saldy=date_diff(date_range[0].end_date,date_range[0].start_date)+1
         
     salsql=frappe.db.sql(""" select net_pay,start_date,end_date from `tabSalary Slip` where status in ('Draft','Submitted') and company='{0}' {1} and  end_date between '{2}' and '{3}' """.format(layer.company,deptsql,s,e),as_dict=1,debug=0)
     totsal=0
@@ -487,6 +501,10 @@ def get_report(company,batch):
         rear_wages.append(0)
 
         #========================================================================
+
+    #-------------------------------
+    rear_tot_direct.append((direct_material_cost)+float(rear_wages_tot))
+    #-------------------------------
     rearind=frappe.db.get_all('Broiler Indirect Expenses',filters={'company':layer.company},fields=['title','name'])
     if rearind:
         rear_ind_expanse_item=[]
@@ -636,10 +654,33 @@ def get_report(company,batch):
         i+=1
 
     rear_html+='</tr>'
+
+     #---------------------------------------------------
+    rear_html+='<tr class="table-secondary">'
+    i=0
+    for doc in rear_direct:
+        if i==0:
+            rear_html+='<th scope="row">'+str(doc)+'</th>'
+        else:
+            rear_html+='<td class="text-right" colspan="2">'+str(frappe.utils.fmt_money(doc))+'</td>'
+        i+=1
+
+    rear_html+='</tr>'
     #---------------------------------------------------
     rear_html+='<tr>'
     i=0
     for doc in rear_wages:
+        if i==0:
+            rear_html+='<th scope="row">'+str(doc)+'</th>'
+        else:
+            rear_html+='<td class="text-right" colspan="2">'+str(frappe.utils.fmt_money(doc))+'</td>'
+        i+=1
+
+    rear_html+='</tr>'
+     #---------------------------------------------------
+    rear_html+='<tr class="table-secondary">'
+    i=0
+    for doc in rear_tot_direct:
         if i==0:
             rear_html+='<th scope="row">'+str(doc)+'</th>'
         else:
@@ -740,8 +781,13 @@ def get_report(company,batch):
         for man in manuf:
             if man.item_code==cull:
                 rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
-                rear_html+='<tr class="table-secondary"><td>Cull Items</td> <td class="text-right"> Qty</td> <td class="text-right"> Amount</td></tr>'
-                rear_html+='<tr><td>'+str(getitem_name(man.item_code))+'</td><td class="text-right">'+str(man.qty)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(man.amount))+'</td></tr>'
+                rear_html+='<tr class="table-secondary"><td>Mortality / Cull Items</td> <td class="text-right"> Qty</td> <td class="text-right"> Amount</td></tr>'
+                if layer.total_mortaliy > man.qty:
+                    rte=float(man.amount)/float(man.qty)
+                    amt=float(rte)*float(layer.total_mortaliy)
+                    rear_html+='<tr><td>'+str(getitem_name(man.item_code))+'</td><td class="text-right">'+str(layer.total_mortaliy)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(amt))+'</td></tr>'
+                else:
+                    rear_html+='<tr><td>'+str(getitem_name(man.item_code))+'</td><td class="text-right">'+str(man.qty)+'</td><td class="text-right">'+str(frappe.utils.fmt_money(man.amount))+'</td></tr>'
         
     cost=float(col_tot)/(float(production_cnt)+float(layer.current_alive_chicks))
     rear_html+='<tr ><td> &nbsp;</td> <td colspan="2">&nbsp;</td> </tr>'
@@ -754,7 +800,7 @@ def get_report(company,batch):
     
     curdate=getdate(curdate).strftime("%d-%m-%Y")
     
-    msg='Batch : '+str(layer.name)+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: '+str(layer.receiving_date)+' To '+str(curdate)
+    msg='Batch : '+str(layer.name)+'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: '+str(getdate(layer.receiving_date).strftime("%d-%m-%Y"))+' To '+str(curdate)
     return {'rear':rear_html,'budget':budget_html,'rear_graph':rear_graph,'msg':msg}
 
 def getitem_name(item_code):
@@ -907,7 +953,8 @@ def get_frc_graph(batch):
         for we in weight:
             fcr=0
             if we.wk==x:
-                fcr=feed/we.weight
+                if feed and we.weight:
+                    fcr=feed/we.weight
                 rx.update({'act_fcr':flt(fcr,3)})
 
         
