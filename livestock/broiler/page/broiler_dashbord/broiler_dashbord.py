@@ -524,16 +524,16 @@ def get_report(company,batch):
             if exppjt:
                 ind_expanse+=float(exppjt[0].debit)-float(exppjt[0].credit)
 
-            expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
-            if expwpjt:
-                exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
-                if exp != 0:
-                    if wageper:
-                        ind_expanse+=(float(exp)/100)*float(wageper)                
-                    else:
-                        batchcount=frappe.db.sql(""" select count(name) as cnt from `tabLayer Batch` where  status='Open' """,as_dict=1,debug=0)
-                        if batchcount:
-                            ind_expanse+=float(exp)/float(batchcount[0].cnt)
+            #expwpjt=frappe.db.sql(""" select IFNULL(sum(debit_in_account_currency), 0) as debit,IFNULL(sum(credit_in_account_currency), 0) as credit from `tabGL Entry` where is_cancelled!=1 and account in ("{0}") and posting_date between '{1}' and '{2}' and project is NULL """.format(accs,start,end),as_dict=1,debug=0)
+            #if expwpjt:
+            #    exp=float(expwpjt[0].debit)-float(expwpjt[0].credit)
+            #    if exp != 0:
+            #        if wageper:
+            #            ind_expanse+=(float(exp)/100)*float(wageper)                
+            #        else:
+            #            batchcount=frappe.db.sql(""" select count(name) as cnt from `tabLayer Batch` where  status='Open' """,as_dict=1,debug=0)
+            #            if batchcount:
+            #                ind_expanse+=float(exp)/float(batchcount[0].cnt)
 
             rear_ind_expanse_tot+=ind_expanse
             col_tot+=ind_expanse
