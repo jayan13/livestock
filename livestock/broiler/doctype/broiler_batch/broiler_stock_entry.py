@@ -331,12 +331,15 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                 })
 
     if udoc.feed:
-        sfeed=frappe.db.get_list('Feed',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['starter_item as item', 'sum(starter_qty) as qty','starter_uom as uom'],group_by='starter_item')
+        sfeed=frappe.db.sql(""" select item,sum(qty) as qty,uom from ((select finisher_item as item,sum(finisher_qty) as qty,finisher_uom as uom from `tabFeed` where parent='{0}' and `date`<='{1}' group by item) UNION ALL (select starter_item as item,sum(starter_qty) as qty,starter_uom as uom from `tabFeed` where parent='{0}' and `date`<='{1}' group by item)) as feed group by item """.format(batch,transfer_date),as_dict=1,debug=0)
+        #sfeed=frappe.db.get_list('Feed',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['starter_item as item', 'sum(starter_qty) as qty','starter_uom as uom'],group_by='starter_item')
         
         for vc in sfeed:
             if vc.item:
+                
                 pv_item_qty=pv_qty.get(vc.item) or 0
                 itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
+                #frappe.msgprint(str(vc.qty)+'-'+str(pv_item_qty))
                 broiler_item.append('materials', {
                 'materal':vc.item,
                 'used_quantity':itmqty,
@@ -382,56 +385,7 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                                         
                 })
 
-        ffeed=frappe.db.get_list('Feed',filters={'parent': udoc.name,'date':['<=',transfer_date]},fields=['finisher_item as item', 'sum(finisher_qty) as qty','finisher_uom as uom'],group_by='finisher_item')
-
-        for vc in ffeed:
-            if vc.item:
-                pv_item_qty=pv_qty.get(vc.item) or 0
-                itmqty=flt(((vc.qty-pv_item_qty)/cur_live)*int(transfer_qty),2)
-                broiler_item.append('materials', {
-                'materal':vc.item,
-                'used_quantity':itmqty,
-                'batch':batch
-                })
-                item_account_details = get_item_defaults(vc.item, sett.company)
-                stock_uom = item_account_details.stock_uom
-                conversion_factor = get_conversion_factor(vc.item, vc.uom).get("conversion_factor")
-                #frappe.msgprint("conf2"+str(conversion_factor))
-                cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
-                stock_adjustment_account=frappe.db.get_value('Company',sett.company,'stock_adjustment_account')
-                expense_account=stock_adjustment_account or item_account_details.get("expense_account")
-                rate = get_incoming_rate({
-                                "item_code": vc.item,
-                                "warehouse": sett.feed_warehouse,
-                                "posting_date": stock_entry.posting_date,
-                                "posting_time": stock_entry.posting_time,
-                                "qty": -1 * itmqty,
-                                'company':sett.company
-                            })
-                if sett.feed_warehouse:
-                    validate_stock_qty(vc.item,itmqty,sett.feed_warehouse,vc.uom,stock_uom)
-
-                precision = cint(frappe.db.get_default("float_precision")) or 3    
-                amount=flt(itmqty * flt(rate), precision)
-                total_add_cost=total_add_cost+amount
-                stock_entry.append('items', {
-                                's_warehouse': sett.feed_warehouse,
-                                'item_code': vc.item,
-                                'qty': itmqty,
-                                'actual_qty':itmqty,
-                                'uom': vc.uom,
-                                'cost_center':cost_center,					
-                                'ste_detail': item_account_details.name,
-                                'stock_uom': stock_uom,
-                                'expense_account':expense_account,
-                                'valuation_rate': rate,
-                                "basic_rate":rate, 	
-                                "basic_amount":amount,  
-                                "amount":amount,  
-                                "transfer_qty":itmqty,
-                                'conversion_factor': flt(conversion_factor),
-                                        
-                })
+        
 
     if transfer_qty:
 
