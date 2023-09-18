@@ -156,8 +156,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 					ibatch.batch_qty=transfer_qty
 					ibatch.manufacturing_date=posting_date
 					ibatch.stock_uom=stock_uom
-					ibatch.insert()
-		
+					ibatch.insert()	
 		stock_entry.append('items', {
 							't_warehouse': transfer_warehouse or sett.product_target_warehouse,
 							'item_code': sett.finished_product,
@@ -182,7 +181,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
 
 	
-	frappe.throw(str(stock_entry.items))
+
 	#stock_entry.save()
 	stock_entry.insert()
 	stock_entry.docstatus=1
