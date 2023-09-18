@@ -182,7 +182,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
 
 	
-	frappe.throw(str(stock_entry))
+	frappe.throw(str(stock_entry.items))
 	#stock_entry.save()
 	stock_entry.insert()
 	stock_entry.docstatus=1
