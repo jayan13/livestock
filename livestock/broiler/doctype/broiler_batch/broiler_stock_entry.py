@@ -143,8 +143,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
 						"qty": -1 * itmqty,
                         'company':sett.company
 					})
-        if sett.row_material_target_warehouse:
-            validate_stock_qty(sett.base_row_material,itmqty,sett.row_material_target_warehouse,stock_uom,stock_uom)
+        # bin issue
+        #if sett.row_material_target_warehouse:
+        #    validate_stock_qty(sett.base_row_material,itmqty,sett.row_material_target_warehouse,stock_uom,stock_uom)
 
         precision = cint(frappe.db.get_default("float_precision")) or 3    
         amount=flt(itmqty * flt(base_row_rate), precision)
@@ -198,8 +199,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
 						"qty": -1 * itmqty,
                         'company':sett.company
 					})
-                if sett.row_material_target_warehouse:
-                    validate_stock_qty(item.item_code,itmqty,sett.row_material_target_warehouse,item.uom,stock_uom)                
+                # bin issue
+                #if sett.row_material_target_warehouse:
+                #    validate_stock_qty(item.item_code,itmqty,sett.row_material_target_warehouse,item.uom,stock_uom)                
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(itmqty * flt(rate), precision)
@@ -254,8 +256,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                                 "qty": -1 * itmqty,
                                 'company':sett.company
                             })
-                if sett.row_material_target_warehouse:
-                    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+                # bin issue
+                #if sett.row_material_target_warehouse:
+                #    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(itmqty * flt(rate), precision)
@@ -305,8 +308,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                                 "qty": -1 * itmqty,
                                 'company':sett.company
                             })
-                if sett.row_material_target_warehouse:
-                    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
+                # bin issue            
+                #if sett.row_material_target_warehouse:
+                #    validate_stock_qty(vc.item,itmqty,sett.row_material_target_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(itmqty * flt(rate), precision)
@@ -360,8 +364,9 @@ def stock_entry(batch,transfer_qty,transfer_date,transfer_warehouse=''):
                                 "qty": -1 * itmqty,
                                 'company':sett.company
                             })
-                if sett.feed_warehouse:
-                    validate_stock_qty(vc.item,itmqty,sett.feed_warehouse,vc.uom,stock_uom)
+                # bin issue
+                #if sett.feed_warehouse:
+                #    validate_stock_qty(vc.item,itmqty,sett.feed_warehouse,vc.uom,stock_uom)
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(flt(vc.qty) * flt(rate), precision)
