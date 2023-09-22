@@ -51,8 +51,8 @@ def stock_entry(own_packing):
 			            "allow_zero_valuation": '',
 					})
                     
-        if udoc.warehouse:
-            validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
+        #if udoc.warehouse:
+        #    validate_stock_qty(udoc.item,udoc.number_of_chicken,udoc.warehouse,stock_uom,stock_uom)
 
         
 
