@@ -1470,8 +1470,9 @@ def sales_entry(batch,item,transfer_qty,transfer_date):
 	else:
 		base_row_rate=0
 
-	if warehouse:
-		validate_stock_qty(item,transfer_qty,warehouse,stock_uom,stock_uom)
+	# bin issue
+	#if warehouse:
+	#	validate_stock_qty(item,transfer_qty,warehouse,stock_uom,stock_uom)
 
 	precision = cint(frappe.db.get_default("float_precision")) or 3    
 	amount=flt(transfer_qty * flt(base_row_rate), precision)

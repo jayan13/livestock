@@ -50,8 +50,9 @@ def stock_entry(batch):
 						"qty": -1 * udoc.number_received,
                         'company':sett.company
 					})
-        if sett.row_material_target_warehouse:
-            validate_stock_qty(sett.base_row_material,udoc.number_received,sett.row_material_target_warehouse,stock_uom,stock_uom)
+        # bin issue
+        #if sett.row_material_target_warehouse:
+        #    validate_stock_qty(sett.base_row_material,udoc.number_received,sett.row_material_target_warehouse,stock_uom,stock_uom)
 
         precision = cint(frappe.db.get_default("float_precision")) or 3    
         amount=flt(flt(udoc.number_received) * flt(base_row_rate), precision)
@@ -87,9 +88,9 @@ def stock_entry(batch):
                 conversion_factor = get_conversion_factor(item.item_code, item.uom).get("conversion_factor")
                 cost_center=sett.cost_center or udoc.cost_center or item_account_details.get("buying_cost_center")
                 expense_account=sett.expense_account or item_account_details.get("expense_account")                
-                
-                if wareh:
-                    validate_stock_qty(item.item_code,item.qty,wareh,item.uom,stock_uom)                
+                # bin issue
+                #if wareh:
+                #    validate_stock_qty(item.item_code,item.qty,wareh,item.uom,stock_uom)                
 
                 precision = cint(frappe.db.get_default("float_precision")) or 3    
                 amount=flt(flt(item.qty) * flt(item.rate), precision)
