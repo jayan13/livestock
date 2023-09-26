@@ -95,6 +95,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 	stock_entry.posting_date=posting_date
 	stock_entry.posting_time=posting_time
 	stock_entry.set_posting_time='1'
+	transfer_warehouse=transfer_warehouse or sett.product_target_warehouse
 
 	if stock_entry.stock_entry_type == "Repack":
 		if sett.base_row_material:
@@ -158,7 +159,7 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 						ibatch.stock_uom=stock_uom
 						ibatch.insert()	
 			stock_entry.append('items', {
-								't_warehouse': transfer_warehouse or sett.product_target_warehouse,
+								't_warehouse': transfer_warehouse,
 								'item_code': sett.finished_product,
 								'qty': transfer_qty,
 								'actual_qty':transfer_qty,
@@ -180,78 +181,90 @@ def stock_entry(batch,transfer_qty,rooster_qty,transfer_date,transfer_warehouse=
 		else:
 			frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
 
+		stock_entry.insert()
+		stock_entry.docstatus=1
+		stock_entry.save()
 	else:
+		
+		if sett.row_material_target_warehouse!=transfer_warehouse:
 
-		if sett.finished_product:
+			if sett.finished_product:
 
-			base_row_rate = get_incoming_rate({
-							"item_code": sett.base_row_material,
-							"warehouse": sett.row_material_target_warehouse,
-							"posting_date": posting_date,
-							"posting_time": posting_time,
-							"qty": -1 * transfer_qty,
-							'company':sett.company
-						})
-						
-			item_account_details = get_item_defaults(sett.finished_product, sett.company)
-			stock_uom = item_account_details.stock_uom
-			conversion_factor = get_conversion_factor(sett.finished_product, stock_uom).get("conversion_factor")
-			cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
-			expense_account=sett.expense_account or item_account_details.get("expense_account")                                
-			precision = cint(frappe.db.get_default("float_precision")) or 3		
-			amount=flt(int(transfer_qty) * flt(base_row_rate), precision)
-			
-			if item_account_details.has_batch_no:
-				if not batch_no:
-					manufacture_date=posting_date.strftime("%d-%m-%Y")
-					batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
-					if not frappe.db.exists("Batch", {"name": batch_no}):
-						ibatch = frappe.new_doc("Batch")
-						ibatch.batch_id=batch_no
-						ibatch.item=sett.finished_product
-						ibatch.item_name=item_account_details.name
-						ibatch.batch_qty=transfer_qty
-						ibatch.manufacturing_date=posting_date
-						ibatch.stock_uom=stock_uom
-						ibatch.insert()	
-			stock_entry.append('items', {
-								's_warehouse': sett.row_material_target_warehouse,
-								't_warehouse': transfer_warehouse or sett.product_target_warehouse,
-								'item_code': sett.finished_product,
-								'qty': transfer_qty,
-								'actual_qty':transfer_qty,
-								'uom': stock_uom,
-								'cost_center':cost_center,					
-								'ste_detail': item_account_details.name,
-								'stock_uom': stock_uom,
-								'expense_account':expense_account,
-								'valuation_rate': base_row_rate,
-								"basic_rate":base_row_rate, 	
-								"basic_amount":amount,  
-								"amount":amount,  
-								"transfer_qty":transfer_qty,
-								'conversion_factor': flt(conversion_factor),
-								'batch_no':batch_no,
-								
+				base_row_rate = get_incoming_rate({
+								"item_code": sett.base_row_material,
+								"warehouse": sett.row_material_target_warehouse,
+								"posting_date": posting_date,
+								"posting_time": posting_time,
+								"qty": -1 * transfer_qty,
+								'company':sett.company
+							})
 							
-			})
-		else:
-			frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
+				item_account_details = get_item_defaults(sett.finished_product, sett.company)
+				stock_uom = item_account_details.stock_uom
+				conversion_factor = get_conversion_factor(sett.finished_product, stock_uom).get("conversion_factor")
+				cost_center=sett.cost_center or lbatch.cost_center or item_account_details.get("buying_cost_center")
+				expense_account=sett.expense_account or item_account_details.get("expense_account")                                
+				precision = cint(frappe.db.get_default("float_precision")) or 3		
+				amount=flt(int(transfer_qty) * flt(base_row_rate), precision)
+				
+				if item_account_details.has_batch_no:
+					if not batch_no:
+						manufacture_date=posting_date.strftime("%d-%m-%Y")
+						batch_no='LY'+'-'+str(manufacture_date)+'-'+str(batch) 
+						if not frappe.db.exists("Batch", {"name": batch_no}):
+							ibatch = frappe.new_doc("Batch")
+							ibatch.batch_id=batch_no
+							ibatch.item=sett.finished_product
+							ibatch.item_name=item_account_details.name
+							ibatch.batch_qty=transfer_qty
+							ibatch.manufacturing_date=posting_date
+							ibatch.stock_uom=stock_uom
+							ibatch.insert()	
+				stock_entry.append('items', {
+									's_warehouse': sett.row_material_target_warehouse,
+									't_warehouse': transfer_warehouse,
+									'item_code': sett.finished_product,
+									'qty': transfer_qty,
+									'actual_qty':transfer_qty,
+									'uom': stock_uom,
+									'cost_center':cost_center,					
+									'ste_detail': item_account_details.name,
+									'stock_uom': stock_uom,
+									'expense_account':expense_account,
+									'valuation_rate': base_row_rate,
+									"basic_rate":base_row_rate, 	
+									"basic_amount":amount,  
+									"amount":amount,  
+									"transfer_qty":transfer_qty,
+									'conversion_factor': flt(conversion_factor),
+									'batch_no':batch_no,
+									
+								
+				})
+			else:
+				frappe.throw(_("Please set Finished Item in Layer Shed settings for {0} ").format(sett.company))
+
+			stock_entry.insert()
+			stock_entry.docstatus=1
+			stock_entry.save()
 
 	#stock_entry.save()
-	stock_entry.insert()
-	stock_entry.docstatus=1
-	stock_entry.save()
+	#stock_entry.insert()
+	#stock_entry.docstatus=1
+	#stock_entry.save()
 
 	lbatch.rooster_qty=rooster_qty
 	lbatch.item_processed=1
 	lbatch.layer_status='Laying'
 	lbatch.flock_transfer_date=posting_date
 	lbatch.save()
-	
-	url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
-	frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
-	return stock_entry.as_dict()
+	if stock_entry.stock_entry_type == "Material Transfer" and sett.row_material_target_warehouse==transfer_warehouse:
+		frappe.msgprint('Layer Batch Status Changed to laying')
+		return 'Batch Updated'
+	else:
+		url=frappe.utils.get_url_to_form('Stock Entry', stock_entry.name)
+		frappe.msgprint('Stock Entry <a href="'+str(url)+'"  target="_blank" > '+str(stock_entry.name)+'</a> created')
+		return 'Batch Updated'
 
 def create_stock_entry_mortality(item,parent_field=''):
 	lbatch=frappe.get_doc('Layer Batch',item.parent)
