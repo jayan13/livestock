@@ -25,6 +25,17 @@
   "description": null,
   "docstatus": 0,
   "doctype": "Project Type",
+  "modified": "2021-11-14 10:34:06.053420",
+  "name": "Other",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "project_type": "Other"
+ },
+ {
+  "description": null,
+  "docstatus": 0,
+  "doctype": "Project Type",
   "modified": "2022-05-31 08:48:26.379254",
   "name": "Slaughter",
   "parent": null,
@@ -69,11 +80,11 @@
   "description": null,
   "docstatus": 0,
   "doctype": "Project Type",
-  "modified": "2021-11-14 10:34:06.053420",
-  "name": "Other",
+  "modified": "2023-01-19 09:07:21.229382",
+  "name": "LAYER",
   "parent": null,
   "parentfield": null,
   "parenttype": null,
-  "project_type": "Other"
+  "project_type": "LAYER"
  }
 ]
