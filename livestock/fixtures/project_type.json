@@ -3,39 +3,6 @@
   "description": null,
   "docstatus": 0,
   "doctype": "Project Type",
-  "modified": "2021-11-14 10:34:06.033681",
-  "name": "Internal",
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "project_type": "Internal"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Project Type",
-  "modified": "2021-11-14 10:34:06.045990",
-  "name": "External",
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "project_type": "External"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Project Type",
-  "modified": "2021-11-14 10:34:06.053420",
-  "name": "Other",
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "project_type": "Other"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Project Type",
   "modified": "2022-05-31 08:48:26.379254",
   "name": "Slaughter",
   "parent": null,
@@ -64,17 +31,6 @@
   "parentfield": null,
   "parenttype": null,
   "project_type": " Hatchery"
- },
- {
-  "description": null,
-  "docstatus": 0,
-  "doctype": "Project Type",
-  "modified": "2022-09-02 12:58:43.227604",
-  "name": "Property Maintenance",
-  "parent": null,
-  "parentfield": null,
-  "parenttype": null,
-  "project_type": "Property Maintenance"
  },
  {
   "description": null,

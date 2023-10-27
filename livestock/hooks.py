@@ -229,6 +229,12 @@ fixtures = [
 		"daily-eggs-report",
 		"daily-eggs-loading-a"
 		)] ] },
+	{ "doctype": "Project Type", "filters": [ ["name", "in", ( 
+		"LAYER",
+		"Broiler",
+		"Slaughter",
+		"Hatchery",
+		)] ] },
 	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form","Chicken Own Packing-Form","Chicken Co Packing-Form" )] ] },
 
 ]
