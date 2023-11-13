@@ -88,7 +88,8 @@ app_license = "MIT"
 # Override standard doctype classes
 
 override_doctype_class = {
-	'Project':'livestock.override.HatcheryProject'
+	'Project':'livestock.override.HatcheryProject',
+	"Stock Entry": "livestock.overrides.stock_entry.CustomStockEntry",
  }
 
 # Document Events
@@ -104,6 +105,7 @@ override_doctype_class = {
 # }  after_insert
 doc_events = {
     "Stock Entry": {
+		#"validate":"livestock.overrides.stock_entry.CustomStockEntry.validate",
         "on_submit": [
 			"livestock.slaughtering.doctype.chicken_own_packing.own_packing_stock_entry.update_item_stat",
 			"livestock.hatchery.doctype.hatchery_batch.hatchery_stock_entry.update_item_stat",
@@ -205,6 +207,7 @@ fixtures = [
 					"Stock Entry-own_repack",
 					"Stock Entry-manufacturing_type",
 					"Stock Entry-stock_entry_type_option",
+					"Stock Entry-total_items_qty"
                     
                 ),
             ]
@@ -229,13 +232,7 @@ fixtures = [
 		"daily-eggs-report",
 		"daily-eggs-loading-a"
 		)] ] },
-	{ "doctype": "Project Type", "filters": [ ["name", "in", ( 
-		"LAYER",
-		"Broiler",
-		"Slaughter",
-		"Hatchery",
-		)] ] },
-	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form","Chicken Own Packing-Form","Chicken Co Packing-Form" )] ] },
+	{ "doctype": "Client Script", "filters": [ ["name", "in", ( "Project-Form","Chicken Own Packing-Form","Chicken Co Packing-Form","Stock Entry-Form" )] ] },
 
 ]
 # before_tests = "livestock.install.before_tests"
